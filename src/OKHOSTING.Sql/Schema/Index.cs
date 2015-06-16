@@ -15,5 +15,10 @@ namespace OKHOSTING.Sql.Schema
 		public List<Column> Columns { get; set; }
 		public SortDirection Direction { get; set; }
 		public bool Unique { get; set; }
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

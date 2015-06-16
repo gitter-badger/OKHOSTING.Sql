@@ -125,7 +125,8 @@ namespace OKHOSTING.Sql
 					CommandParameter param = CreateCommandParameter(cv);
 
 					columnsList += EncloseName(cv.Column.Name) + ", ";
-					valuesList += "@" + param.Name + ", ";
+					valuesList += param.Name + ", ";
+					command.Parameters.Add(param);
 				}
 			}
 
@@ -197,7 +198,7 @@ namespace OKHOSTING.Sql
 				//Building the sql sentence...
 				command.Script += 
 					EncloseName(value.Column.Name) + 
-					" = @" + param.Name +
+					" = " + param.Name +
 					", ";
 
 			}
@@ -513,7 +514,7 @@ namespace OKHOSTING.Sql
 			command.Script =
 				EqualityComparison(
 				ColumnFullName(filter.Column),
-				"@" + param.Name,
+				param.Name,
 				CompareOperator.Like);
 
 			return command;
@@ -546,13 +547,13 @@ namespace OKHOSTING.Sql
 					EqualityComparison
 					(
 						ColumnFullName(filter.Column),
-						"@" + minParam.Name,
+						minParam.Name,
 						CompareOperator.GreaterThanEqual
 					),
 					EqualityComparison
 					(
 						ColumnFullName(filter.Column),
-						"@" + maxParam.Name,
+						maxParam.Name,
 						CompareOperator.LessThanEqual
 					),
 					LogicalOperator.And,
@@ -576,7 +577,7 @@ namespace OKHOSTING.Sql
 				EqualityComparison
 				(
 					ColumnFullName(filter.Column),
-					"@" + param.Name,
+					param.Name,
 					filter.Operator
 				);
 
@@ -762,7 +763,7 @@ namespace OKHOSTING.Sql
 				IComparable item = valuesList[i];
 				string paramName = randomPrefix + "_" + i;
 
-				command.Script += "@" + paramName + ", ";
+				command.Script += paramName + ", ";
 				command.Parameters.Add(new CommandParameter() { Name = paramName, DbType = DataBase.Parse(item.GetType()), Value = item });
 			}
 
@@ -1318,7 +1319,7 @@ namespace OKHOSTING.Sql
 
 		protected CommandParameter CreateCommandParameter(ColumnValue cv)
 		{
-			return CreateCommandParameter(cv.Value, cv.Column.DbType, ParameterDirection.Input, null);
+			return CreateCommandParameter(cv.Value, cv.Column.DbType, ParameterDirection.Input, "@" + cv.Column.Name + Random.Next().ToString());
 		}
 
 		protected CommandParameter CreateCommandParameter(object value)

@@ -16,16 +16,17 @@ namespace OKHOSTING.Sql.Schema
 			DataBase = nativeDatabase;
 		}
 
-		public readonly DataBase DataBase;
-		public readonly List<Table> Tables = new List<Table>();
-		public readonly List<View> Views = new List<View>();
-		public readonly List<User> Users = new List<User>();
+		public DataBase DataBase;
+		public List<Table> Tables = new List<Table>();
+		public List<View> Views = new List<View>();
+		public List<User> Users = new List<User>();
 
 		public Table this[string name]
 		{
 			get
 			{
-				return Tables.Where(c => c.Name == name).Single();
+				name = name.ToLower();
+				return Tables.Where(c => c.Name.ToLower() == name).Single();
 			}
 		}
 
@@ -82,6 +83,7 @@ namespace OKHOSTING.Sql.Schema
 				catch { }
 
 				schemaReader = dbReader.DatabaseSchema;
+				dbReader.
 			}
 
 			AutoMapper.Mapper.CreateMap<DatabaseSchema, DataBaseSchema>()

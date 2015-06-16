@@ -46,5 +46,10 @@ namespace OKHOSTING.Sql.Schema
 		/// Action on delete
 		/// </summary>
 		public ConstraintAction DeleteAction { get; set; }
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

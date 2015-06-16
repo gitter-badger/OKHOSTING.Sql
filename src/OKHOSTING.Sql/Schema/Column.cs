@@ -169,5 +169,10 @@ namespace OKHOSTING.Sql.Schema
 		{
 			return Name.GetHashCode() * Table.GetHashCode();
 		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

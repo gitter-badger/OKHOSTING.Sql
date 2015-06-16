@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKHOSTING.Sql.Tests", "OKHOSTING.Sql.Tests\OKHOSTING.Sql.Tests.csproj", "{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseSchemaReader", "..\src\dbschemareader\DatabaseSchemaReader\DatabaseSchemaReader.csproj", "{AA652F8E-0B96-484C-A146-C4183E4A0A25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKHOSTING.Sql", "..\src\OKHOSTING.Sql\OKHOSTING.Sql.csproj", "{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKHOSTING.Sql.MySql", "..\src\OKHOSTING.Sql.MySql\OKHOSTING.Sql.MySql.csproj", "{0A304A16-0F65-4CE6-A878-41263293021C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OKHOSTING.Sql.SQLite", "..\src\OKHOSTING.Sql.SQLite\OKHOSTING.Sql.SQLite.csproj", "{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Net4|Any CPU = Net4|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Net4|Any CPU.ActiveCfg = Release|Any CPU
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Net4|Any CPU.Build.0 = Release|Any CPU
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Net4|Any CPU.ActiveCfg = Net4|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Net4|Any CPU.Build.0 = Net4|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA652F8E-0B96-484C-A146-C4183E4A0A25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Net4|Any CPU.ActiveCfg = Release|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Net4|Any CPU.Build.0 = Release|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Net4|Any CPU.ActiveCfg = Release|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Net4|Any CPU.Build.0 = Release|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A304A16-0F65-4CE6-A878-41263293021C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Net4|Any CPU.ActiveCfg = Release|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Net4|Any CPU.Build.0 = Release|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4A97070-C6CA-4304-B6C1-3DE5E7BFB5FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -32,7 +32,8 @@ namespace OKHOSTING.Sql.Schema
 		{
 			get
 			{
-				return Columns.Where(c => c.Name == name).Single();
+				name = name.ToLower();
+				return Columns.Where(c => c.Name.ToLower() == name).Single();
 			}
 		}
 
@@ -44,11 +45,11 @@ namespace OKHOSTING.Sql.Schema
 			}
 		}
 
-		public readonly List<Column> Columns = new List<Column>();
-		public readonly List<ForeignKey> ForeignKeys = new List<ForeignKey>();
-		public readonly List<CheckConstraint> CheckConstraints = new List<CheckConstraint>();
-		public readonly List<Index> Indexes = new List<Index>();
-		public readonly List<Trigger> Triggers = new List<Trigger>();
+		public List<Column> Columns = new List<Column>();
+		public List<ForeignKey> ForeignKeys = new List<ForeignKey>();
+		public List<CheckConstraint> CheckConstraints = new List<CheckConstraint>();
+		public List<Index> Indexes = new List<Index>();
+		public List<Trigger> Triggers = new List<Trigger>();
 		
 		/// <summary>
 		/// Gets a value indicating whether this table has an autonumber column (identity or equivalent).
@@ -88,6 +89,12 @@ namespace OKHOSTING.Sql.Schema
 		public override int GetHashCode()
 		{
 			return Name.GetHashCode();
+		}
+
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }
