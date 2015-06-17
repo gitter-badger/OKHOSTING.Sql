@@ -12,11 +12,11 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class Select
 	{
-		public IEnumerable<Column> Columns { get; set; }
 		public Table From { get; set; }
-		public IEnumerable<SelectJoin> Joins { get; set; }
-		public IEnumerable<Filters.FilterBase> Where { get; set; }
-		public IEnumerable<OrderBy> OrderBy { get; set; }
 		public SelectLimit Limit { get; set; }
+		public readonly List<Column> Columns = new List<Column>();
+		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
+		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
+		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
 	}
 }

@@ -14,6 +14,6 @@ namespace OKHOSTING.Sql.Operations
 	{
 		public Table Table { get; set; }
 		public SelectJoinType Type { get; set; }
-		public IEnumerable<Filters.FilterBase> On { get; set; }
+		public readonly List<Filters.FilterBase> On = new List<Filters.FilterBase>();
 	}
 }

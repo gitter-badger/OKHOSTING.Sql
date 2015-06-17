@@ -37,6 +37,7 @@ namespace OKHOSTING.Sql
 			ConnectionString = connectionString;
 			ProviderFactory = providerFactory;
 			Connection = providerFactory.CreateConnection();
+			Connection.ConnectionString = connectionString;
 		}
 
 		/// <summary>
@@ -163,6 +164,9 @@ namespace OKHOSTING.Sql
 							//Executing command and getting the number of affected rows
 							rowsAffected = dbCommand.ExecuteNonQuery();
 						}
+
+						//clear parameters
+						dbCommand.Parameters.Clear();
 
 						//calling events
 						e.Result = rowsAffected;

@@ -83,7 +83,6 @@ namespace OKHOSTING.Sql.Schema
 				catch { }
 
 				schemaReader = dbReader.DatabaseSchema;
-				dbReader.
 			}
 
 			AutoMapper.Mapper.CreateMap<DatabaseSchema, DataBaseSchema>()

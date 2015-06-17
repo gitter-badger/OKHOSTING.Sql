@@ -10,7 +10,7 @@ namespace OKHOSTING.Sql.Operations
 	public class Update
 	{
 		public Table From { get; set; }
-		public IEnumerable<ColumnValue> Set { get; set; }
-		public IEnumerable<Filters.FilterBase> Where { get; set; }
+		public readonly List<ColumnValue> Set = new List<ColumnValue>();
+		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 	}
 }

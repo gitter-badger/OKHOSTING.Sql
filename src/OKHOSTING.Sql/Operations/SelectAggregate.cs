@@ -12,7 +12,7 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class SelectAggregate: Select
 	{
-		public IEnumerable<SelectAggregateColumn> AggregateColumns { get; set; }
-		public IEnumerable<Column> GroupBy { get; set; }
+		public readonly List<SelectAggregateColumn> AggregateColumns = new List<SelectAggregateColumn>();
+		public readonly List<Column> GroupBy = new List<Column>();
 	}
 }

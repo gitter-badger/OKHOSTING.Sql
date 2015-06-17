@@ -10,6 +10,6 @@ namespace OKHOSTING.Sql.Operations
 	public class Insert
 	{
 		public Table Into { get; set; }
-		public IEnumerable<ColumnValue> Values { get; set; }
+		public readonly List<ColumnValue> Values = new List<ColumnValue>();
 	}
 }

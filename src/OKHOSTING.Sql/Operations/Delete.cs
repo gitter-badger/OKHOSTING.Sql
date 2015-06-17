@@ -10,6 +10,6 @@ namespace OKHOSTING.Sql.Operations
 	public class Delete
 	{
 		public Table From { get; set; }
-		public IEnumerable<Filters.FilterBase> Where { get; set; }
+		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 	}
 }
