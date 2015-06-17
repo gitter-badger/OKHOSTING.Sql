@@ -6,7 +6,8 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.config
+[Aa]pp.config
+[Ww]eb.config
 
 # Build results
 [Dd]ebug/
