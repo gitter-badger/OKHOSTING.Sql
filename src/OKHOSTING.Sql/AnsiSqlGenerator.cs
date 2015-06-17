@@ -602,6 +602,7 @@ namespace OKHOSTING.Sql
 				var c = Filter(f);
 
 				command.Append(c);
+				command.Script += Operator(logicalOperator);
 			}
 
 			//Removing last logic operator

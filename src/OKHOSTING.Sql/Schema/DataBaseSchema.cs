@@ -17,9 +17,9 @@ namespace OKHOSTING.Sql.Schema
 		}
 
 		public DataBase DataBase;
-		public List<Table> Tables = new List<Table>();
-		public List<View> Views = new List<View>();
-		public List<User> Users = new List<User>();
+		public readonly List<Table> Tables = new List<Table>();
+		public readonly List<View> Views = new List<View>();
+		public readonly List<User> Users = new List<User>();
 
 		public Table this[string name]
 		{
@@ -30,7 +30,7 @@ namespace OKHOSTING.Sql.Schema
 			}
 		}
 
-		private ConstraintAction Parse(string action)
+		private ConstraintAction ParseConstraintAction(string action)
 		{
 			switch (action)
 			{
@@ -85,94 +85,132 @@ namespace OKHOSTING.Sql.Schema
 				schemaReader = dbReader.DatabaseSchema;
 			}
 
-			AutoMapper.Mapper.CreateMap<DatabaseSchema, DataBaseSchema>()
-				.ForMember(sdb => sdb.DataBase, a => a.Ignore());
-
-			AutoMapper.Mapper.CreateMap<DatabaseTable, Table>()
-				.ForMember(t => t.DataBase, a => a.UseValue(schema))
-				.ForMember(t => t.PrimaryKey, a => a.Ignore())
-				.ForMember(t => t.IdentityIncrement, a => a.MapFrom(s => s.PrimaryKeyColumn.IdentityDefinition.IdentityIncrement))
-				.ForMember(t => t.IdentitySeed, a => a.MapFrom(s => s.PrimaryKeyColumn.IdentityDefinition.IdentitySeed));
-
-			AutoMapper.Mapper.CreateMap<DatabaseColumn, Column>()
-				.ForMember(c => c.DbType, a => a.MapFrom(dbc => DataBase.Parse(dbc.DataType.GetNetType()))) //estaba comentado?
-				.ForMember(c => c.Table, a => a.MapFrom(dbc => dbc.Table))
-				.ForMember(c => c.IsNullable, a => a.MapFrom(dbc => dbc.Nullable));
-
-			AutoMapper.Mapper.CreateMap<DatabaseIndex, Index>()
-				.ForMember(i => i.Table, a => a.MapFrom(dbi => schemaReader.FindTableByName(dbi.TableName)))
-				.ForMember(i => i.Direction, a => a.UseValue<SortDirection>(SortDirection.Ascending))
-				.ForMember(i => i.Unique, a => a.MapFrom(dbi => dbi.IsUnique));
-
-			AutoMapper.Mapper.CreateMap<DatabaseTrigger, Trigger>()
-				.ForMember(i => i.Table, a => a.MapFrom(dbt => schemaReader.FindTableByName(dbt.TableName)));
-
-			AutoMapper.Mapper.CreateMap<DatabaseConstraint, ForeignKey>()
-				.ForMember(fk => fk.Table, a => a.MapFrom(dbc => schemaReader.FindTableByName(dbc.TableName)))
-				.ForMember(fk => fk.RemoteTable, a => a.MapFrom(dbc => schemaReader.FindTableByName(dbc.RefersToTable)))
-				.ForMember(fk => fk.UpdateAction, a => a.MapFrom(dbc => schema.Parse(dbc.UpdateRule)))
-				.ForMember(fk => fk.DeleteAction, a => a.MapFrom(dbc => schema.Parse(dbc.DeleteRule)))
-				.ForMember(fk => fk.Columns, a => a.Ignore());
-
-			AutoMapper.Mapper.CreateMap<DatabaseConstraint, CheckConstraint>()
-				.ForMember(cc => cc.Table, a => a.MapFrom(dcc => schemaReader.FindTableByName(dcc.TableName)));
-
-			AutoMapper.Mapper.CreateMap<DatabaseView, View>()
-				.ForMember(i => i.DataBase, a => a.UseValue<DataBaseSchema>(schema))
-				.ForMember(i => i.Command, a => a.MapFrom(dbv => dbv.Sql));
-
-			AutoMapper.Mapper.CreateMap<DatabaseUser, User>()
-				.ForMember(u => u.DataBase, a => a.UseValue(schema));
-
-			AutoMapper.Mapper.AssertConfigurationIsValid();
-
-			AutoMapper.Mapper.Map<DatabaseSchema, DataBaseSchema>(schemaReader, schema);
-
-			//fix foreign keys local and foreign tables manually since they fail
-			foreach (Table t in schema.Tables)
+			foreach (DatabaseTable dbt in schemaReader.Tables)
 			{
-				foreach (Column c in t.Columns)
+				dbt.PrimaryKeyColumn.AddIdentity();
+
+				var table = new Table()
 				{
-					c.Table = t;
+					Name = dbt.Name,
+					DataBase = schema,
+					IdentityIncrement = dbt.PrimaryKeyColumn.IdentityDefinition.IdentityIncrement,
+					IdentitySeed = dbt.PrimaryKeyColumn.IdentityDefinition.IdentitySeed,
+				};
+
+				schema.Tables.Add(table);
+			}
+
+			foreach (DatabaseTable dbt in schemaReader.Tables)
+			{
+				var table = schema[dbt.Name];
+
+				foreach (DatabaseColumn dbc in dbt.Columns)
+				{
+					table.Columns.Add(new Column()
+					{
+						Name = dbc.Name,
+						//DbType = DataBase.Parse(dbc.DataType.GetNetType()),
+						Table = table,
+						Description = dbc.Description,
+						IsNullable = dbc.Nullable,
+						IsAutoNumber = dbc.IsAutoNumber,
+						ComputedDefinition = dbc.ComputedDefinition,
+						DefaultValue = dbc.DefaultValue,
+						IsPrimaryKey = dbc.IsPrimaryKey,
+						Length = dbc.Length,
+						Ordinal = dbc.Ordinal,
+						Precision = dbc.Precision,
+						Scale = dbc.Scale,
+					});
 				}
 
-				foreach (ForeignKey c in t.ForeignKeys)
+				foreach (DatabaseIndex dbi in dbt.Indexes)
 				{
-					c.Table = t;
+					Index index = new Index()
+					{
+						Name = dbi.Name,
+						Table = table,
+						Direction = SortDirection.Ascending,
+						Unique = dbi.IsUnique,
+					};
+
+					foreach (DatabaseColumn dbc in dbi.Columns)
+					{
+						index.Columns.Add(table[dbc.Name]);
+					}
+					
+					table.Indexes.Add(index);
 				}
 
-				foreach (CheckConstraint c in t.CheckConstraints)
+				foreach (DatabaseTrigger dbtr in dbt.Triggers)
 				{
-					c.Table = t;
+					DataBaseOperation operation = DataBaseOperation.Insert;
+					Enum.TryParse<DataBaseOperation>(dbtr.TriggerEvent, true, out operation);
+
+					Trigger trigger = new Trigger()
+					{
+						TriggerBody = dbtr.TriggerBody,
+						TriggerEvent = operation,
+						Table = table,
+					};
+
+					table.Triggers.Add(trigger);
 				}
 
-				foreach (Index c in t.Indexes)
+				foreach (DatabaseConstraint dbcons in dbt.CheckConstraints)
 				{
-					c.Table = t;
-				}
+					if (dbcons.ConstraintType == ConstraintType.Check)
+					{
+						CheckConstraint constraint = new CheckConstraint()
+						{
+							Expression = dbcons.Expression,
+							Table = table,
+						};
+						
+						table.CheckConstraints.Add(constraint);
+					}
+					else if (dbcons.ConstraintType == ConstraintType.ForeignKey)
+					{
+						ForeignKey foreignKey = new ForeignKey()
+						{
+							Name= dbcons.Name,
+							DeleteAction = schema.ParseConstraintAction(dbcons.DeleteRule),
+							UpdateAction =schema.ParseConstraintAction(dbcons.UpdateRule),
+							RemoteTable = schema[dbcons.RefersToTable],
+							Table = table,
+						};
 
-				foreach (Trigger c in t.Triggers)
-				{
-					c.Table = t;
+						var referencedColumns = dbcons.ReferencedColumns(schemaReader).ToArray();
+						for (int i = 0; i < dbcons.Columns.Count; i++)
+						{
+							foreignKey.Columns.Add(new Tuple<Column,Column>(table[dbcons.Columns[i]], foreignKey.RemoteTable[referencedColumns[i]]));
+						}
+					}
 				}
 			}
 
-			foreach (DatabaseTable t1 in schemaReader.Tables)
+			foreach (DatabaseView dbv in schemaReader.Views)
 			{
-				Table t2 = (from t in schema.Tables where t.Name == t1.Name select t).Single();
-
-				foreach (DatabaseConstraint nativeFK in t1.ForeignKeys)
+				View view = new View()
 				{
-					ForeignKey foreignKey = (from fk in t2.ForeignKeys where fk.Name == nativeFK.Name select fk).Single();
+					Name = dbv.Name,
+					Command = dbv.Sql,
+					Description = dbv.Description,
+					DataBase = schema,
+				};
 
-					for (int i = 0; i < nativeFK.Columns.Count; i++)
-					{
-						Column localColumn = (from c in foreignKey.Table.Columns where c.Name == nativeFK.Columns[i] select c).Single();
-						Column foreignColumn = (from c in foreignKey.RemoteTable.Columns where c.Name == nativeFK.ReferencedColumns(schemaReader).ToArray()[i] select c).Single();
+				schema.Views.Add(view);
+			}
 
-						foreignKey.Columns.Add(new Tuple<Column,Column>(localColumn, foreignColumn));
-					}
-				}
+			foreach (DatabaseUser dbu in schemaReader.Users)
+			{
+				User user = new User()
+				{
+					Name = dbu.Name,
+					DataBase = schema,
+				};
+
+				schema.Users.Add(user);
 			}
 
 			return schema;

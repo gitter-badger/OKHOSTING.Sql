@@ -25,7 +25,7 @@ namespace OKHOSTING.Sql.Tests
 		}
 
 		[Test]
-		public void RunInsert()
+		public void InsertSelectUpdate()
 		{
 			DataBase db = Connect();
 			var schema = db.Schema;

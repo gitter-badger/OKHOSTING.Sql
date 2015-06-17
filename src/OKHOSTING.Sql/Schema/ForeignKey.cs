@@ -14,7 +14,6 @@ namespace OKHOSTING.Sql.Schema
 	{
 		public ForeignKey()
 		{
-			Columns = new List<Tuple<Column, Column>>();
 		}
 
 		/// <summary>
@@ -33,11 +32,6 @@ namespace OKHOSTING.Sql.Schema
 		public Table RemoteTable { get; set; }
 
 		/// <summary>
-		/// The list of local and remote columns, linked in a tuple
-		/// </summary>
-		public List<Tuple<Column, Column>> Columns { get; set; }
-
-		/// <summary>
 		/// Action on update
 		/// </summary>
 		public ConstraintAction UpdateAction { get; set; }
@@ -46,6 +40,11 @@ namespace OKHOSTING.Sql.Schema
 		/// Action on delete
 		/// </summary>
 		public ConstraintAction DeleteAction { get; set; }
+
+		/// <summary>
+		/// The list of local and remote columns, linked in a tuple
+		/// </summary>
+		public readonly List<Tuple<Column, Column>> Columns = new List<Tuple<Column, Column>>();
 
 		public override string ToString()
 		{

@@ -12,9 +12,9 @@ namespace OKHOSTING.Sql.Schema
 	{
 		public string Name { get; set; }
 		public Table Table { get; set; }
-		public List<Column> Columns { get; set; }
 		public SortDirection Direction { get; set; }
 		public bool Unique { get; set; }
+		public readonly List<Column> Columns = new List<Column>();
 
 		public override string ToString()
 		{

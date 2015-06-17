@@ -88,7 +88,7 @@ namespace OKHOSTING.Sql
 		
 		public void CreateRandomName()
 		{
-			Name = DbType + Random.Next().ToString();
+			Name = "@" + DbType + Random.Next().ToString();
 		}
 	}
 }
