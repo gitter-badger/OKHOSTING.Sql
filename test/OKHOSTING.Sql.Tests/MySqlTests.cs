@@ -66,5 +66,28 @@ namespace OKHOSTING.Sql.Tests
 
 			Assert.AreEqual(affectedRows, 1);
 		}
+
+		public void CreateTable()
+		{
+			DataBase db = Connect();
+			MySql.SqlGenerator generator = new MySql.SqlGenerator();
+
+			Table table = new Table("pruebas");
+
+			table.Columns.Add(new Column() { Name = "Id", DbType = System.Data.DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true });
+			table.Columns.Add(new Column() { Name = "Nombre", DbType = System.Data.DbType.AnsiString, Length = 100, IsNullable = false });
+			table.Indexes.Add(new Index() { Name = "IX_Nombre", Unique = true, Table = table });
+			table.Indexes[0].Columns.Add(table["Nombre"]);
+
+			var sql = generator.Create(table);
+			db.Execute(sql);
+
+			sql = generator.Create(table.Indexes[0]);
+			db.Execute(sql);
+
+			sql = generator.Drop(table);
+			db.Execute(sql);
+		}
+
 	}
 }
