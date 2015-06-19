@@ -10,7 +10,7 @@ namespace OKHOSTING.Sql.MySql
 	/// <summary>
 	/// Generator of Sql sequences for MySql RDMS
 	/// </summary>
-	public class SqlGenerator: AnsiSqlGenerator
+	public class SqlGenerator: SqlGeneratorBase
 	{
 
 		/// <summary>

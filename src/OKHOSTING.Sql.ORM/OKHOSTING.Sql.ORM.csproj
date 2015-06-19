@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=1.40.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OKHOSTING.Core">
       <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
     </Reference>
@@ -42,13 +46,103 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataBase.cs" />
+    <Compile Include="Filters\AndFilter.cs" />
+    <Compile Include="Filters\CompareFilter.cs" />
+    <Compile Include="Filters\CustomFilter.cs" />
+    <Compile Include="Filters\FilterBase.cs" />
+    <Compile Include="Filters\FilterCollection.cs" />
+    <Compile Include="Filters\FilterEventArgs.cs" />
+    <Compile Include="Filters\FilterEventHandler.cs" />
+    <Compile Include="Filters\ForeignKeyFilter.cs" />
+    <Compile Include="Filters\InFilter.cs" />
+    <Compile Include="Filters\LikeFilter.cs" />
+    <Compile Include="Filters\LogicalOperatorFilter.cs" />
+    <Compile Include="Filters\MemberCompareFilter.cs" />
+    <Compile Include="Filters\MemberFilter.cs" />
+    <Compile Include="Filters\OrFilter.cs" />
+    <Compile Include="Filters\PrimaryKeyFilter.cs" />
+    <Compile Include="Filters\RangeFilter.cs" />
+    <Compile Include="Filters\ValueCompareFilter.cs" />
+    <Compile Include="MemberMap.cs" />
+    <Compile Include="Operations\MemberValue.cs" />
+    <Compile Include="Operations\Delete.cs" />
+    <Compile Include="Operations\Insert.cs" />
+    <Compile Include="Operations\OrderBy.cs" />
+    <Compile Include="Operations\Select.cs" />
+    <Compile Include="Operations\SelectAggregate.cs" />
+    <Compile Include="Operations\SelectAggregateColumn.cs" />
+    <Compile Include="Operations\SelectAggregateFunction.cs" />
+    <Compile Include="Operations\SelectJoin.cs" />
+    <Compile Include="Operations\SelectJoinType.cs" />
+    <Compile Include="Operations\SelectLimit.cs" />
+    <Compile Include="Operations\Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TypeMap.cs" />
+    <Compile Include="Validators\CompareValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\CustomValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\DirectoryValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\FileValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\IValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\MemberCompareValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\MemberValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\NullPrimaryKeyError.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\PrimaryKeyValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\RangeValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\RegexValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\RequiredValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\StringLenghtValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\TypeValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\ValidationError.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\ValidationEventArgs.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\ValidationEventHandler.cs" />
+    <Compile Include="Validators\ValidationException.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Validators\ValueCompareValidator.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
       <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
       <Name>OKHOSTING.Sql</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

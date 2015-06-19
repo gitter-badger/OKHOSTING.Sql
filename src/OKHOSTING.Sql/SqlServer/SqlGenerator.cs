@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.SqlServer
 	/// <summary>
 	/// Provides formatting methods for Sql Server DataBases
 	/// </summary>
-	public class SqlGenerator : AnsiSqlGenerator
+	public class SqlGenerator : SqlGeneratorBase
 	{
 		/// <summary>
 		/// Creates a new instance

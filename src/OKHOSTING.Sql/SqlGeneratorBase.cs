@@ -14,12 +14,12 @@ namespace OKHOSTING.Sql
 	/// <summary>
 	/// Generates ANSI Sql script commands for DML and DDL
 	/// </summary>
-	public abstract class AnsiSqlGenerator
+	public abstract class SqlGeneratorBase
 	{
 		/// <summary>
 		/// Constructs the generator
 		/// </summary>
-		public AnsiSqlGenerator() 
+		public SqlGeneratorBase() 
 		{
 		}
 

@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.OleDb
 	/// <summary>
 	/// Generator of Sql sequences for MsAccess
 	/// </summary>
-	public class MsAccessSqlGenerator: AnsiSqlGenerator
+	public class MsAccessSqlGenerator: SqlGeneratorBase
 	{
 
 		/// <summary>

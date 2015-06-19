@@ -1,0 +1,46 @@
+﻿using OKHOSTING.Core.Data;
+using OKHOSTING.Data.Sql.Schema;
+using System;
+using System.Xml.Serialization;
+
+namespace OKHOSTING.Sql.ORM.Operations
+{
+	/// <summary>
+	/// An item of an "Order By" clause for Select operations
+	/// </summary>
+	public abstract class OrderBy
+	{
+		/// <summary>
+		/// MemberMap which determines the sorting
+		/// </summary>
+		public MemberMap Member;
+
+		/// <summary>
+		/// The direction of the sorting
+		/// </summary>
+		public SortDirection Direction;
+
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		public OrderBy()
+		{
+		}
+
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		protected OrderBy(MemberMap orderBy): this(orderBy, SortDirection.Ascending)
+		{
+		}
+
+		/// <summary>
+		/// Creates a new instance
+		/// </summary>
+		protected OrderBy(MemberMap member, SortDirection direction)
+		{
+			this.Member = member;
+			this.Direction = direction;
+		}
+	}
+}

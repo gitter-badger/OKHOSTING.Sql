@@ -30,8 +30,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="OKHOSTING.Core">
-      <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
+    <Reference Include="OKHOSTING.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\References\OKHOSTING.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -42,11 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnsiSqlGenerator.cs" />
+    <Compile Include="SqlGeneratorBase.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandEventArgs.cs" />
     <Compile Include="CommandParameter.cs" />
-    <Compile Include="Configuration.cs" />
     <Compile Include="DataBase.cs" />
     <Compile Include="Filters\AndFilter.cs" />
     <Compile Include="Filters\ColumnCompareFilter.cs" />

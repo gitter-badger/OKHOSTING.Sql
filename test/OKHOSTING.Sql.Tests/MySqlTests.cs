@@ -31,12 +31,12 @@ namespace OKHOSTING.Sql.Tests
 			MySql.SqlGenerator generator = new MySql.SqlGenerator();
 
 			//define table schema
-			Table table = new Table("prueba");
-			table.Columns.Add(new Column() { Name = "Id", DbType = System.Data.DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true });
-			table.Columns.Add(new Column() { Name = "Texto", DbType = System.Data.DbType.AnsiString, Length = 100, IsNullable = false });
-			table.Columns.Add(new Column() { Name = "Numero", DbType = System.Data.DbType.Int32, IsNullable = false });
-			table.Indexes.Add(new Index() { Name = "IX_Texto", Unique = true, Table = table });
-			table.Indexes[0].Columns.Add(table["Texto"]);
+			Table table = new Table("test1");
+			table.Columns.Add(new Column() { Name = "Id", DbType = System.Data.DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+			table.Columns.Add(new Column() { Name = "TextField", DbType = System.Data.DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+			table.Columns.Add(new Column() { Name = "NumberField", DbType = System.Data.DbType.Int32, IsNullable = false, Table = table });
+			table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = true, Table = table });
+			table.Indexes[0].Columns.Add(table["TextField"]);
 
 			//create
 			var sql = generator.Create(table);
@@ -50,9 +50,9 @@ namespace OKHOSTING.Sql.Tests
 			//insert
 			Insert insert = new Insert();
 			insert.Into = table;
-			insert.Values.Add(new ColumnValue(table["id"], 1));
-			insert.Values.Add(new ColumnValue(table["texto"], "prueba1"));
-			insert.Values.Add(new ColumnValue(table["numero"], 100));
+			insert.Values.Add(new ColumnValue(table["Id"], 1));
+			insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
+			insert.Values.Add(new ColumnValue(table["NumberField"], 100));
 
 			sql = generator.Insert(insert);
 			int affectedRows = db.Execute(sql);
@@ -62,8 +62,8 @@ namespace OKHOSTING.Sql.Tests
 			Select select = new Select();
 			select.From = table;
 			select.Columns.Add(table["id"]);
-			select.Columns.Add(table["texto"]);
-			select.Where.Add(new ValueCompareFilter(table["texto"], "prueba1"));
+			select.Columns.Add(table["TextField"]);
+			select.Where.Add(new ValueCompareFilter(table["TextField"], "test11"));
 
 			sql = generator.Select(select);
 			var result = db.GetDataTable(sql);
@@ -72,7 +72,7 @@ namespace OKHOSTING.Sql.Tests
 			//delete
 			Delete delete = new Delete();
 			delete.From = table;
-			delete.Where.Add(new ValueCompareFilter(table["texto"], "prueba1"));
+			delete.Where.Add(new ValueCompareFilter(table["TextField"], "test11"));
 
 			sql = generator.Delete(delete);
 			affectedRows = db.Execute(sql);
