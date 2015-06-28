@@ -1,4 +1,4 @@
-﻿using OKHOSTING.Data.Sql.Schema;
+﻿using OKHOSTING.Sql.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +12,10 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// </summary>
 	public class MemberValue
 	{
-		public readonly MemberMap MemberMap;
+		public readonly DataMember MemberMap;
 		public readonly object Value;
 
-		public MemberValue(MemberMap member, object value)
+		public MemberValue(DataMember member, object value)
 		{
 			if (member == null)
 			{

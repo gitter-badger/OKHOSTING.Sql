@@ -9,7 +9,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <summary>
 	/// Represents a Filter with the Like operator
 	/// </summary>
-	public class LikeFilter<T> : MemberFilter<T>
+	public class LikeFilter : MemberFilter
 	{
 		/// <summary>
 		/// Defines the pattern for the filter
@@ -30,7 +30,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="pattern">
 		/// Defines the pattern for the filter
 		/// </param>
-		public LikeFilter(System.Linq.Expressions.Expression<Func<T, object>> member, string pattern) : this(member, pattern, false) { }
+		public LikeFilter(DataMember member, string pattern) : this(member, pattern, false) { }
 
 		/// <summary>
 		/// Construct the filter
@@ -44,7 +44,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="caseSensitive">
 		/// Indicates if the filter comparison will be case sensitive
 		/// </param>
-		public LikeFilter(System.Linq.Expressions.Expression<Func<T, object>> member, string pattern, bool caseSensitive): base(member)
+		public LikeFilter(DataMember member, string pattern, bool caseSensitive): base(member)
 		{
 			if (string.IsNullOrWhiteSpace(pattern))
 			{

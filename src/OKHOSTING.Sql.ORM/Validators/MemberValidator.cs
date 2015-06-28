@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <summary>
 		/// MemberMap that implements the DataValueValidator
 		/// </summary>
-		public readonly MemberMap Member;
+		public readonly DataMember Member;
 
 		/// <summary>
 		/// Performs the validation

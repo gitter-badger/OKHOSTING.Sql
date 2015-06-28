@@ -6,12 +6,12 @@ using System.Reflection;
 
 namespace OKHOSTING.Sql.ORM
 {
-	public abstract class MemberMap
+	public abstract class DataMember
 	{
 		/// <summary>
 		/// The type map that contains this object
 		/// </summary>
-		public readonly TypeMap Type;
+		public readonly DataType Type;
 		
 		/// <summary>
 		/// The database column where this field will be stored
@@ -27,7 +27,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				var memberInfo = GetMembers().Last();
+				var memberInfo = FinalMemberInfo;
 
 				if (memberInfo is FieldInfo)
 				{
@@ -42,7 +42,7 @@ namespace OKHOSTING.Sql.ORM
 
 		public readonly List<Validators.IValidator> Validators = new List<Validators.IValidator>();
 
-		protected MemberMap(TypeMap type, Schema.Column column, string member)
+		protected DataMember(DataType type, Schema.Column column, string member)
 		{
 			if (type == null)
 			{
@@ -65,7 +65,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			//validate member expression
-			GetMembers();
+			var x = MemberInfos;
 
 			Type = type;
 			Column = column;
@@ -85,34 +85,45 @@ namespace OKHOSTING.Sql.ORM
 		/// <remarks>
 		/// http://www.java2s.com/Code/CSharp/Reflection/GetPropertyfromPropertypath.htm
 		/// </remarks>
-		public IEnumerable<MemberInfo> GetMembers()
+		public IEnumerable<MemberInfo> MemberInfos
 		{
-			string[] splittedMembers = Member.Split(new[] { '.' }, StringSplitOptions.None);
-
-			Type memberType = Type.InnerType;
-			MemberInfo memberInfo = memberType.GetProperty(splittedMembers[0]);
-
-			if (memberInfo == null)
+			get
 			{
-				throw new ArgumentOutOfRangeException("Members", splittedMembers[0], "Type " + memberType + " does not contain a member with that name");
-			}
+				string[] splittedMembers = Member.Split(new[] { '.' }, StringSplitOptions.None);
 
-			memberType = GetReturnType(memberInfo);
-
-			yield return memberInfo;
-
-			for (int x = 1; x < splittedMembers.Length; ++x)
-			{
-				memberInfo = memberType.GetProperty(splittedMembers[x]);
+				Type memberType = Type.InnerType;
+				MemberInfo memberInfo = memberType.GetProperty(splittedMembers[0]);
 
 				if (memberInfo == null)
 				{
-					throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
+					throw new ArgumentOutOfRangeException("Members", splittedMembers[0], "Type " + memberType + " does not contain a member with that name");
 				}
-				
+
 				memberType = GetReturnType(memberInfo);
 
 				yield return memberInfo;
+
+				for (int x = 1; x < splittedMembers.Length; ++x)
+				{
+					memberInfo = memberType.GetProperty(splittedMembers[x]);
+
+					if (memberInfo == null)
+					{
+						throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
+					}
+				
+					memberType = GetReturnType(memberInfo);
+
+					yield return memberInfo;
+				}
+			}
+		}
+
+		public MemberInfo FinalMemberInfo
+		{
+			get
+			{
+				return MemberInfos.Last();
 			}
 		}
 
@@ -120,7 +131,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			object result = obj;
 
-			foreach (MemberInfo memberInfo in GetMembers())
+			foreach (MemberInfo memberInfo in MemberInfos)
 			{
 				if (result != null)
 				{
@@ -138,8 +149,7 @@ namespace OKHOSTING.Sql.ORM
 
 		public void SetValue(object obj, object value)
 		{
-			MemberInfo finalMember = GetMembers().Last();
-			SetValue(finalMember, obj, value);
+			SetValue(FinalMemberInfo, obj, value);
 		}
 
 		#region Static
@@ -198,7 +208,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public static bool IsMapped(TypeMap typeMap, string member)
+		public static bool IsMapped(DataType typeMap, string member)
 		{
 			return typeMap.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
@@ -206,15 +216,16 @@ namespace OKHOSTING.Sql.ORM
 		#endregion
 	}
 
-	public class MemberMap<T> : MemberMap
+	public class DataMember<T> : DataMember
 	{
 		/// <summary>
 		/// The member expression that indicates where this field will be stored in runtime
 		/// </summary>
 		public readonly Expression<Func<T, object>> MemberExpression;
 
-		public MemberMap(Schema.Column column, Expression<Func<T, object>> memberExpression): base(typeof(T), column, GetMemberString(memberExpression))
+		public DataMember(Schema.Column column, Expression<Func<T, object>> memberExpression): base(typeof(T), column, GetMemberString(memberExpression))
 		{
+			MemberExpression = memberExpression;
 		}
 
 		#region Static
@@ -252,23 +263,23 @@ namespace OKHOSTING.Sql.ORM
 
 		public static bool IsMapped(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
-			TypeMap<T> typeMapping = TypeMap.GetMap<T>();
+			DataType<T> typeMapping = DataType<T>.GetMap();
 			return typeMapping.Members.Where(c => c.MemberExpression.Equals(expression)).Count() > 0;
 		}
 
-		public static MemberMap<T> From(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static DataMember<T> From(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
-			TypeMap<T> typeMapping = TypeMap.GetMap<T>();
+			DataType<T> typeMapping = DataType<T>.GetMap();
 
 			return typeMapping.Members.Where(c => c.MemberExpression.Equals(expression)).Single();
 		}
 
-		public static implicit operator MemberMap<T>(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static implicit operator DataMember<T>(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
 			return From(expression);
 		}
 
-		public static implicit operator System.Linq.Expressions.Expression<Func<T, object>>(MemberMap<T> member)
+		public static implicit operator System.Linq.Expressions.Expression<Func<T, object>>(DataMember<T> member)
 		{
 			return member.MemberExpression;
 		}

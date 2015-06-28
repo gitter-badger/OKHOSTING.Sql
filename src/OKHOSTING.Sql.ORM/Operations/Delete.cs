@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 {
 	public class Delete
 	{
-		public TypeMap From { get; set; }
+		public DataType From { get; set; }
 		public IEnumerable<Filters.FilterBase> Where { get; set; }
 	}
 }

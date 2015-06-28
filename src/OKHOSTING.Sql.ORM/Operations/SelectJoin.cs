@@ -1,4 +1,4 @@
-﻿using OKHOSTING.Data.Sql.Schema;
+﻿using OKHOSTING.Sql.Schema;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// </summary>
 	public class SelectJoin
 	{
-		public TypeMap Type { get; set; }
+		public DataType Type { get; set; }
 		public SelectJoinType JoinType { get; set; }
 		public IEnumerable<Filters.FilterBase> On { get; set; }
 	}

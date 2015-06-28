@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// Member that is wrong defined and that 
 		/// is part of the primary key
 		/// </summary>
-		public readonly MemberMap Member;
+		public readonly DataMember Member;
 
 		/// <summary>
 		/// Constructs the error object
@@ -26,7 +26,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <param name="message">
 		/// Description of the error
 		/// </param>
-		public NullPrimaryKeyError(MemberMap member, IValidator validator, string message): base(validator, message)
+		public NullPrimaryKeyError(DataMember member, IValidator validator, string message): base(validator, message)
 		{
 			//Validating if the dataValue argument is null
 			if (member == null) throw new ArgumentNullException("member");

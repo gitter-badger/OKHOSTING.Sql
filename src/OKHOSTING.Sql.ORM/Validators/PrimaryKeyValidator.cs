@@ -10,20 +10,10 @@ namespace OKHOSTING.Sql.ORM.Validators
 	public class PrimaryKeyValidator: IValidator
 	{
 		/// <summary>
-		/// DataBaseOperation that will be performed. Affects the way validation is done.
-		/// </summary>
-		public readonly DataBaseOperation Operation;
-
-		/// <summary>
 		/// Constructs the validator
 		/// </summary>
-		/// <param name="dobj">
-		/// DataObject for primary key validation
-		/// </param>
-		/// <param name="operation">DataBaseOperation that will be performed. Affects the way validation is done.</param>
-		public PrimaryKeyValidator(DataBaseOperation operation)
+		public PrimaryKeyValidator()
 		{
-			this.Operation = operation;
 		}
 		
 		/// <summary>
@@ -36,10 +26,10 @@ namespace OKHOSTING.Sql.ORM.Validators
 		{
 			//Local Vars
 			NullPrimaryKeyError error = null;
-			TypeMap dtype = obj.GetType();
+			DataType dtype = obj.GetType();
 
 			//Crossing the MemberMap's on the collection
-			foreach (MemberMap dv in dtype.PrimaryKey)
+			foreach (DataMember dv in dtype.PrimaryKey)
 			{
 				bool isNull;
 
@@ -53,12 +43,9 @@ namespace OKHOSTING.Sql.ORM.Validators
 					isNull = dv.GetValue(obj) == null;
 				}
 
-				if (isNull)
+				if (isNull && !dv.Column.IsAutoNumber)
 				{
-					if (!(Operation == DataBaseOperation.Insert && dv.Column.IsAutoNumber))
-					{
-						error = new NullPrimaryKeyError(dv, this, "PrimaryKey contains a null value");
-					}
+					error = new NullPrimaryKeyError(dv, this, "PrimaryKey contains a null value");
 				}
 				
 				//If an error exists, break and return the error

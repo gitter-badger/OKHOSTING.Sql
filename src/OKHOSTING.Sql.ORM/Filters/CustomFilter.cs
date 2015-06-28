@@ -5,11 +5,10 @@ using System.Xml;
 
 namespace OKHOSTING.Sql.ORM.Filters
 {
-
 	/// <summary>
 	/// Represents a custom filter
 	/// </summary>
-	public class CustomFilter<T> : FilterBase<T>
+	public class CustomFilter : FilterBase
 	{
 		/// <summary>
 		/// Sql filter expression
@@ -30,11 +29,6 @@ namespace OKHOSTING.Sql.ORM.Filters
 			}
 
 			this.Filter = filter;
-		}
-
-		public override string GetSqlFilter()
-		{
-			return Filter;
 		}
 	}
 }

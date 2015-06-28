@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.ORM.Validators
 {

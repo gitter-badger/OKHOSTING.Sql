@@ -30,7 +30,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <summary>
 		/// DataMember for build the field definition
 		/// </summary>
-		public MemberMap Member;
+		public DataMember Member;
 
 		/// <summary>
 		/// Constructs the AggegateSelectField
@@ -38,7 +38,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <param name="dataValue">
 		/// DataMember for build the field definition
 		/// </param>
-		public SelectAggregateColumn(MemberMap member)
+		public SelectAggregateColumn(DataMember member)
 			: this(member, SelectAggregateFunction.None) 
 		{ 
 		}
@@ -52,7 +52,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <param name="aggregateFunction">
 		/// Aggregate function to use for calculate the column
 		/// </param>
-		public SelectAggregateColumn(MemberMap member, SelectAggregateFunction aggregateFunction) : this(member, aggregateFunction, string.Empty) { }
+		public SelectAggregateColumn(DataMember member, SelectAggregateFunction aggregateFunction) : this(member, aggregateFunction, string.Empty) { }
 
 		/// <summary>
 		/// Constructs the AggegateSelectField
@@ -66,7 +66,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <param name="alias">
 		/// Alias name of the resulting field
 		/// </param>
-		public SelectAggregateColumn(MemberMap member, SelectAggregateFunction aggregateFunction, string alias) : this(member, aggregateFunction, alias, false) { }
+		public SelectAggregateColumn(DataMember member, SelectAggregateFunction aggregateFunction, string alias) : this(member, aggregateFunction, alias, false) { }
 
 		/// <summary>
 		/// Constructs the AggegateSelectField
@@ -83,7 +83,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <param name="alias">
 		/// Alias name of the resulting field
 		/// </param>
-		public SelectAggregateColumn(MemberMap member, SelectAggregateFunction aggregateFunction, string alias, bool distinct)
+		public SelectAggregateColumn(DataMember member, SelectAggregateFunction aggregateFunction, string alias, bool distinct)
 		{
 			if (member == null)
 			{

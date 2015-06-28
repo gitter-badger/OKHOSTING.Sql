@@ -26,27 +26,9 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="foreignKey">
 		/// Foreign object
 		/// </param>
-		public ForeignKeyFilter(MemberMap<T> member, object foreignKey): base(member)
+		public ForeignKeyFilter(DataMember<T> member, object foreignKey): base(member)
 		{
 			ForeignKey = foreignKey;
-		}
-
-		/// <summary>
-		/// Compares the DataMember on the specified object with the 
-		/// ValueToCompare field
-		/// </summary>
-		/// <param name="obj"></param>
-		/// <returns>
-		/// True if the comparison is fulfilled, otherwise false
-		/// </returns>
-		public override bool Match(T obj)
-		{
-			if (obj == null)
-			{
-				throw new ArgumentNullException("obj");
-			}
-
-			return new PrimaryKeyFilter<T>(ForeignKey).Match(obj);
 		}
 	}
 }

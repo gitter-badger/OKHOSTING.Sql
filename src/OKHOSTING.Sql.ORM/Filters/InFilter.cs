@@ -16,7 +16,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <typeparam name="T">
 	/// Type of the items in the values set
 	/// </typeparam>
-	public class InFilter<T>: MemberFilter<T>
+	public class InFilter: MemberFilter
 	{
 		#region Fields
 
@@ -46,7 +46,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="dataMember">
 		/// DataMember used in the filter
 		/// </param>
-		public InFilter(System.Linq.Expressions.Expression<Func<T, object>> member) : this(member, null, false) { }
+		public InFilter(DataMember member) : this(member, null, false) { }
 
 		/// <summary>
 		/// Constructs the In Filter
@@ -57,7 +57,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="values">
 		/// List of possible values of the filter
 		/// </param>
-		public InFilter(System.Linq.Expressions.Expression<Func<T, object>> member, IEnumerable<IComparable> values): this(member, values, false)
+		public InFilter(DataMember member, IEnumerable<IComparable> values): this(member, values, false)
 		{
 		}
 
@@ -74,7 +74,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Indicates if the filter comparison will be case sensitive
 		/// when listItemsType = System.String
 		/// </param>
-		public InFilter(System.Linq.Expressions.Expression<Func<T, object>> member, IEnumerable<IComparable> values, bool caseSensitive): base(member)
+		public InFilter(DataMember member, IEnumerable<IComparable> values, bool caseSensitive): base(member)
 		{
 			this.Values = values;
 			this.CaseSensitive = caseSensitive;

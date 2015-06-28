@@ -1,4 +1,4 @@
-using OKHOSTING.Data.Sql.ORM.Generators;
+using OKHOSTING.Core.Data;
 
 namespace OKHOSTING.Sql.ORM.Filters
 {
@@ -30,5 +30,6 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Filter used on the evaluation
 		/// </param>
 		public AndFilter(AndFilter filter) : this(filter.InnerFilters) { }
+
 	}
 }

@@ -20,7 +20,7 @@ namespace OKHOSTING.Sql.Filters
 		/// Collection of conditions or filters that will be merged 
 		/// with the and operator
 		/// </summary>
-		public readonly IEnumerable<Filters.FilterBase> InnerFilters;
+		public readonly List<Filters.FilterBase> InnerFilters = new List<FilterBase>();
 
 		/// <summary>
 		/// Logical operator used in the filter
@@ -30,7 +30,7 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Constructs the filter
 		/// </summary>
-		public LogicalOperatorFilter(IEnumerable<Filters.FilterBase> innerFilters) : this(innerFilters, LogicalOperator.And) { }
+		public LogicalOperatorFilter(List<Filters.FilterBase> innerFilters) : this(innerFilters, LogicalOperator.And) { }
 
 		/// <summary>
 		/// Constructs the filter
@@ -42,7 +42,7 @@ namespace OKHOSTING.Sql.Filters
 		/// Collection of conditions or filters that will be merged 
 		/// with the and operator
 		/// </param>
-		public LogicalOperatorFilter(IEnumerable<Filters.FilterBase> innerFilters, LogicalOperator logicalOperator)
+		public LogicalOperatorFilter(List<Filters.FilterBase> innerFilters, LogicalOperator logicalOperator)
 		{
 			InnerFilters = innerFilters;
 			LogicalOperator = logicalOperator;

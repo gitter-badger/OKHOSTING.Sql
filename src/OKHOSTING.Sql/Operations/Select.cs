@@ -18,5 +18,7 @@ namespace OKHOSTING.Sql.Operations
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
+
+
 	}
 }

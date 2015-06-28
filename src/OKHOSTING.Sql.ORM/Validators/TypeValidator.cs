@@ -21,7 +21,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <summary>
 		/// The TypeMap (or a subclass of it) that must be selected as a value of the MemberMap
 		/// </summary>
-		public readonly TypeMap Type;
+		public readonly DataType Type;
 
 		/// <summary>
 		/// Construct the validator
@@ -29,7 +29,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <param name="parent">
 		/// TypeMap (or any subclass of it) that can be selected as the Value of the MemberMap
 		/// </param>
-		public TypeValidator(TypeMap type)
+		public TypeValidator(DataType type)
 		{
 			//Validating arguments
 			if (type == null) throw new ArgumentNullException("type");
@@ -51,7 +51,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 			ValidationError error = null;
 
 			//Getting the current value of the associated MemberMap
-			TypeMap val = (TypeMap) Member.GetValue(obj);
+			DataType val = (DataType) Member.GetValue(obj);
 
 			//Do not validate null values
 			if (val == null) return null;

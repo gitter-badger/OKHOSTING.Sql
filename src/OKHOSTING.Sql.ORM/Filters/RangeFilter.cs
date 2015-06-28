@@ -9,7 +9,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <summary>
 	/// Implements a filter criterion based on a value range
 	/// </summary>
-	public class RangeFilter<T>: MemberFilter<T>
+	public class RangeFilter: MemberFilter
 	{
 		/// <summary>
 		/// Minimum value of the allowed range
@@ -33,7 +33,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="maxValue">
 		/// Maximum value of the allowed range
 		/// </param>
-		public RangeFilter(System.Linq.Expressions.Expression<Func<T, object>> member, IComparable minValue, IComparable maxValue): base(member)
+		public RangeFilter(DataMember member, IComparable minValue, IComparable maxValue): base(member)
 		{
 			MinValue = minValue;
 			MaxValue = maxValue;

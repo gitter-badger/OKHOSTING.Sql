@@ -1,5 +1,5 @@
 ﻿using OKHOSTING.Core.Data;
-using OKHOSTING.Data.Sql.Schema;
+using OKHOSTING.Sql.Schema;
 using System;
 using System.Xml.Serialization;
 
@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <summary>
 		/// MemberMap which determines the sorting
 		/// </summary>
-		public MemberMap Member;
+		public DataMember Member;
 
 		/// <summary>
 		/// The direction of the sorting
@@ -30,14 +30,14 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <summary>
 		/// Creates a new instance
 		/// </summary>
-		protected OrderBy(MemberMap orderBy): this(orderBy, SortDirection.Ascending)
+		protected OrderBy(DataMember orderBy): this(orderBy, SortDirection.Ascending)
 		{
 		}
 
 		/// <summary>
 		/// Creates a new instance
 		/// </summary>
-		protected OrderBy(MemberMap member, SortDirection direction)
+		protected OrderBy(DataMember member, SortDirection direction)
 		{
 			this.Member = member;
 			this.Direction = direction;

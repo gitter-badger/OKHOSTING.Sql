@@ -10,7 +10,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <summary>
 	/// Compare a DataValue with a value
 	/// </summary>
-	public class ValueCompareFilter<T> : CompareFilter<T>
+	public class ValueCompareFilter : CompareFilter
 	{
 		/// <summary>
 		/// Value for comparison
@@ -26,7 +26,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="valueToCompare">
 		/// Value for comparison
 		/// </param>
-		public ValueCompareFilter(System.Linq.Expressions.Expression<Func<T, object>> member, IComparable valueToCompare) : this(member, valueToCompare, CompareOperator.Equal) { }
+		public ValueCompareFilter(DataMember dmember, IComparable valueToCompare) : this(dmember, valueToCompare, CompareOperator.Equal) { }
 
 		/// <summary>
 		/// Constructs the filter
@@ -40,7 +40,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="op">
 		/// Operator for comparison
 		/// </param>
-		public ValueCompareFilter(System.Linq.Expressions.Expression<Func<T, object>> member, IComparable valueToCompare, CompareOperator op) : base(member, op)
+		public ValueCompareFilter(DataMember dmember, IComparable valueToCompare, CompareOperator op) : base(dmember, op)
 		{
 			this.ValueToCompare = valueToCompare;
 		}

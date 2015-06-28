@@ -4,13 +4,14 @@ using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
 using System.Reflection;
+using OKHOSTING.Core.Data;
 
 namespace OKHOSTING.Sql.ORM.Filters
 {
 	/// <summary>
 	/// Base class for value-to-compare filters
 	/// </summary>
-	public abstract class CompareFilter<T> : MemberFilter<T>
+	public abstract class CompareFilter : MemberFilter
 	{
 		/// <summary>
 		/// Operator of the comparison
@@ -23,7 +24,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="dataMember">
 		/// DataMember to compare
 		/// </param>
-		protected CompareFilter(System.Linq.Expressions.Expression<Func<T, object>> member) : this(member, CompareOperator.Equal) { }
+		protected CompareFilter(DataMember dmember) : this(dmember, CompareOperator.Equal) { }
 
 		/// <summary>
 		/// Construct the filter
@@ -34,7 +35,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="op">
 		/// Operator to use in the comparison
 		/// </param>
-		protected CompareFilter(System.Linq.Expressions.Expression<Func<T, object>> member, CompareOperator op): base(member)
+		protected CompareFilter(DataMember dmember, CompareOperator op): base(dmember)
 		{
 			this.Operator = op;
 		}

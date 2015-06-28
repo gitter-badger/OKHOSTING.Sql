@@ -11,8 +11,8 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// </summary>
 	public class Select
 	{
-		public IEnumerable<MemberMap> Columns { get; set; }
-		public TypeMap From { get; set; }
+		public IEnumerable<DataMember> Columns { get; set; }
+		public DataType From { get; set; }
 		public IEnumerable<SelectJoin> Joins { get; set; }
 		public IEnumerable<Filters.FilterBase> Where { get; set; }
 		public IEnumerable<OrderBy> OrderBy { get; set; }

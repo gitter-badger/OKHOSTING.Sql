@@ -1,5 +1,6 @@
 using System;
 using OKHOSTING.Sql.ORM.Filters;
+using OKHOSTING.Core.Data;
 
 namespace OKHOSTING.Sql.ORM.Validators
 {
@@ -12,7 +13,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <summary>
 		/// MemberMap to compare with the MemberMap of the validator
 		/// </summary>
-		public readonly MemberMap MemberToCompare;
+		public readonly DataMember MemberToCompare;
 
 		/// <summary>
 		/// Constructs the validator
@@ -23,7 +24,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <param name="dataValueToCompare">
 		/// MemberMap to compare with the MemberMap of the validator
 		/// </param>
-		public MemberCompareValidator(CompareOperator op, MemberMap memberToCompare): base(op)
+		public MemberCompareValidator(CompareOperator op, DataMember memberToCompare): base(op)
 		{
 			//Validating if dataValueToCompare argument is null
 			if (memberToCompare == null) throw new ArgumentNullException("memberToCompare");

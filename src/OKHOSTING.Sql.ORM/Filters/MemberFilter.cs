@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <summary>
 		/// DataMember used to filter
 		/// </summary>
-		public readonly MemberMap Member;
+		public readonly DataMember Member;
 
 		/// <summary>
 		/// Creates the filter
@@ -21,23 +21,10 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="dataMember">
 		/// DataMember used to filter
 		/// </param>
-		protected MemberFilter(MemberMap member)
+		protected MemberFilter(DataMember member)
 		{
 			//Establishing the DataMember to filter
 			this.Member = member;
-		}
-	}
-
-	public abstract class MemberFilter<T> : MemberFilter
-	{
-		/// <summary>
-		/// Creates the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used to filter
-		/// </param>
-		protected MemberFilter(System.Linq.Expressions.Expression<Func<T, object>> member): base((MemberMap<T>) member)
-		{
 		}
 	}
 }
