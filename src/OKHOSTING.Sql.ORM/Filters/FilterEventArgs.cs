@@ -5,7 +5,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <summary>
 	/// Argument for custom filter event
 	/// </summary>
-	public class FilterEventArgs<T>: EventArgs
+	public class FilterEventArgs: EventArgs
 	{
 		/// <summary>
 		/// Indicates if the filter was successfully approved
@@ -15,7 +15,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <summary>
 		/// object in wich the filter must be applied
 		/// </summary>
-		public readonly T ObjectToFilter;
+		public readonly object ObjectToFilter;
 
 		/// <summary>
 		/// Constructs the argument
@@ -23,7 +23,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <param name="objectToFilter">
 		/// object in wich the filter must be applied
 		/// </param>
-		public FilterEventArgs(T objectToFilter)
+		public FilterEventArgs(object objectToFilter)
 		{
 			this.ObjectToFilter = objectToFilter;
 			this.Match = false;

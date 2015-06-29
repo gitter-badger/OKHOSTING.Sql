@@ -714,7 +714,7 @@ namespace OKHOSTING.Sql
 			{
 				//Resolve inheritance Inner Joins
 
-				command.Script += join.Type.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + " ON ";
+				command.Script += join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + " ON ";
 				command.Append(Filter(join.On, LogicalOperator.And));
 			}
 

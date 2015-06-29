@@ -1,4 +1,5 @@
 using OKHOSTING.Core.Data;
+using System.Collections.Generic;
 
 namespace OKHOSTING.Sql.ORM.Filters
 {
@@ -16,12 +17,12 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Collection of conditions or filters that will be merged 
 		/// with the And operator
 		/// </param>
-		public AndFilter(FilterCollection innerFilters) : base(innerFilters, LogicalOperator.And) { }
+		public AndFilter(List<FilterBase> innerFilters) : base(innerFilters, LogicalOperator.And) { }
 
 		/// <summary>
 		/// Constructs the class
 		/// </summary>
-		public AndFilter() : this(new FilterCollection()) { }
+		public AndFilter() : this(new List<FilterBase>()) { }
 
 		/// <summary>
 		/// Constructs the class

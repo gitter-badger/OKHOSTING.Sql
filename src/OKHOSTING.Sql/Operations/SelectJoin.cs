@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.Operations
 	public class SelectJoin
 	{
 		public Table Table { get; set; }
-		public SelectJoinType Type { get; set; }
+		public SelectJoinType JoinType { get; set; }
 		public readonly List<Filters.FilterBase> On = new List<Filters.FilterBase>();
 	}
 }

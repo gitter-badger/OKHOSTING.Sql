@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using OKHOSTING.Sql.ORM.Operations;
 
 namespace OKHOSTING.Sql.ORM
 {
-	public class Table<TKey, TType>: Core.Data.DictionaryBase<TKey, TType>
+	public class Table<TKey, TType>: Core.Data.DictionaryBase<TKey, TType> where TKey : IComparable
 	{
+		public readonly DataBase DataBase;
+
 		public override void Add(KeyValuePair<TKey, TType> item)
 		{
 			Insert insert = new Insert();
 			insert.Into = typeof(TType);
-			List<MemberValue> values = new List<MemberValue>();
 
 			foreach (DataMember dmember in insert.Into.Members)
 			{
-				values.Add(new MemberValue(dmember, dmember.GetValue(item)));
+				insert.Values.Add(new MemberValue(dmember, dmember.GetValue(item)));
 			}
 
-			insert.Values = values;
+			string sql = DataBase.SqlGenerator.Insert(OperationConverter.Parse(insert));
+			DataBase.NativeDataBase.Execute(sql);
 		}
 
 		public override bool ContainsKey(TKey key)
@@ -42,7 +45,14 @@ namespace OKHOSTING.Sql.ORM
 
 		public override bool Remove(TKey key)
 		{
-			throw new NotImplementedException();
+			Delete delete = new Delete();
+			delete.From = typeof(TType);
+			delete.Where.Add(new Filters.ValueCompareFilter(delete.From.PrimaryKey.First(), key));
+
+			string sql = DataBase.SqlGenerator.Delete(OperationConverter.Parse(delete));
+			var result = DataBase.NativeDataBase.Execute(sql);
+			
+			return result > 0;
 		}
 
 		public override TType this[TKey key]
@@ -55,6 +65,10 @@ namespace OKHOSTING.Sql.ORM
 			{
 				throw new NotImplementedException();
 			}
+		}
+
+		internal Table(DataBase database)
+		{
 		}
 	}
 }

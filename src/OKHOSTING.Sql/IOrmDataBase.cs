@@ -9,6 +9,8 @@ namespace OKHOSTING.Sql
 	/// <typeparam name="TKey">Type of key that will be used among all the DataBase</typeparam>
 	public interface IOrmDataBase
 	{
-		IDictionary<TKey, TValue> Table<TKey, TValue>() where TValue : class;
+		IDictionary<TKey, TValue> Table<TKey, TValue>()
+			where TKey : IComparable
+			where TValue : class;
 	}
 }

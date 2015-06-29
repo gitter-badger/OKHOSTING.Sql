@@ -14,7 +14,14 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// DataMember used to filter
 		/// </summary>
-		public readonly Column Column;
+		public Column Column;
+
+		/// <summary>
+		/// Creates the filter
+		/// </summary>
+		protected ColumnFilter()
+		{
+		}
 
 		/// <summary>
 		/// Creates the filter

@@ -16,7 +16,7 @@ namespace OKHOSTING.Sql.Filters
 		/// Collection of conditions or filters that will be merged 
 		/// with the And operator
 		/// </param>
-		public AndFilter(IEnumerable<Filters.FilterBase> innerFilters) : base(innerFilters, LogicalOperator.And) { }
+		public AndFilter(List<Filters.FilterBase> innerFilters) : base(innerFilters, LogicalOperator.And) { }
 
 		/// <summary>
 		/// Constructs the class

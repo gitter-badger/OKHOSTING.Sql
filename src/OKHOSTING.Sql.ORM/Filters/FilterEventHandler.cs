@@ -11,5 +11,5 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// <param name="e">
 	/// Event information argument
 	/// </param>
-	public delegate void FilterEventHandler<T>(FilterBase<T> sender, FilterEventArgs<T> e);
+	public delegate void FilterEventHandler(FilterBase sender, FilterEventArgs e);
 }

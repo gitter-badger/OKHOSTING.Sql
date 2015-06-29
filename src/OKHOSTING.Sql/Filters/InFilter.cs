@@ -24,7 +24,7 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// List of values of the filter
 		/// </summary>
-		public IEnumerable<IComparable> Values;
+		public readonly List<IComparable> Values = new List<IComparable>();
 
 		/// <summary>
 		/// Indicates if the filter comparison will be case sensitive
@@ -58,7 +58,7 @@ namespace OKHOSTING.Sql.Filters
 		/// <param name="values">
 		/// List of possible values of the filter
 		/// </param>
-		public InFilter(Column column, IEnumerable<IComparable> values): this(column, values, false)
+		public InFilter(Column column, List<IComparable> values): this(column, values, false)
 		{
 		}
 
@@ -75,7 +75,7 @@ namespace OKHOSTING.Sql.Filters
 		/// Indicates if the filter comparison will be case sensitive
 		/// when listItemsType = System.String
 		/// </param>
-		public InFilter(Column column, IEnumerable<IComparable> values, bool caseSensitive): base(column)
+		public InFilter(Column column, List<IComparable> values, bool caseSensitive): base(column)
 		{
 			this.Values = values;
 			this.CaseSensitive = caseSensitive;

@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// <summary>
 	/// An item of an "Order By" clause for Select operations
 	/// </summary>
-	public abstract class OrderBy
+	public class OrderBy
 	{
 		/// <summary>
 		/// MemberMap which determines the sorting

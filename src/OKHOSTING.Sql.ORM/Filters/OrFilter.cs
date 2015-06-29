@@ -16,7 +16,7 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Collection of conditions or filters that will be merged 
 		/// with the Or operator
 		/// </param>
-		public OrFilter(FilterCollection innerFilters) : base(innerFilters, OKHOSTING.Core.Data.LogicalOperator.Or) 
+		public OrFilter(List<FilterBase> innerFilters) : base(innerFilters, OKHOSTING.Core.Data.LogicalOperator.Or) 
 		{ 
 		}
 	}
