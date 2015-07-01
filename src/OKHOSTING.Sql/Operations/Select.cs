@@ -14,7 +14,7 @@ namespace OKHOSTING.Sql.Operations
 	{
 		public Table From { get; set; }
 		public SelectLimit Limit { get; set; }
-		public readonly List<Column> Columns = new List<Column>();
+		public readonly List<SelectColumn> Columns = new List<SelectColumn>();
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();

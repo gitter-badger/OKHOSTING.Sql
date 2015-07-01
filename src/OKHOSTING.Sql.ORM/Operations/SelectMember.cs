@@ -1,0 +1,60 @@
+﻿using OKHOSTING.Sql.Schema;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Xml.Serialization;
+
+namespace OKHOSTING.Sql.ORM.Operations
+{
+	/// <summary>
+	/// Defines a field on a select query that can contain an alias
+	/// </summary>
+	public class SelectMember
+	{
+		/// <summary>
+		/// Alias name of the resulting field
+		/// </summary>
+		public string Alias;
+
+		/// <summary>
+		/// DataMember for build the field definition
+		/// </summary>
+		public DataMember Member;
+
+		/// <summary>
+		/// Constructs the AggegateSelectField
+		/// </summary>
+		/// <param name="dataValue">
+		/// DataMember for build the field definition
+		/// </param>
+		public SelectMember(DataMember member): this(member, null)
+		{ 
+		}
+
+		/// <summary>
+		/// Constructs the AggegateSelectField
+		/// </summary>
+		/// <param name="dataValue">
+		/// DataMember for build the field definition
+		/// </param>
+		/// <param name="alias">
+		/// Alias name of the resulting field
+		/// </param>
+		public SelectMember(DataMember member, string alias)
+		{
+			if (member == null)
+			{
+				throw new ArgumentNullException("member");
+			}
+
+			Member = member;
+			Alias = alias;
+		}
+
+		public static implicit operator SelectMember(DataMember member)
+		{
+			return new SelectMember(member);
+		}
+	}
+}

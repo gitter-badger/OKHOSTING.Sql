@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.Operations
 	/// Defines a field on a select query that will be processed 
 	/// with an aggregate function on a ResultSet grouped
 	/// </summary>
-	public struct SelectAggregateColumn
+	public class SelectAggregateColumn: SelectColumn
 	{
 		/// <summary>
 		/// Aggregate function to use for calculate the column
@@ -22,16 +22,6 @@ namespace OKHOSTING.Sql.Operations
 		/// Speficy if the DISTINCT modifier must be applied
 		/// </summary>
 		public bool Distinct;
-
-		/// <summary>
-		/// Alias name of the resulting field
-		/// </summary>
-		public string Alias;
-
-		/// <summary>
-		/// DataMember for build the field definition
-		/// </summary>
-		public Column Column;
 
 		/// <summary>
 		/// Constructs the AggegateSelectField
@@ -83,17 +73,10 @@ namespace OKHOSTING.Sql.Operations
 		/// <param name="alias">
 		/// Alias name of the resulting field
 		/// </param>
-		public SelectAggregateColumn(Column column, SelectAggregateFunction aggregateFunction, string alias, bool distinct)
+		public SelectAggregateColumn(Column column, SelectAggregateFunction aggregateFunction, string alias, bool distinct): base(column, alias)
 		{
-			if (column == null)
-			{
-				throw new ArgumentNullException("column");
-			}
-
-			Column = column;
 			AggregateFunction = aggregateFunction;
 			Distinct = distinct;
-			Alias = alias;
 		}
 	}
 }

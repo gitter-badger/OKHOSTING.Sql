@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 	{
 		public DataType From { get; set; }
 		public SelectLimit Limit { get; set; }
-		public readonly List<DataMember> Members = new List<DataMember>();
+		public readonly List<SelectMember> Members = new List<SelectMember>();
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();

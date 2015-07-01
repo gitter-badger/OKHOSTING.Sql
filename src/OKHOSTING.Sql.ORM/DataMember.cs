@@ -149,6 +149,24 @@ namespace OKHOSTING.Sql.ORM
 
 		public void SetValue(object obj, object value)
 		{
+			var allMembers = MemberInfos.ToList();
+			var allValues = GetValues(obj).ToList();
+
+			//ensure all nested members are not null
+			for(int i= 0; i < allValues.Count(); i++)
+			{
+				object val = allValues[i];
+				MemberInfo member = allMembers[i];
+				
+				if (val == null)
+				{
+					object container = (i == 0)? obj : allValues[i -1];
+					object newValue = Activator.CreateInstance(GetReturnType(member));
+
+					SetValue(member, container, newValue);
+				}
+			}
+
 			SetValue(FinalMemberInfo, obj, value);
 		}
 

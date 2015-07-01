@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// </summary>
 	public class SelectAggregate: Select
 	{
-		public IEnumerable<SelectAggregateColumn> AggregateColumns { get; set; }
+		public IEnumerable<SelectAggregateMember> AggregateMembers { get; set; }
 		public IEnumerable<DataMember> GroupBy { get; set; }
 	}
 }

@@ -355,11 +355,21 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Select Clause from the Select Sql Sentence
 		/// </returns>
-		protected virtual Command SelectClause(Table table, IEnumerable<Column> columns)
+		protected virtual Command SelectClause(Table table, List<SelectColumn> columns)
 		{
 			//Validating if table argument is null
 			if (table == null) throw new ArgumentNullException("table");
-			if (columns == null) columns = table.Columns;
+			
+			//use all columns if none is defined
+			if (columns == null)
+			{
+				columns = new List<SelectColumn>();
+				
+				foreach (Column c in table.Columns)
+				{
+					columns.Add(c);
+				}
+			}
 
 			//Creating Sql Clause
 			string sql = "SELECT ";
@@ -370,8 +380,14 @@ namespace OKHOSTING.Sql
 			//Crossing all the loaded members
 			foreach (var c in columns)
 			{
-				//sql += GetCompletlyQualifiedField(tableName, EncloseName(value.Key)) + ", ";
-				sql += EncloseName(c.Name) + ", ";
+				sql += string.Format("{0}.{1}", EncloseName(c.Column.Table.Name), EncloseName(c.Column.Name));
+				
+				if (!string.IsNullOrWhiteSpace(c.Alias))
+				{
+					sql += string.Format(" AS {0}", c.Alias);
+				}
+
+				sql += ", ";
 			}
 
 			//Removing last ", "
@@ -390,7 +406,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Group By Clause for the Select Sentence
 		/// </returns>
-		protected virtual Command GroupByClause(IEnumerable<Column> dataValuesToGroup)
+		protected virtual Command GroupByClause(List<Column> dataValuesToGroup)
 		{
 			//Local Vars
 			string groupByClause = string.Empty;
@@ -419,13 +435,13 @@ namespace OKHOSTING.Sql
 		/// Table that you desire to select
 		/// </param>
 		/// <param name="orderBy">
-		/// IEnumerable of OrderByItem, which are columns and sort directions
+		/// List of OrderByItem, which are columns and sort directions
 		/// </param>
 		/// <returns>
 		/// Clause order by corresponding to the 
 		/// Order definition specified
 		/// </returns>
-		protected virtual Command OrderByClause(IEnumerable<OrderBy> orderBy)
+		protected virtual Command OrderByClause(List<OrderBy> orderBy)
 		{
 			//local variables
 			string orderString = "ORDER BY ";
@@ -584,7 +600,7 @@ namespace OKHOSTING.Sql
 			return command;
 		}
 
-		protected virtual Command Filter(IEnumerable<FilterBase> filters, LogicalOperator logicalOperator)
+		protected virtual Command Filter(List<FilterBase> filters, LogicalOperator logicalOperator)
 		{
 			//Local Vars
 			Command command = new Command();
@@ -650,7 +666,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Where Clause for a Select, Update and Delete Sql Sentence
 		/// </returns>
-		protected virtual Command WhereClause(IEnumerable<FilterBase> filters)
+		protected virtual Command WhereClause(List<FilterBase> filters)
 		{
 			return WhereClause(filters, LogicalOperator.And);
 		}
@@ -668,7 +684,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Where Clause for a Select, Update and Delete Sql Sentence
 		/// </returns>
-		protected virtual Command WhereClause(IEnumerable<FilterBase> filters, LogicalOperator logicalOperator)
+		protected virtual Command WhereClause(List<FilterBase> filters, LogicalOperator logicalOperator)
 		{
 			//Validating if there are filters defined
 			if (filters == null || filters.Count() == 0) return null;
@@ -746,7 +762,7 @@ namespace OKHOSTING.Sql
 		/// Type of the items in the list of values
 		/// </typeparam>
 		/// <param name="valuesList">
-		/// IEnumerable of values for create the In sentence
+		/// List of values for create the In sentence
 		/// </param>
 		/// <returns>
 		/// Sql In clause for filters

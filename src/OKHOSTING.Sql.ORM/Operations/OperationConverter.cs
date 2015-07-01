@@ -54,31 +54,29 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 		public static Sql.Operations.Select Parse(Select select)
 		{
-			var native = new OKHOSTING.Sql.Operations.Select();
-			native.From = select.From.Table;
-			native.Limit = Parse(select.Limit);
+			return Parse(select, new OKHOSTING.Sql.Operations.Select());
+		}
 
-			foreach (DataMember member in select.Members)
+		public static Sql.Operations.SelectAggregate Parse(SelectAggregate select)
+		{
+			var native = (OKHOSTING.Sql.Operations.SelectAggregate) Parse(select, new OKHOSTING.Sql.Operations.SelectAggregate());
+
+			foreach (SelectAggregateMember agregateMember in select.AggregateMembers)
 			{
-				native.Columns.Add(member.Column);
+				native.AggregateColumns.Add(Parse(agregateMember));
 			}
 
-			foreach (SelectJoin join in select.Joins)
+			foreach (DataMember groupBy in select.GroupBy)
 			{
-				native.Joins.Add(Parse(join));
-			}
-			
-			foreach (Filters.FilterBase filter in select.Where)
-			{
-				native.Where.Add(Filters.FilterConverter.Parse(filter));
-			}
-
-			foreach (OrderBy orderBy in select.OrderBy)
-			{
-				native.OrderBy.Add(Parse(orderBy));
+				native.GroupBy.Add(groupBy.Column);
 			}
 
 			return native;
+		}
+
+		public static Sql.Operations.SelectAggregateColumn Parse(SelectAggregateMember aggregateMember)
+		{
+			return new Sql.Operations.SelectAggregateColumn(aggregateMember.Member.Column, aggregateMember.AggregateFunction, aggregateMember.Alias, aggregateMember.Distinct);
 		}
 
 		public static Sql.Operations.OrderBy Parse(OrderBy orderBy)
@@ -113,5 +111,32 @@ namespace OKHOSTING.Sql.ORM.Operations
 			return native;
 		}
 
+		private static Sql.Operations.Select Parse(Select select, Sql.Operations.Select native)
+		{
+			native.From = select.From.Table;
+			native.Limit = Parse(select.Limit);
+
+			foreach (SelectMember selectMember in select.Members)
+			{
+				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.Member.Column, selectMember.Alias));
+			}
+
+			foreach (SelectJoin join in select.Joins)
+			{
+				native.Joins.Add(Parse(join));
+			}
+
+			foreach (Filters.FilterBase filter in select.Where)
+			{
+				native.Where.Add(Filters.FilterConverter.Parse(filter));
+			}
+
+			foreach (OrderBy orderBy in select.OrderBy)
+			{
+				native.OrderBy.Add(Parse(orderBy));
+			}
+
+			return native;
+		}
 	}
 }

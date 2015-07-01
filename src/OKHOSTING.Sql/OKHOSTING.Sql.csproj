@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Operations\SelectColumn.cs" />
     <Compile Include="SqlGeneratorBase.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandEventArgs.cs" />

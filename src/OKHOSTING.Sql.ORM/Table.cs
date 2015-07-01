@@ -25,22 +25,72 @@ namespace OKHOSTING.Sql.ORM
 
 		public override bool ContainsKey(TKey key)
 		{
-			throw new NotImplementedException();
+			Select select = new Select();
+			select.From = typeof(TType);
+			select.Members.Add(select.From.PrimaryKey.First());
+			select.Where.Add(new Filters.ValueCompareFilter(select.From.PrimaryKey.First(), key));
+
+			string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
+			return DataBase.NativeDataBase.ExistsData(sql);
 		}
 
 		public override IEnumerator<KeyValuePair<TKey, TType>> GetEnumerator()
 		{
-			throw new NotImplementedException();
+			Select select = new Select();
+			select.From = typeof(TType);
+
+			foreach (DataMember member in select.From.Members)
+			{
+				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+			}
+
+			string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
+			var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
+			DataMember pkMember = select.From.PrimaryKey.First();
+
+			while (dataReader.Read())
+			{
+				TType instance = Activator.CreateInstance<TType>();
+				
+				foreach (SelectMember member in select.Members)
+				{
+					object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias)? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+					member.Member.SetValue(instance, value);
+				}
+
+				TKey key = (TKey) Convert.ChangeType(pkMember.GetValue(instance), pkMember.ReturnType);
+
+				yield return new KeyValuePair<TKey, TType>(key, instance);
+			}
 		}
 
 		public override bool IsReadOnly
 		{
-			get { throw new NotImplementedException(); }
+			get 
+			{
+				return false; ; 
+			}
 		}
 
 		public override ICollection<TKey> Keys
 		{
-			get { throw new NotImplementedException(); }
+			get 
+			{
+				Select select = new Select();
+				select.From = typeof(TType);
+				select.Members.Add(select.From.PrimaryKey.First());
+
+				string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
+				var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
+				List<TKey> keys = new List<TKey>();
+
+				while (dataReader.Read())
+				{
+					keys.Add((TKey) dataReader[0]);
+				}
+
+				return keys;
+			}
 		}
 
 		public override bool Remove(TKey key)

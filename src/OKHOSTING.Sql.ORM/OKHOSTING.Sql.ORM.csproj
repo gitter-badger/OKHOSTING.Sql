@@ -69,8 +69,8 @@
     <Compile Include="Operations\OrderBy.cs" />
     <Compile Include="Operations\Select.cs" />
     <Compile Include="Operations\SelectAggregate.cs" />
-    <Compile Include="Operations\SelectAggregateColumn.cs" />
-    <Compile Include="Operations\SelectAggregateFunction.cs" />
+    <Compile Include="Operations\SelectAggregateMember.cs" />
+    <Compile Include="Operations\SelectMember.cs" />
     <Compile Include="Operations\SelectJoin.cs" />
     <Compile Include="Operations\SelectLimit.cs" />
     <Compile Include="Operations\Update.cs" />
