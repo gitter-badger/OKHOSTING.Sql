@@ -56,7 +56,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public DataType BaseTypeMap
+		public DataType BaseDataType
 		{
 			get
 			{
@@ -92,7 +92,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Returns all parent Types ordered from base to child
 		/// </summary>
-		public IEnumerable<DataType> GetBaseTypeMaps()
+		public IEnumerable<DataType> GetBaseDataTypes()
 		{
 			Type current;
 
@@ -118,17 +118,17 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// All TypeMap that directly inherit from the current TypeMap
 		/// </returns>
-		public IEnumerable<DataType> GetSubClassMaps()
+		public IEnumerable<DataType> GetSubDataTypes()
 		{
 			//Crossing all loaded DataTypes
 			foreach (DataType dt in DataTypes)
 			{
 				//Validating if the dataType has a Base Class
-				if (dt.BaseTypeMap != null)
+				if (dt.BaseDataType != null)
 				{
 					//Validating if the base class of the TypeMap<T>
 					//is this TypeMap<T>
-					if (dt.BaseTypeMap.Equals(this))
+					if (dt.BaseDataType.Equals(this))
 					{
 						yield return dt;
 					}
@@ -143,21 +143,21 @@ namespace OKHOSTING.Sql.ORM
 		/// All DataTypes that directly and indirectly inherit from the current TypeMap<T>. 
 		/// Returns the hole tree of subclasses.
 		/// </returns>
-		public IEnumerable<DataType> GetSubClassMapsRecursive()
+		public IEnumerable<DataType> GetSubDataTypesRecursive()
 		{
 			//Crossing all loaded DataTypes
 			foreach (DataType tm in DataTypes)
 			{
 				//Validating if the dataType has a Base Class
-				if (tm.BaseTypeMap != null)
+				if (tm.BaseDataType != null)
 				{
 					//Validating if the base class of the TypeMap<T>
 					//is this TypeMap<T>
-					if (tm.BaseTypeMap.Equals(this))
+					if (tm.BaseDataType.Equals(this))
 					{
 						yield return tm;
 
-						foreach (var tm2 in tm.GetSubClassMapsRecursive())
+						foreach (var tm2 in tm.GetSubDataTypesRecursive())
 						{
 							yield return tm2;
 						}

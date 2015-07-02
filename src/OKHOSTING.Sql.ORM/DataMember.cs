@@ -92,24 +92,19 @@ namespace OKHOSTING.Sql.ORM
 				string[] splittedMembers = Member.Split(new[] { '.' }, StringSplitOptions.None);
 
 				Type memberType = Type.InnerType;
-				MemberInfo memberInfo = memberType.GetProperty(splittedMembers[0]);
-
-				if (memberInfo == null)
+				
+				for (int x = 0; x < splittedMembers.Length; x++)
 				{
-					throw new ArgumentOutOfRangeException("Members", splittedMembers[0], "Type " + memberType + " does not contain a member with that name");
-				}
-
-				memberType = GetReturnType(memberInfo);
-
-				yield return memberInfo;
-
-				for (int x = 1; x < splittedMembers.Length; ++x)
-				{
-					memberInfo = memberType.GetProperty(splittedMembers[x]);
+					MemberInfo memberInfo = memberType.GetProperty(splittedMembers[x]);
 
 					if (memberInfo == null)
 					{
-						throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
+						memberInfo = memberType.GetField(splittedMembers[x]);
+					
+						if (memberInfo == null)
+						{
+							throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
+						}
 					}
 				
 					memberType = GetReturnType(memberInfo);

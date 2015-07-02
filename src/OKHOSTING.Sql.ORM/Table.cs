@@ -11,16 +11,21 @@ namespace OKHOSTING.Sql.ORM
 
 		public override void Add(KeyValuePair<TKey, TType> item)
 		{
-			Insert insert = new Insert();
-			insert.Into = typeof(TType);
+			DataType dtype = typeof(TType);
 
-			foreach (DataMember dmember in insert.Into.Members)
+			foreach (DataType parent in dtype.GetBaseDataTypes())
 			{
-				insert.Values.Add(new MemberValue(dmember, dmember.GetValue(item)));
-			}
+				Insert insert = new Insert();
+				insert.Into = parent;
 
-			string sql = DataBase.SqlGenerator.Insert(OperationConverter.Parse(insert));
-			DataBase.NativeDataBase.Execute(sql);
+				foreach (DataMember dmember in parent.Members)
+				{
+					insert.Values.Add(new MemberValue(dmember, dmember.GetValue(item)));
+				}
+
+				string sql = DataBase.SqlGenerator.Insert(OperationConverter.Parse(insert));
+				DataBase.NativeDataBase.Execute(sql);
+			}
 		}
 
 		public override bool ContainsKey(TKey key)
@@ -36,12 +41,30 @@ namespace OKHOSTING.Sql.ORM
 
 		public override IEnumerator<KeyValuePair<TKey, TType>> GetEnumerator()
 		{
+			DataType dtype = typeof(TType);
 			Select select = new Select();
-			select.From = typeof(TType);
+			select.From = dtype;
 
-			foreach (DataMember member in select.From.Members)
+			foreach (DataMember member in dtype.Members)
 			{
 				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+			}
+
+			//go from child type to base type adding joins
+			while(dtype.BaseDataType != null)
+			{
+				SelectJoin join = new SelectJoin();
+				join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
+				join.Type = dtype;
+				join.On.Add(new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First()));
+				
+				foreach (DataMember member in dtype.BaseDataType.Members)
+				{
+					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+				}
+
+				select.Joins.Add(join);
+				dtype = dtype.BaseDataType;
 			}
 
 			string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
@@ -95,13 +118,20 @@ namespace OKHOSTING.Sql.ORM
 
 		public override bool Remove(TKey key)
 		{
-			Delete delete = new Delete();
-			delete.From = typeof(TType);
-			delete.Where.Add(new Filters.ValueCompareFilter(delete.From.PrimaryKey.First(), key));
+			DataType dtype = typeof(TType);
+			int result = 0;
 
-			string sql = DataBase.SqlGenerator.Delete(OperationConverter.Parse(delete));
-			var result = DataBase.NativeDataBase.Execute(sql);
-			
+			//go from child to base class inheritance
+			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
+			{
+				Delete delete = new Delete();
+				delete.From = parent;
+				delete.Where.Add(new Filters.ValueCompareFilter(parent.PrimaryKey.First(), key));
+
+				string sql = DataBase.SqlGenerator.Delete(OperationConverter.Parse(delete));
+				result += DataBase.NativeDataBase.Execute(sql);
+			}
+
 			return result > 0;
 		}
 
@@ -109,11 +139,80 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				throw new NotImplementedException();
+				DataType dtype = typeof(TType);
+				Select select = new Select();
+				select.From = dtype;
+
+				foreach (DataMember member in dtype.Members)
+				{
+					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+				}
+
+				//go from child type to base type adding joins
+				while (dtype.BaseDataType != null)
+				{
+					SelectJoin join = new SelectJoin();
+					join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
+					join.Type = dtype;
+					join.On.Add(new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First()));
+
+					foreach (DataMember member in dtype.BaseDataType.Members)
+					{
+						select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+					}
+
+					select.Joins.Add(join);
+					dtype = dtype.BaseDataType;
+				}
+
+				dtype = typeof(TType);
+				select.Where.Add(new Filters.ValueCompareFilter(dtype.PrimaryKey.First(), key));
+
+				string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
+				var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
+
+				if (dataReader.Read())
+				{
+					TType instance = Activator.CreateInstance<TType>();
+
+					foreach (DataType parent in dtype.GetBaseDataTypes())
+					{
+						foreach (SelectMember member in parent.Members)
+						{
+							object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+							member.Member.SetValue(instance, value);
+						}
+					}
+
+					return instance;
+				}
+				else
+				{
+					return default(TType);
+				}
 			}
 			set
 			{
-				throw new NotImplementedException();
+				if (ContainsKey(key))
+				{
+					Update update = new Update();
+					update.From = typeof(TType);
+
+					foreach (DataMember dmember in update.From.Members)
+					{
+						update.Set.Add(new MemberValue(dmember, dmember.GetValue(value)));
+					}
+
+					update.Where.Add(new Filters.ValueCompareFilter(update.From.PrimaryKey.First(), key));
+
+					string sql = DataBase.SqlGenerator.Update(OperationConverter.Parse(update));
+					var result = DataBase.NativeDataBase.Execute(sql);
+			
+				}
+				else
+				{
+					Add(new KeyValuePair<TKey, TType>(key, value));
+				}
 			}
 		}
 
