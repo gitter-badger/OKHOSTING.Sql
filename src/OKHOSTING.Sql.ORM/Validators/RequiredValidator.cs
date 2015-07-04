@@ -48,5 +48,17 @@ namespace OKHOSTING.Sql.ORM.Validators
 			//Returning the error or null
 			return error;
 		}
+
+		public static bool IsRequired(System.Reflection.MemberInfo member)
+		{
+			//Validating if the MemberInfo is null
+			if (member == null) throw new ArgumentNullException("member");
+
+			//Recovering the attributes of type DataMemberAttribute declared in the MemberInfo
+			object[] attributes = member.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.RequiredAttribute), false);
+
+			return attributes.Length > 0;
+		}
+
 	}
 }

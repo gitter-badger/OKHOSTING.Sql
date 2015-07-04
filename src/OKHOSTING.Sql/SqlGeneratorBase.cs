@@ -871,7 +871,7 @@ namespace OKHOSTING.Sql
 			//if this is a string value, format as a string
 			if (column.IsString)
 			{
-				if (column.Length.HasValue && column.Length != -1)
+				if (column.Length.HasValue && column.Length > 0)
 				{
 					columnDefinition += FormatStringType(column.Length.Value);
 				}

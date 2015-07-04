@@ -6,8 +6,38 @@ using System.Reflection;
 
 namespace OKHOSTING.Sql.ORM
 {
-	public abstract class DataMember
+	public class DataMember
 	{
+		public DataMember(DataType type, Schema.Column column, string member)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+
+			if (column == null)
+			{
+				throw new ArgumentNullException("column");
+			}
+
+			if (string.IsNullOrWhiteSpace(member))
+			{
+				throw new ArgumentNullException("member");
+			}
+
+			if (column.Table != type.Table)
+			{
+				throw new ArgumentOutOfRangeException("column", column, "This column does not belong the the Table that TypeMap is mapped to");
+			}
+
+			//validate member expression
+			var x = MemberInfos;
+
+			Type = type;
+			Column = column;
+			Member = member;
+		}
+
 		/// <summary>
 		/// The type map that contains this object
 		/// </summary>
@@ -41,36 +71,6 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		public readonly List<Validators.IValidator> Validators = new List<Validators.IValidator>();
-
-		protected DataMember(DataType type, Schema.Column column, string member)
-		{
-			if (type == null)
-			{
-				throw new ArgumentNullException("type");
-			}
-
-			if (column == null)
-			{
-				throw new ArgumentNullException("column");
-			}
-
-			if (string.IsNullOrWhiteSpace(member))
-			{
-				throw new ArgumentNullException("member");
-			}
-
-			if (column.Table != type.Table)
-			{
-				throw new ArgumentOutOfRangeException("column", column, "This column does not belong the the Table that TypeMap is mapped to");
-			}
-
-			//validate member expression
-			var x = MemberInfos;
-
-			Type = type;
-			Column = column;
-			Member = member;
-		}
 
 		public override string ToString()
 		{
@@ -231,19 +231,17 @@ namespace OKHOSTING.Sql.ORM
 
 	public class DataMember<T> : DataMember
 	{
-		/// <summary>
-		/// The member expression that indicates where this field will be stored in runtime
-		/// </summary>
-		public readonly Expression<Func<T, object>> MemberExpression;
+		public DataMember(Schema.Column column, string member): base(typeof(T), column, member)
+		{
+		}
 
 		public DataMember(Schema.Column column, Expression<Func<T, object>> memberExpression): base(typeof(T), column, GetMemberString(memberExpression))
 		{
-			MemberExpression = memberExpression;
 		}
 
 		#region Static
 
-		public static string GetMemberString(System.Linq.Expressions.Expression<Func<T, object>> member)
+		protected static string GetMemberString(System.Linq.Expressions.Expression<Func<T, object>> member)
 		{
 			if (member.Body is UnaryExpression)
 			{
@@ -277,24 +275,22 @@ namespace OKHOSTING.Sql.ORM
 		public static bool IsMapped(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
 			DataType<T> typeMapping = DataType<T>.GetMap();
-			return typeMapping.Members.Where(c => c.MemberExpression.Equals(expression)).Count() > 0;
+			string member = GetMemberString(expression);
+
+			return typeMapping.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
 
-		public static DataMember<T> From(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static DataMember<T> GetMap(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
 			DataType<T> typeMapping = DataType<T>.GetMap();
+			string member = GetMemberString(expression);
 
-			return typeMapping.Members.Where(c => c.MemberExpression.Equals(expression)).Single();
+			return typeMapping.Members.Where(c => c.Member.Equals(member)).Single();
 		}
 
 		public static implicit operator DataMember<T>(System.Linq.Expressions.Expression<Func<T, object>> expression)
 		{
-			return From(expression);
-		}
-
-		public static implicit operator System.Linq.Expressions.Expression<Func<T, object>>(DataMember<T> member)
-		{
-			return member.MemberExpression;
+			return GetMap(expression);
 		}
 
 		#endregion

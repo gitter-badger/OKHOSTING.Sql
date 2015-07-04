@@ -2,18 +2,18 @@
 using System.Linq;
 using System.Collections.Generic;
 using OKHOSTING.Sql.ORM.Operations;
+using OKHOSTING.Sql.ORM.Filters;
 
 namespace OKHOSTING.Sql.ORM
 {
-	public class Table<TKey, TType>: Core.Data.DictionaryBase<TKey, TType> where TKey : IComparable
+	public class Table<TKey, TType>: Core.Data.DictionaryBase<TKey, TType>
 	{
 		public readonly DataBase DataBase;
+		public readonly DataType DataType = typeof(Type);
 
 		public override void Add(KeyValuePair<TKey, TType> item)
 		{
-			DataType dtype = typeof(TType);
-
-			foreach (DataType parent in dtype.GetBaseDataTypes())
+			foreach (DataType parent in DataType.GetBaseDataTypes().Reverse())
 			{
 				Insert insert = new Insert();
 				insert.Into = parent;
@@ -23,66 +23,28 @@ namespace OKHOSTING.Sql.ORM
 					insert.Values.Add(new MemberValue(dmember, dmember.GetValue(item)));
 				}
 
-				string sql = DataBase.SqlGenerator.Insert(OperationConverter.Parse(insert));
-				DataBase.NativeDataBase.Execute(sql);
+				DataBase.Insert(insert);
 			}
 		}
 
 		public override bool ContainsKey(TKey key)
 		{
 			Select select = new Select();
-			select.From = typeof(TType);
+			select.From = DataType;
 			select.Members.Add(select.From.PrimaryKey.First());
-			select.Where.Add(new Filters.ValueCompareFilter(select.From.PrimaryKey.First(), key));
+			select.Where.Add(GetPrimaryKeyFilter(key));
 
-			string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
-			return DataBase.NativeDataBase.ExistsData(sql);
+			return DataBase.Select<TType>(select).Count() > 1;
 		}
 
 		public override IEnumerator<KeyValuePair<TKey, TType>> GetEnumerator()
 		{
-			DataType dtype = typeof(TType);
-			Select select = new Select();
-			select.From = dtype;
-
-			foreach (DataMember member in dtype.Members)
-			{
-				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
-			}
-
-			//go from child type to base type adding joins
-			while(dtype.BaseDataType != null)
-			{
-				SelectJoin join = new SelectJoin();
-				join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
-				join.Type = dtype;
-				join.On.Add(new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First()));
-				
-				foreach (DataMember member in dtype.BaseDataType.Members)
-				{
-					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
-				}
-
-				select.Joins.Add(join);
-				dtype = dtype.BaseDataType;
-			}
-
-			string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
-			var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
+			Select select = CreateSelect();
 			DataMember pkMember = select.From.PrimaryKey.First();
-
-			while (dataReader.Read())
+			
+			foreach (TType instance in DataBase.Select<TType>(select))
 			{
-				TType instance = Activator.CreateInstance<TType>();
-				
-				foreach (SelectMember member in select.Members)
-				{
-					object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias)? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
-					member.Member.SetValue(instance, value);
-				}
-
 				TKey key = (TKey) Convert.ChangeType(pkMember.GetValue(instance), pkMember.ReturnType);
-
 				yield return new KeyValuePair<TKey, TType>(key, instance);
 			}
 		}
@@ -100,16 +62,15 @@ namespace OKHOSTING.Sql.ORM
 			get 
 			{
 				Select select = new Select();
-				select.From = typeof(TType);
+				select.From = DataType;
 				select.Members.Add(select.From.PrimaryKey.First());
 
-				string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
-				var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
 				List<TKey> keys = new List<TKey>();
+				DataMember pk = select.From.PrimaryKey.First();
 
-				while (dataReader.Read())
+				foreach(TType instance in DataBase.Select<TType>(select))
 				{
-					keys.Add((TKey) dataReader[0]);
+					keys.Add((TKey) pk.GetValue(instance));
 				}
 
 				return keys;
@@ -118,18 +79,16 @@ namespace OKHOSTING.Sql.ORM
 
 		public override bool Remove(TKey key)
 		{
-			DataType dtype = typeof(TType);
 			int result = 0;
 
 			//go from child to base class inheritance
-			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
+			foreach (DataType parent in DataType.GetBaseDataTypes())
 			{
 				Delete delete = new Delete();
 				delete.From = parent;
-				delete.Where.Add(new Filters.ValueCompareFilter(parent.PrimaryKey.First(), key));
+				delete.Where.Add(GetPrimaryKeyFilter(key));
 
-				string sql = DataBase.SqlGenerator.Delete(OperationConverter.Parse(delete));
-				result += DataBase.NativeDataBase.Execute(sql);
+				result += DataBase.Delete(delete);
 			}
 
 			return result > 0;
@@ -139,52 +98,13 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				DataType dtype = typeof(TType);
-				Select select = new Select();
-				select.From = dtype;
+				Select select = CreateSelect();
+				select.Where.Add(GetPrimaryKeyFilter(key));
+				var result = DataBase.Select<TType>(select).ToList();
 
-				foreach (DataMember member in dtype.Members)
+				if (result.Count > 0)
 				{
-					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
-				}
-
-				//go from child type to base type adding joins
-				while (dtype.BaseDataType != null)
-				{
-					SelectJoin join = new SelectJoin();
-					join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
-					join.Type = dtype;
-					join.On.Add(new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First()));
-
-					foreach (DataMember member in dtype.BaseDataType.Members)
-					{
-						select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
-					}
-
-					select.Joins.Add(join);
-					dtype = dtype.BaseDataType;
-				}
-
-				dtype = typeof(TType);
-				select.Where.Add(new Filters.ValueCompareFilter(dtype.PrimaryKey.First(), key));
-
-				string sql = DataBase.SqlGenerator.Select(OperationConverter.Parse(select));
-				var dataReader = DataBase.NativeDataBase.GetDataReader(sql);
-
-				if (dataReader.Read())
-				{
-					TType instance = Activator.CreateInstance<TType>();
-
-					foreach (DataType parent in dtype.GetBaseDataTypes())
-					{
-						foreach (SelectMember member in parent.Members)
-						{
-							object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
-							member.Member.SetValue(instance, value);
-						}
-					}
-
-					return instance;
+					return result[0];
 				}
 				else
 				{
@@ -195,19 +115,20 @@ namespace OKHOSTING.Sql.ORM
 			{
 				if (ContainsKey(key))
 				{
-					Update update = new Update();
-					update.From = typeof(TType);
-
-					foreach (DataMember dmember in update.From.Members)
+					foreach (DataType parent in DataType.GetBaseDataTypes().Reverse())
 					{
-						update.Set.Add(new MemberValue(dmember, dmember.GetValue(value)));
+						Update update = new Update();
+						update.From = parent;
+
+						foreach (DataMember dmember in parent.Members)
+						{
+							update.Set.Add(new MemberValue(dmember, dmember.GetValue(value)));
+						}
+
+						update.Where.Add(GetPrimaryKeyFilter(key));
+
+						DataBase.Update(update);
 					}
-
-					update.Where.Add(new Filters.ValueCompareFilter(update.From.PrimaryKey.First(), key));
-
-					string sql = DataBase.SqlGenerator.Update(OperationConverter.Parse(update));
-					var result = DataBase.NativeDataBase.Execute(sql);
-			
 				}
 				else
 				{
@@ -216,8 +137,63 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
+		#region Non public
+
 		internal Table(DataBase database)
 		{
+			DataBase = database;
 		}
+
+		protected virtual Filters.FilterBase GetPrimaryKeyFilter(TKey key)
+		{
+			return GetPrimaryKeyFilter(DataType, key);
+		}
+
+		protected virtual Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, TKey key)
+		{
+			return new Filters.ValueCompareFilter(dtype.PrimaryKey.First(), (IComparable) key);
+		}
+
+		protected virtual Filters.FilterBase GetSelectJoinFilter(DataType dtype)
+		{
+			return new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First());
+		}
+
+		/// <summary>
+		/// Creates a select operation with all DataType's members and inheritance inner joins
+		/// </summary>
+		/// <returns>Select operation</returns>
+		protected Select CreateSelect()
+		{
+			DataType dtype = DataType;
+			Select select = new Select();
+			select.From = dtype;
+
+			foreach (DataMember member in dtype.Members)
+			{
+				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+			}
+
+			//go from child type to base type adding joins
+			while (dtype.BaseDataType != null)
+			{
+				SelectJoin join = new SelectJoin();
+				join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
+				join.Type = dtype;
+				join.On.Add(GetSelectJoinFilter(dtype));
+
+				foreach (DataMember member in dtype.BaseDataType.Members)
+				{
+					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+				}
+
+				select.Joins.Add(join);
+				dtype = dtype.BaseDataType;
+			}
+
+			return select;
+		}
+
+		#endregion
 	}
 }

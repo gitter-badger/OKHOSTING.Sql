@@ -41,7 +41,7 @@ namespace OKHOSTING.Sql.Tests
 			//create
 			var sql = generator.Create(table);
 			db.Execute(sql);
-			Assert.True(db.TableExists(table.Name));
+			Assert.True(db.ExistsTable(table.Name));
 
 			//add index
 			sql = generator.Create(table.Indexes[0]);
@@ -81,7 +81,7 @@ namespace OKHOSTING.Sql.Tests
 			//drop
 			sql = generator.Drop(table);
 			db.Execute(sql);
-			Assert.False(db.TableExists(table.Name));
+			Assert.False(db.ExistsTable(table.Name));
 		}
 	}
 }

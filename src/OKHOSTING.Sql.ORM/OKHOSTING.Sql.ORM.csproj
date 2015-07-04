@@ -38,6 +38,7 @@
       <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -46,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MultipleKeyTable.cs" />
     <Compile Include="DataBase.cs" />
     <Compile Include="Filters\AndFilter.cs" />
     <Compile Include="Filters\CompareFilter.cs" />
@@ -65,7 +67,6 @@
     <Compile Include="Operations\MemberValue.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />
-    <Compile Include="Operations\OperationConverter.cs" />
     <Compile Include="Operations\OrderBy.cs" />
     <Compile Include="Operations\Select.cs" />
     <Compile Include="Operations\SelectAggregate.cs" />
@@ -89,7 +90,6 @@
     <Compile Include="Validators\FileValidator.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Filters\FilterConverter.cs" />
     <Compile Include="Validators\IValidator.cs">
       <SubType>Code</SubType>
     </Compile>

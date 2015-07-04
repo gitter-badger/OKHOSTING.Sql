@@ -651,7 +651,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Boolean value that indicates if the table exists
 		/// </returns>
-		public virtual bool TableExists(string name)
+		public virtual bool ExistsTable(string name)
 		{
 			//Local vars
 			bool existsTable = false;
@@ -845,17 +845,17 @@ namespace OKHOSTING.Sql
 			DbTypeMap.Add(DbType.Boolean, typeof(bool));
 			DbTypeMap.Add(DbType.Byte, typeof(Byte));
 			DbTypeMap.Add(DbType.Currency, typeof(Decimal));
-			DbTypeMap.Add(DbType.Date, typeof(DateTime));
 			DbTypeMap.Add(DbType.DateTime, typeof(DateTime));
 			DbTypeMap.Add(DbType.DateTime2, typeof(DateTime));
 			DbTypeMap.Add(DbType.DateTimeOffset, typeof(DateTime));
+			DbTypeMap.Add(DbType.Date, typeof(DateTime));
 			DbTypeMap.Add(DbType.Decimal, typeof(Decimal));
 			DbTypeMap.Add(DbType.Double, typeof(Double));
 			DbTypeMap.Add(DbType.Int16, typeof(Int16));
 			DbTypeMap.Add(DbType.Int32, typeof(Int32));
 			DbTypeMap.Add(DbType.Int64, typeof(Int16));
 			DbTypeMap.Add(DbType.Guid, typeof(Guid));
-			DbTypeMap.Add(DbType.Object, typeof(byte[]));
+			DbTypeMap.Add(DbType.Object, typeof(object));
 			DbTypeMap.Add(DbType.SByte, typeof(SByte));
 			DbTypeMap.Add(DbType.Single, typeof(Single));
 			DbTypeMap.Add(DbType.String, typeof(string));
@@ -866,11 +866,6 @@ namespace OKHOSTING.Sql
 			DbTypeMap.Add(DbType.UInt64, typeof(UInt16));
 			DbTypeMap.Add(DbType.VarNumeric, typeof(Int64));
 			DbTypeMap.Add(DbType.Xml, typeof(string));
-
-			//DbTypeMap.Add(DbType.AnsiString, MySqlDbType.VarChar);
-			//DbTypeMap.Add(DbType.Binary, MySqlDbType.Timestamp);
-			//DbTypeMap.Add(DbType.Binary, MySqlDbType.VarBinary);
-			//DbTypeMap.Add(DbType.String, MySqlDbType.VarString);
 		}
 
 		public static Type Parse(DbType dbType)

@@ -10,9 +10,9 @@ namespace OKHOSTING.Sql.ORM
 	/// <summary>
 	/// A Type that is mapped to a database Table
 	/// </summary>
-	public abstract class DataType
+	public class DataType
 	{
-		protected DataType(Type innerType, Schema.Table table)
+		public DataType(Type innerType, Schema.Table table)
 		{
 			if (innerType == null)
 			{
@@ -90,7 +90,7 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		/// <summary>
-		/// Returns all parent Types ordered from base to child
+		/// Returns all parent Types ordered from child to base
 		/// </summary>
 		public IEnumerable<DataType> GetBaseDataTypes()
 		{
@@ -261,7 +261,121 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// List of available type mappings, system-wide
 		/// </summary>
-		public static readonly List<DataType> DataTypes = new List<DataType>();
+		protected static readonly List<DataType> DataTypes = new List<DataType>();
+
+		public static IEnumerable<DataType> DefaultMap(IEnumerable<Tuple<Type, Schema.Table>> types)
+		{
+			foreach (var tuple in types)
+			{
+				DefaultMap(tuple.Item1, tuple.Item2);
+				yield return tuple.Item1;
+			}
+		}
+
+		/// <summary>
+		/// Creates a new DataType based on an existing Table, matching only members that have a column with the same name
+		/// </summary>
+		public static DataType DefaultMap(Type type, Schema.Table table)
+		{
+			if (IsMapped(type))
+			{
+				throw new ArgumentOutOfRangeException("type", "This Types is already mapped");
+			}
+
+			DataType dtype = new DataType(type, table);
+			DataTypes.Add(dtype);
+
+			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly))
+			{
+				if ((memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo) && table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
+				{
+					DataMember member = new DataMember(dtype, table[memberInfo.Name], memberInfo.Name);
+					dtype.Members.Add(member);
+				}
+			}
+
+			return dtype;
+		}
+
+		public static IEnumerable<DataType> DefaultMap(IEnumerable<Type> types)
+		{
+			foreach (Type t in types)
+			{
+				DefaultMap(t);
+				yield return t;
+			}
+
+			//create foreign keys now that all tables are created
+			foreach (Type t in types)
+			{
+			}
+		}
+		
+			/// <summary>
+		/// Creates a new DataType, creating as well a new Table with all members of type as columns
+		/// </summary>
+		public static DataType DefaultMap(Type type)
+		{
+			Schema.Table table = new Schema.Table();
+			table.Name = type.Name;
+
+			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				//ignore methods, events and other members
+				if (!(memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo))
+				{
+					continue;
+				}
+
+				//ignore readonly properties
+				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
+				{
+					continue;
+				}
+
+				//ignore readonly fields
+				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
+				{
+					continue;
+				}
+
+				//is this a primary key?
+				bool isPrimaryKey = memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
+
+				//ignore inherited members, except for primary keys
+				if (!memberInfo.DeclaringType.Equals(type) && !isPrimaryKey)
+				{
+					continue;
+				}
+
+				Schema.Column column = new Schema.Column();
+				column.Name = memberInfo.Name;
+				column.Table = table;
+				column.DbType = Sql.DataBase.Parse(DataMember.GetReturnType(memberInfo));
+				column.IsNullable = !Validators.RequiredValidator.IsRequired(memberInfo);
+
+				if (isPrimaryKey)
+				{
+					column.IsPrimaryKey = true;
+					column.IsNullable = false;
+				}
+
+				if (column.IsString)
+				{
+					column.Length = Validators.StringLengthValidator.GetMaxLenght(memberInfo);
+				}
+
+				table.Columns.Add(column);
+			}
+
+			if (table.PrimaryKey.Count() < 1)
+			{
+				throw new ArgumentException("Could not define a primary key for Type " + typeof(T).FullName, "T");
+			}
+
+			return DefaultMap(type, table);
+		}
+
 
 		#endregion
 	}

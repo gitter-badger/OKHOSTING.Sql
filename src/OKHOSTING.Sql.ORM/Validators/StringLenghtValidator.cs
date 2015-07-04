@@ -130,16 +130,13 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// </summary>
 		/// <param name="dmember">String DataValue that has a StringLengthValidator attribute</param>
 		/// <returns>Maximum lenght of the string DataValue. 0 if no max lenght is defined.</returns>
-		public static int GetMaxLenght(DataMember dmember)
+		public static int GetMaxLenght(System.Reflection.MemberInfo member)
 		{
 			//Validating if the MemberInfo is null
-			if (dmember == null) throw new ArgumentNullException("dmember");
+			if (member == null) throw new ArgumentNullException("member");
 
 			//Recovering the attributes of type DataMemberAttribute declared in the MemberInfo
-			object[] attributes = dmember.FinalMemberInfo.GetCustomAttributes(typeof(StringLengthValidator), false);
-
-			//Evaluating if exists the DataMemberAttribute in the MemberInfo and returning the result
-			if (attributes.Length == 0) return 0;
+			object[] attributes = member.GetCustomAttributes(typeof(StringLengthValidator), false);
 
 			foreach (StringLengthValidator validator in attributes)
 			{
@@ -151,24 +148,30 @@ namespace OKHOSTING.Sql.ORM.Validators
 					return validator.MaxLength;
 			}
 
+			//try with StringLengthAttribute
+			attributes = member.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.StringLengthAttribute), false);
+
+			foreach (System.ComponentModel.DataAnnotations.StringLengthAttribute validator in attributes)
+			{
+				return validator.MaximumLength;
+			}
+
 			//if operator is not one of the previous, return null
 			return 0;
 		}
+
 		/// <summary>
 		/// Gets the min lenght of a string DataValue
 		/// </summary>
 		/// <param name="dmember">String DataValue that has a StringLengthValidator attribute</param>
 		/// <returns>Maximum lenght of the string DataValue. Null if no max lenght is defined.</returns>
-		public static int GetMinLenght(DataMember dmember)
+		public static int GetMinLenght(System.Reflection.MemberInfo member)
 		{
 			//Validating if the MemberInfo is null
-			if (dmember == null) throw new ArgumentNullException("dmember");
+			if (member == null) throw new ArgumentNullException("member");
 
 			//Recovering the attributes of type DataMemberAttribute declared in the MemberInfo
-			object[] attributes = dmember.FinalMemberInfo.GetCustomAttributes(typeof(StringLengthValidator), false);
-
-			//Evaluating if exists the DataMemberAttribute in the MemberInfo and returning the result
-			if (attributes.Length == 0) return 0;
+			object[] attributes = member.GetCustomAttributes(typeof(StringLengthValidator), false);
 
 			foreach (StringLengthValidator validator in attributes)
 			{
@@ -178,6 +181,14 @@ namespace OKHOSTING.Sql.ORM.Validators
 					return validator.MaxLength + 1;
 				else if (validator.Operator == CompareOperator.GreaterThanEqual)
 					return validator.MaxLength;
+			}
+
+			//try with StringLengthAttribute
+			attributes = member.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.StringLengthAttribute), false);
+
+			foreach (System.ComponentModel.DataAnnotations.StringLengthAttribute validator in attributes)
+			{
+				return validator.MinimumLength;
 			}
 
 			//if operator is not one of the previous, return null

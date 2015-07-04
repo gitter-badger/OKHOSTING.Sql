@@ -137,7 +137,7 @@ namespace OKHOSTING.Sql.SqlServer
 		/// <returns>
 		/// Boolean value that indicates if the table exists
 		/// </returns>
-		public override bool TableExists(string name)
+		public override bool ExistsTable(string name)
 		{
 			//Local vars
 			bool existsTable = false;
