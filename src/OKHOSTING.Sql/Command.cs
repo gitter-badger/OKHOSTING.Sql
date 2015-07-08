@@ -31,11 +31,6 @@ namespace OKHOSTING.Sql
 			return new Command() { Script = command };
 		}
 
-		public static implicit operator String(Command command)
-		{
-			return command.Script;
-		}
-
 		public static Command operator +(Command command1, Command command2)
 		{
 			command1.Append(command2);

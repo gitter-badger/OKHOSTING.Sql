@@ -77,7 +77,7 @@ namespace OKHOSTING.Sql.OleDb
 		/// <example>
 		/// For typeof(Int32), "INTEGER" is returned
 		/// </example>
-		protected override Command Format(DbType type)
+		protected override string Format(DbType type)
 		{
 			//Validating that the type Argument is not null
 			if (type == null) throw new ArgumentNullException("type");
@@ -147,13 +147,13 @@ namespace OKHOSTING.Sql.OleDb
 		/// <example>
 		/// if lenght is cero, "TEXT" is returned, is lengh is 20, CHAR(20) is returned
 		/// </example>
-		protected override Command FormatStringType(int lenght)
+		protected override string FormatStringType(int lenght)
 		{
 			//Validating the lenght of the string 
 			if (lenght == 0)
 				return "MEMO";
 			else
-				return this.Format(DbType.StringFixedLength) + " (" + lenght + ")";
+				return this.Format(DbType.StringFixedLength) + " (" + lenght.ToString() + ")";
 		}
 
 		#endregion

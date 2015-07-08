@@ -34,8 +34,18 @@
       <HintPath>..\packages\Dapper.1.42\lib\net45\Dapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\test\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="OKHOSTING.Core">
       <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="OKHOSTING.Core.Cryptography">
+      <HintPath>..\References\OKHOSTING.Core.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpAESCrypt">
+      <HintPath>..\References\SharpAESCrypt.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -47,6 +57,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Converters\ConverterBase.cs" />
+    <Compile Include="Converters\EncryptBinary.cs" />
+    <Compile Include="Converters\Uppercase.cs" />
+    <Compile Include="Converters\Lowercase.cs" />
+    <Compile Include="Converters\Trim.cs" />
+    <Compile Include="Converters\EncryptString.cs" />
+    <Compile Include="Converters\IConverter.cs" />
+    <Compile Include="Converters\Json.cs" />
     <Compile Include="MultipleKeyTable.cs" />
     <Compile Include="DataBase.cs" />
     <Compile Include="Filters\AndFilter.cs" />
@@ -64,9 +82,11 @@
     <Compile Include="Filters\RangeFilter.cs" />
     <Compile Include="Filters\ValueCompareFilter.cs" />
     <Compile Include="DataMember.cs" />
-    <Compile Include="Operations\MemberValue.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />
+    <Compile Include="Operations\MemberValue.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Operations\OrderBy.cs" />
     <Compile Include="Operations\Select.cs" />
     <Compile Include="Operations\SelectAggregate.cs" />

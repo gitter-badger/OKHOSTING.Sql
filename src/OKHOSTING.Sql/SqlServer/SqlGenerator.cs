@@ -84,7 +84,7 @@ namespace OKHOSTING.Sql.SqlServer
 		/// <example>
 		/// For typeof(Int32), "INTEGER" is returned
 		/// </example>
-		protected override Command Format(DbType type)
+		protected override string Format(DbType type)
 		{
 			//Getting the type name in Database
 			switch (type)
@@ -208,7 +208,7 @@ namespace OKHOSTING.Sql.SqlServer
 		protected override Command IndexDefinition(Index index)
 		{
 			//local vars
-			string sql = string.Empty;
+			Command sql = new Command();
 
 			//Creating the sql 
 			sql += 
@@ -223,7 +223,7 @@ namespace OKHOSTING.Sql.SqlServer
 			}
 
 			//Enclosing the field lists
-			sql = sql.TrimEnd(',', ' ');
+			sql.Script = sql.Script.TrimEnd(',', ' ');
 			sql += ")";
 
 			return sql;

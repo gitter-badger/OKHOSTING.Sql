@@ -111,7 +111,7 @@ namespace OKHOSTING.Sql.MySql
 		/// <example>
 		/// For typeof(Int32), "INTEGER" is returned
 		/// </example>
-		protected override Command Format(DbType type)
+		protected override string Format(DbType type)
 		{
 			switch (type)
 			{

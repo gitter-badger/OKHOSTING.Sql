@@ -9,6 +9,6 @@ namespace OKHOSTING.Sql.ORM.Operations
 	public class Insert
 	{
 		public DataType Into { get; set; }
-		public List<MemberValue> Values { get; set; }
+		public readonly List<MemberValue> Values = new List<MemberValue>();
 	}
 }

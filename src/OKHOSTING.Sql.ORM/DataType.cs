@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using System.Data;
 
 namespace OKHOSTING.Sql.ORM
 {
@@ -63,7 +64,7 @@ namespace OKHOSTING.Sql.ORM
 				Type current;
 
 				//Get all types in ascendent order (from base to child)
-				current = this.InnerType;
+				current = this.InnerType.BaseType;
 
 				while (current != null)
 				{
@@ -243,6 +244,16 @@ namespace OKHOSTING.Sql.ORM
 		
 		#region Static
 
+		/// <summary>
+		/// List of available type mappings, system-wide
+		/// </summary>
+		public static readonly List<DataType> DataTypes = new List<DataType>();
+
+		public static implicit operator DataType(Type type)
+		{
+			return GetMap(type);
+		}
+
 		public static bool IsMapped(Type type)
 		{
 			return DataTypes.Where(m => m.InnerType.Equals(type)).Count() > 0;
@@ -252,16 +263,47 @@ namespace OKHOSTING.Sql.ORM
 		{
 			return DataTypes.Where(m => m.InnerType.Equals(type)).Single();
 		}
-		
-		public static implicit operator DataType(Type type)
-		{
-			return GetMap(type);
-		}
 
 		/// <summary>
-		/// List of available type mappings, system-wide
+		/// Returns a collection of members that are mapable, 
+		/// meaning they are fields or properties, public, non read-only, and non-static
 		/// </summary>
-		protected static readonly List<DataType> DataTypes = new List<DataType>();
+		public static IEnumerable<System.Reflection.MemberInfo> GetMapableMembers(Type type)
+		{
+			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				//ignore methods, events and other members
+				if (!(memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo))
+				{
+					continue;
+				}
+
+				//ignore readonly properties
+				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
+				{
+					continue;
+				}
+
+				//ignore readonly fields
+				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
+				{
+					continue;
+				}
+
+				//ignore inherited members, except for primary keys
+				if (!memberInfo.DeclaringType.Equals(type) && !IsPrimaryKey(memberInfo))
+				{
+					continue;
+				}
+
+				yield return memberInfo;
+			}
+		}
+
+		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
+		{
+			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
+		}
 
 		public static IEnumerable<DataType> DefaultMap(IEnumerable<Tuple<Type, Schema.Table>> types)
 		{
@@ -285,9 +327,9 @@ namespace OKHOSTING.Sql.ORM
 			DataType dtype = new DataType(type, table);
 			DataTypes.Add(dtype);
 
-			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly))
+			foreach (var memberInfo in GetMapableMembers(type))
 			{
-				if ((memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo) && table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
+				if (table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
 				{
 					DataMember member = new DataMember(dtype, table[memberInfo.Name], memberInfo.Name);
 					dtype.Members.Add(member);
@@ -297,86 +339,148 @@ namespace OKHOSTING.Sql.ORM
 			return dtype;
 		}
 
+		/// <summary>
+		/// Creates a list of new DataTypes, creating as well a list of new Tables with all members of type as columns
+		/// </summary>
 		public static IEnumerable<DataType> DefaultMap(IEnumerable<Type> types)
 		{
-			foreach (Type t in types)
+			//map primary keys first, so we allow to foreign keys and inheritance to be correctly mapped
+			foreach (Type type in types)
 			{
-				DefaultMap(t);
-				yield return t;
+				Schema.Table table = new Schema.Table(type.Name);
+				DataType dtype = new DataType(type, table);
+				DataTypes.Add(dtype);
+
+				foreach (var memberInfo in GetMapableMembers(type).Where(m => IsPrimaryKey(m)))
+				{
+					Schema.Column column = new Schema.Column();
+					column.Name = memberInfo.Name;
+					column.Table = table;
+					column.IsPrimaryKey = true;
+					column.IsNullable = false;
+					column.DbType = Sql.DataBase.Parse(DataMember.GetReturnType(memberInfo)); //only atomic values supported at the moment
+
+					if (column.IsString)
+					{
+						column.Length = Validators.StringLengthValidator.GetMaxLenght(memberInfo);
+					}
+
+					//only autoincrement the base table
+					if (dtype.BaseDataType == null && column.IsIntegral)
+					{
+						column.IsAutoNumber = true;
+					}
+
+					table.Columns.Add(column);
+
+					//create datamember
+					DataMember dmember = new DataMember(type, column, memberInfo.Name);
+					dtype.Members.Add(dmember);
+				}
 			}
 
-			//create foreign keys now that all tables are created
-			foreach (Type t in types)
+			foreach (Type type in types)
 			{
+				DataType dtype = type;
+
+				//create inheritance foreign keys
+				if (dtype.BaseDataType != null)
+				{
+					Schema.ForeignKey foreignKey = new Schema.ForeignKey();
+					foreignKey.Table = dtype.Table;
+					foreignKey.RemoteTable = dtype.BaseDataType.Table;
+					foreignKey.Name = "FK_" + dtype.Table.Name + "_" + dtype.BaseDataType.Table.Name;
+
+					//we asume that primary keys on parent and child tables have the same number and order of related columns
+					for (int i = 0; i < dtype.PrimaryKey.Count(); i++)
+					{
+						DataMember pk = dtype.PrimaryKey.ToArray()[i];
+						DataMember basePk = dtype.BaseDataType.PrimaryKey.ToArray()[i];
+
+						foreignKey.Columns.Add(new Tuple<Schema.Column, Schema.Column>(pk.Column, basePk.Column));
+					}
+
+					dtype.Table.ForeignKeys.Add(foreignKey);
+				}
+
+				//map non primary key members now
+				foreach (var memberInfo in GetMapableMembers(type).Where(m => !IsPrimaryKey(m)))
+				{
+					Type returnType = DataMember.GetReturnType(memberInfo);
+
+					//its a persistent type, with it's own table, map primary keys
+					if (IsMapped(returnType))
+					{
+						//we asume this datatype is already mapped along with it's primery key
+						DataType returnDataType = returnType;
+
+						Schema.ForeignKey foreignKey = new Schema.ForeignKey();
+						foreignKey.Table = dtype.Table;
+						foreignKey.RemoteTable = returnDataType.Table;
+						foreignKey.Name = "FK_" + dtype.Table.Name + "_" + memberInfo.Name;
+
+						foreach (DataMember pk in returnDataType.PrimaryKey)
+						{
+							Schema.Column column = new Schema.Column();
+							column.Name = memberInfo.Name + "_" + pk.Member.Replace('.', '_');
+							column.Table = dtype.Table;
+							column.IsPrimaryKey = false;
+							column.IsNullable = !Validators.RequiredValidator.IsRequired(memberInfo);
+							column.DbType = Sql.DataBase.Parse(pk.ReturnType);
+
+							if (column.IsString)
+							{
+								column.Length = Validators.StringLengthValidator.GetMaxLenght(pk.FinalMemberInfo);
+							}
+
+							dtype.Table.Columns.Add(column);
+							foreignKey.Columns.Add(new Tuple<Schema.Column, Schema.Column>(column, pk.Column));
+							
+							//create datamember
+							DataMember dmember = new DataMember(type, column, memberInfo.Name + "." + pk.Member);
+							dtype.Members.Add(dmember);
+						}
+
+						dtype.Table.ForeignKeys.Add(foreignKey);
+					}
+					//just map as a atomic value
+					else
+					{
+						Schema.Column column = new Schema.Column();
+						column.Name = memberInfo.Name;
+						column.Table = dtype.Table;
+						column.IsNullable = !Validators.RequiredValidator.IsRequired(memberInfo);
+						column.IsPrimaryKey = false;
+
+						//create datamember
+						DataMember dmember = new DataMember(type, column, memberInfo.Name);
+						dtype.Members.Add(dmember);
+
+						//is this a regular atomic value?
+						if (Sql.DataBase.DbTypeMap.ContainsValue(returnType) && returnType != typeof(object))
+						{
+							column.DbType = Sql.DataBase.Parse(returnType);
+						}
+						//this is an non-atomic object, but its not mapped as a DataType, so we serialize it as json
+						else
+						{
+							column.DbType = DbType.String;
+							dmember.Converter = new Converters.Json(returnType);
+						}
+
+						if (column.IsString)
+						{
+							column.Length = Validators.StringLengthValidator.GetMaxLenght(memberInfo);
+						}
+
+						dtype.Table.Columns.Add(column);
+					}
+				}
+
+				yield return dtype;
 			}
 		}
 		
-			/// <summary>
-		/// Creates a new DataType, creating as well a new Table with all members of type as columns
-		/// </summary>
-		public static DataType DefaultMap(Type type)
-		{
-			Schema.Table table = new Schema.Table();
-			table.Name = type.Name;
-
-			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
-			{
-				//ignore methods, events and other members
-				if (!(memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo))
-				{
-					continue;
-				}
-
-				//ignore readonly properties
-				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
-				{
-					continue;
-				}
-
-				//ignore readonly fields
-				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
-				{
-					continue;
-				}
-
-				//is this a primary key?
-				bool isPrimaryKey = memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
-
-				//ignore inherited members, except for primary keys
-				if (!memberInfo.DeclaringType.Equals(type) && !isPrimaryKey)
-				{
-					continue;
-				}
-
-				Schema.Column column = new Schema.Column();
-				column.Name = memberInfo.Name;
-				column.Table = table;
-				column.DbType = Sql.DataBase.Parse(DataMember.GetReturnType(memberInfo));
-				column.IsNullable = !Validators.RequiredValidator.IsRequired(memberInfo);
-
-				if (isPrimaryKey)
-				{
-					column.IsPrimaryKey = true;
-					column.IsNullable = false;
-				}
-
-				if (column.IsString)
-				{
-					column.Length = Validators.StringLengthValidator.GetMaxLenght(memberInfo);
-				}
-
-				table.Columns.Add(column);
-			}
-
-			if (table.PrimaryKey.Count() < 1)
-			{
-				throw new ArgumentException("Could not define a primary key for Type " + typeof(T).FullName, "T");
-			}
-
-			return DefaultMap(type, table);
-		}
-
-
 		#endregion
 	}
 

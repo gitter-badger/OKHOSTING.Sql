@@ -12,18 +12,39 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// </summary>
 	public class MemberValue
 	{
-		public readonly DataMember MemberMap;
-		public readonly object Value;
+		public readonly DataMember DataMember;
+		public readonly object Instance;
 
-		public MemberValue(DataMember member, object value)
+		public object Value
+		{
+			get
+			{
+				return DataMember.GetValue(Instance);
+			}
+		}
+
+		public object ValueForColumn
+		{
+			get
+			{
+				return DataMember.GetValueForColumn(Instance);
+			}
+		}
+
+		public MemberValue(DataMember member, object instance)
 		{
 			if (member == null)
 			{
 				throw new ArgumentNullException("member");
 			}
 
-			MemberMap = member;
-			Value = value;
+			if (instance == null)
+			{
+				throw new ArgumentNullException("instance");
+			}
+
+			DataMember = member;
+			Instance = instance;
 		}
 	}
 }

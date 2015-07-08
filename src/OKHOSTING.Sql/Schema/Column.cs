@@ -128,17 +128,35 @@ namespace OKHOSTING.Sql.Schema
 		{
 			get
 			{
+				return IsIntegral || IsDecimal;
+			}
+		}
+
+		public bool IsIntegral
+		{
+			get
+			{
 				return
 					DbType == System.Data.DbType.Byte ||
-					DbType == System.Data.DbType.Currency ||
-					DbType == System.Data.DbType.Decimal ||
-					DbType == System.Data.DbType.Double ||
+					DbType == System.Data.DbType.SByte ||
 					DbType == System.Data.DbType.Int16 ||
 					DbType == System.Data.DbType.Int32 ||
 					DbType == System.Data.DbType.Int64 ||
 					DbType == System.Data.DbType.UInt16 ||
 					DbType == System.Data.DbType.UInt32 ||
-					DbType == System.Data.DbType.UInt64 ||
+					DbType == System.Data.DbType.UInt64;
+			}
+		}
+
+		public bool IsDecimal
+		{
+			get
+			{
+				return
+					DbType == System.Data.DbType.Currency ||
+					DbType == System.Data.DbType.Decimal ||
+					DbType == System.Data.DbType.Single ||
+					DbType == System.Data.DbType.Double ||
 					DbType == System.Data.DbType.VarNumeric;
 			}
 		}
@@ -151,7 +169,8 @@ namespace OKHOSTING.Sql.Schema
 					DbType == System.Data.DbType.Date ||
 					DbType == System.Data.DbType.DateTime ||
 					DbType == System.Data.DbType.DateTime2 ||
-					DbType == System.Data.DbType.DateTimeOffset;
+					DbType == System.Data.DbType.DateTimeOffset ||
+					DbType == System.Data.DbType.Time;
 			}
 		}
 

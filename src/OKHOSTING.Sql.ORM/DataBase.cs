@@ -10,7 +10,7 @@ namespace OKHOSTING.Sql.ORM
 {
 	public class DataBase : IOrmDataBase
 	{
-		protected readonly Dictionary<Type, object> Tables;
+		protected readonly Dictionary<Type, object> Tables = new Dictionary<Type,object>();
 
 		public readonly Sql.DataBase NativeDataBase;
 		public readonly SqlGeneratorBase SqlGenerator;
@@ -62,25 +62,25 @@ namespace OKHOSTING.Sql.ORM
 
 		public int Insert(Insert insert)
 		{
-			string sql = SqlGenerator.Insert(Parse(insert));
+			Command sql = SqlGenerator.Insert(Parse(insert));
 			return NativeDataBase.Execute(sql);
 		}
 
 		public int Update(Update update)
 		{
-			string sql = SqlGenerator.Update(Parse(update));
+			Command sql = SqlGenerator.Update(Parse(update));
 			return NativeDataBase.Execute(sql);
 		}
 
 		public int Delete(Delete delete)
 		{
-			string sql = SqlGenerator.Delete(Parse(delete));
+			Command sql = SqlGenerator.Delete(Parse(delete));
 			return NativeDataBase.Execute(sql);
 		}
 
 		public IEnumerable<TType> Select<TType>(Select select)
 		{
-			string sql = SqlGenerator.Select(Parse(select));
+			Command sql = SqlGenerator.Select(Parse(select));
 			var dataReader = NativeDataBase.GetDataReader(sql);
 
 			while (dataReader.Read())
@@ -90,7 +90,7 @@ namespace OKHOSTING.Sql.ORM
 				foreach (SelectMember member in select.Members)
 				{
 					object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
-					member.Member.SetValue(instance, value);
+					member.Member.SetValueFromColumn(instance, value);
 				}
 
 				yield return instance;
@@ -100,7 +100,7 @@ namespace OKHOSTING.Sql.ORM
 		public void Create<TType>()
 		{
 			DataType dtype = typeof(TType);
-			string sql;
+			Command sql;
 
 			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 			{
@@ -129,30 +129,27 @@ namespace OKHOSTING.Sql.ORM
 		public void Drop<TType>()
 		{
 			DataType dtype = typeof(TType);
-			string sql;
+			Command sql;
 
-			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
+			if (!NativeDataBase.ExistsTable(dtype.Table.Name))
 			{
-				if (!NativeDataBase.ExistsTable(parent.Table.Name))
-				{
-					continue;
-				}
+				return;
+			}
 
-				foreach (Sql.Schema.Index index in parent.Table.Indexes)
-				{
-					sql = SqlGenerator.Create(index);
-					NativeDataBase.Execute(sql);
-				}
-
-				foreach (Sql.Schema.ForeignKey fk in parent.Table.ForeignKeys)
-				{
-					sql = SqlGenerator.Create(fk);
-					NativeDataBase.Execute(sql);
-				}
-
-				sql = SqlGenerator.Drop(parent.Table);
+			foreach (Sql.Schema.Index index in dtype.Table.Indexes)
+			{
+				sql = SqlGenerator.Drop(index);
 				NativeDataBase.Execute(sql);
 			}
+
+			foreach (Sql.Schema.ForeignKey fk in dtype.Table.ForeignKeys)
+			{
+				sql = SqlGenerator.Drop(fk);
+				NativeDataBase.Execute(sql);
+			}
+
+			sql = SqlGenerator.Drop(dtype.Table);
+			NativeDataBase.Execute(sql);
 		}
 
 		#region Filter parsing
@@ -162,13 +159,14 @@ namespace OKHOSTING.Sql.ORM
 			//Validating if there are filters defined
 			if (filter == null) return null;
 
-			if (filter is MemberCompareFilter) return Parse((MemberCompareFilter)filter);
 			if (filter is CustomFilter) return Parse((CustomFilter)filter);
 			if (filter is InFilter) return Parse((InFilter)filter);
 			if (filter is LikeFilter) return Parse((LikeFilter)filter);
 			if (filter is RangeFilter) return Parse((RangeFilter)filter);
+			if (filter is MemberCompareFilter) return Parse((MemberCompareFilter)filter);
 			if (filter is ValueCompareFilter) return Parse((ValueCompareFilter)filter);
-			if (filter is LogicalOperatorFilter) return Parse((LogicalOperatorFilter)filter);
+			if (filter is AndFilter) return Parse((AndFilter)filter);
+			if (filter is OrFilter) return Parse((OrFilter)filter);
 
 			throw new ArgumentOutOfRangeException("filter");
 		}
@@ -186,7 +184,18 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (IComparable v in filter.Values)
 			{
-				native.Values.Add(v);
+				IComparable converted;
+
+				if (filter.Member.Converter != null)
+				{
+					converted = (IComparable) filter.Member.Converter.MemberToColumn(v);
+				}
+				else
+				{
+					converted = v;
+				}
+
+				native.Values.Add(converted);
 			}
 
 			return native;
@@ -194,12 +203,57 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Filters.LikeFilter Parse(LikeFilter filter)
 		{
+			string pattern;
+
+			if (filter.Member.Converter != null)
+			{
+				pattern = (string) filter.Member.Converter.MemberToColumn(filter.Pattern);
+			}
+			else
+			{
+				pattern = filter.Pattern;
+			}
+
 			return new Sql.Filters.LikeFilter(filter.Member.Column, filter.Pattern, filter.CaseSensitive);
+		}
+
+		protected Sql.Filters.RangeFilter Parse(RangeFilter filter)
+		{
+			IComparable minValue, maxValue;
+
+			if (filter.Member.Converter != null)
+			{
+				minValue = (IComparable)filter.Member.Converter.MemberToColumn(filter.MinValue);
+				maxValue = (IComparable)filter.Member.Converter.MemberToColumn(filter.MaxValue);
+			}
+			else
+			{
+				minValue = filter.MinValue;
+				maxValue = filter.MaxValue;
+			}
+
+			return new Sql.Filters.RangeFilter(filter.Member.Column, minValue, maxValue);
 		}
 
 		protected Sql.Filters.ColumnCompareFilter Parse(MemberCompareFilter filter)
 		{
 			return new Sql.Filters.ColumnCompareFilter(filter.Member.Column, filter.MemberToCompare.Column, filter.Operator);
+		}
+
+		protected Sql.Filters.ValueCompareFilter Parse(ValueCompareFilter filter)
+		{
+			IComparable value;
+
+			if (filter.Member.Converter != null)
+			{
+				value = (IComparable)filter.Member.Converter.MemberToColumn(filter.ValueToCompare);
+			}
+			else
+			{
+				value = filter.ValueToCompare;
+			}
+
+			return new Sql.Filters.ValueCompareFilter(filter.Member.Column, value, filter.Operator);
 		}
 
 		protected Sql.Filters.AndFilter Parse(AndFilter filter)
@@ -237,7 +291,7 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (MemberValue mvalue in insert.Values)
 			{
-				native.Values.Add(new Sql.Operations.ColumnValue(mvalue.MemberMap.Column, mvalue.Value));
+				native.Values.Add(new Sql.Operations.ColumnValue(mvalue.DataMember.Column, mvalue.ValueForColumn));
 			}
 
 			return native;
@@ -250,7 +304,7 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (MemberValue mvalue in update.Set)
 			{
-				native.Set.Add(new Sql.Operations.ColumnValue(mvalue.MemberMap.Column, mvalue.Value));
+				native.Set.Add(new Sql.Operations.ColumnValue(mvalue.DataMember.Column, mvalue.ValueForColumn));
 			}
 
 			foreach (Filters.FilterBase filter in update.Where)

@@ -72,6 +72,11 @@ namespace OKHOSTING.Sql.ORM
 
 		public readonly List<Validators.IValidator> Validators = new List<Validators.IValidator>();
 
+		/// <summary>
+		/// Conversions to apply when writing yo or reading from the database
+		/// </summary>
+		public Converters.IConverter Converter;
+
 		public override string ToString()
 		{
 			return Member;
@@ -165,6 +170,28 @@ namespace OKHOSTING.Sql.ORM
 			SetValue(FinalMemberInfo, obj, value);
 		}
 
+		public object GetValueForColumn(object obj)
+		{
+			object value = GetValue(obj);
+
+			if (Converter != null)
+			{
+				value = Converter.MemberToColumn(value);
+			}
+
+			return value;
+		}
+
+		public void SetValueFromColumn(object obj, object value)
+		{
+			if (Converter != null)
+			{
+				value = Converter.ColumnToMember(value);
+			}
+
+			SetValue(obj, value);
+		}
+
 		#region Static
 
 		public static Type GetReturnType(MemberInfo memberInfo)
@@ -241,7 +268,7 @@ namespace OKHOSTING.Sql.ORM
 
 		#region Static
 
-		protected static string GetMemberString(System.Linq.Expressions.Expression<Func<T, object>> member)
+		protected static string GetMemberString(Expression<Func<T, object>> member)
 		{
 			if (member.Body is UnaryExpression)
 			{
@@ -272,7 +299,7 @@ namespace OKHOSTING.Sql.ORM
 			return path + lambdaMemberExpressionOriginal.Member.Name;
 		}
 
-		public static bool IsMapped(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static bool IsMapped(Expression<Func<T, object>> expression)
 		{
 			DataType<T> typeMapping = DataType<T>.GetMap();
 			string member = GetMemberString(expression);
@@ -280,7 +307,7 @@ namespace OKHOSTING.Sql.ORM
 			return typeMapping.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
 
-		public static DataMember<T> GetMap(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static DataMember<T> GetMap(Expression<Func<T, object>> expression)
 		{
 			DataType<T> typeMapping = DataType<T>.GetMap();
 			string member = GetMemberString(expression);
@@ -288,7 +315,7 @@ namespace OKHOSTING.Sql.ORM
 			return typeMapping.Members.Where(c => c.Member.Equals(member)).Single();
 		}
 
-		public static implicit operator DataMember<T>(System.Linq.Expressions.Expression<Func<T, object>> expression)
+		public static implicit operator DataMember<T>(Expression<Func<T, object>> expression)
 		{
 			return GetMap(expression);
 		}

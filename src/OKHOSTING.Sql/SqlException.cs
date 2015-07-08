@@ -63,7 +63,7 @@ namespace OKHOSTING.Sql
 		{
 			get
 			{
-				return base.Message + "\r\n\r\nExecuted Script:\r\n" + this.Command + "\r\n\r\n";
+				return base.Message + "\r\n\r\nExecuted Script:\r\n" + this.Command.Script + "\r\n\r\n";
 			}
 		}
 
