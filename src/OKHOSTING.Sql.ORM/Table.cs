@@ -13,7 +13,9 @@ namespace OKHOSTING.Sql.ORM
 
 		public override void Add(KeyValuePair<TKey, TType> item)
 		{
-			foreach (DataType parent in DataType.GetBaseDataTypes().Reverse())
+			DataType dtype = item.Value.GetType();
+
+			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 			{
 				Insert insert = new Insert();
 				insert.Into = parent;
@@ -124,7 +126,9 @@ namespace OKHOSTING.Sql.ORM
 			{
 				if (ContainsKey(key))
 				{
-					foreach (DataType parent in DataType.GetBaseDataTypes().Reverse())
+					DataType dtype = value.GetType();
+
+					foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 					{
 						Update update = new Update();
 						update.From = parent;
