@@ -203,7 +203,7 @@ namespace OKHOSTING.Sql
 			//Crossing DataValues that aren't primary key
 			foreach (var value in update.Set)
 			{
-				CommandParameter param = new CommandParameter(value.Value, value.Column.Name, value.Column.DbType);
+				CommandParameter param = new CommandParameter(value.Value, "@" + value.Column.Name, value.Column.DbType);
 				command.Parameters.Add(param);
 
 				//Building the sql sentence...
@@ -216,6 +216,9 @@ namespace OKHOSTING.Sql
 
 			//Remove the ", " if there is at least one updated property
 			command.Script = command.Script.TrimEnd(',', ' ');
+
+			//filters
+			command += WhereClause(update.Where);
 
 			//Returning the sentence
 			return command;
@@ -246,7 +249,7 @@ namespace OKHOSTING.Sql
 
 			Command command = "DELETE " + EncloseName(delete.From.Name);
 
-			command.Append(WhereClause(delete.Where, LogicalOperator.And));
+			command += WhereClause(delete.Where);
 		
 			//Retrieving sql sentences for delete
 			return command;

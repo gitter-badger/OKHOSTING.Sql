@@ -43,9 +43,9 @@ namespace OKHOSTING.Sql.ORM
 			Select select = new Select();
 			select.From = DataType;
 			select.Members.Add(select.From.PrimaryKey.First());
-			select.Where.Add(GetPrimaryKeyFilter(key));
+			select.Where.Add(GetPrimaryKeyFilter(DataType, key));
 
-			return DataBase.Select<TType>(select).Count() > 1;
+			return DataBase.Select<TType>(select).Count() > 0;
 		}
 
 		public override IEnumerator<KeyValuePair<TKey, TType>> GetEnumerator()
@@ -97,7 +97,7 @@ namespace OKHOSTING.Sql.ORM
 			{
 				Delete delete = new Delete();
 				delete.From = parent;
-				delete.Where.Add(GetPrimaryKeyFilter(key));
+				delete.Where.Add(GetPrimaryKeyFilter(parent, key));
 
 				result += DataBase.Delete(delete);
 			}
@@ -110,7 +110,7 @@ namespace OKHOSTING.Sql.ORM
 			get
 			{
 				Select select = CreateSelect();
-				select.Where.Add(GetPrimaryKeyFilter(key));
+				select.Where.Add(GetPrimaryKeyFilter(DataType, key));
 				var result = DataBase.Select<TType>(select).ToList();
 
 				if (result.Count > 0)
@@ -133,12 +133,13 @@ namespace OKHOSTING.Sql.ORM
 						Update update = new Update();
 						update.From = parent;
 
-						foreach (DataMember dmember in parent.Members)
+						//update everything but the primary key
+						foreach (DataMember dmember in parent.Members.Where(m => !m.Column.IsPrimaryKey))
 						{
 							update.Set.Add(new MemberValue(dmember, value));
 						}
 
-						update.Where.Add(GetPrimaryKeyFilter(key));
+						update.Where.Add(GetPrimaryKeyFilter(parent, key));
 
 						DataBase.Update(update);
 					}
@@ -155,11 +156,6 @@ namespace OKHOSTING.Sql.ORM
 		internal Table(DataBase database)
 		{
 			DataBase = database;
-		}
-
-		protected virtual Filters.FilterBase GetPrimaryKeyFilter(TKey key)
-		{
-			return GetPrimaryKeyFilter(DataType, key);
 		}
 
 		protected virtual Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, TKey key)

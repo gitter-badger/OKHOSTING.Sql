@@ -247,7 +247,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// List of available type mappings, system-wide
 		/// </summary>
-		public static readonly List<DataType> DataTypes = new List<DataType>();
+		protected static readonly List<DataType> DataTypes = new List<DataType>();
 
 		public static implicit operator DataType(Type type)
 		{

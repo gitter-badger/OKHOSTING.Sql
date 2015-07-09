@@ -86,6 +86,26 @@ namespace OKHOSTING.Sql.ORM.Tests
 			Drop();
 		}
 
+		[Test]
+		public void Update()
+		{
+			MapTypes();
+			Create();
+
+			Employee employee = new Employee();
+			employee.Firstname = "Susana";
+			employee.LastName = "Mendoza";
+			employee.BirthDate = new DateTime(1980, 1, 1);
+			employee.Salary = 1000;
+			DataBase.Table<int, Employee>().Add(new KeyValuePair<int, Employee>(0, employee));
+
+			employee.Salary = 3000;
+			employee.BirthDate = new DateTime(2000, 1, 1);
+			DataBase.Table<int, Employee>()[employee.Id] = employee;
+
+			Drop();
+		}
+
 
 		[Test]
 		public void manualMap()

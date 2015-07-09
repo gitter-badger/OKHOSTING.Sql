@@ -39,7 +39,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="OKHOSTING.Core">
-      <HintPath>..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
+      <HintPath>..\References\OKHOSTING.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />

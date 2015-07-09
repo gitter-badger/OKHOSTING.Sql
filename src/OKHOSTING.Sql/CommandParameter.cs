@@ -45,6 +45,10 @@ namespace OKHOSTING.Sql
 
 		public CommandParameter(object value, string name, System.Data.DbType dbType, int size)
 		{
+			Value = value;
+			DbType = dbType;
+			Size = size; 
+			
 			if (string.IsNullOrWhiteSpace(name))
 			{
 				CreateRandomName();
@@ -53,10 +57,6 @@ namespace OKHOSTING.Sql
 			{
 				Name = name;
 			}
-
-			Value = value;
-			DbType = dbType;
-			Size = size;
 		}
 
 		/// <summary>

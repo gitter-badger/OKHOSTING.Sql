@@ -81,19 +81,21 @@ namespace OKHOSTING.Sql.ORM
 		public IEnumerable<TType> Select<TType>(Select select)
 		{
 			Command sql = SqlGenerator.Select(Parse(select));
-			var dataReader = NativeDataBase.GetDataReader(sql);
-
-			while (dataReader.Read())
+			
+			using (var dataReader = NativeDataBase.GetDataReader(sql))
 			{
-				TType instance = Activator.CreateInstance<TType>();
-
-				foreach (SelectMember member in select.Members)
+				while (dataReader.Read())
 				{
-					object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
-					member.Member.SetValueFromColumn(instance, value);
-				}
+					TType instance = Activator.CreateInstance<TType>();
 
-				yield return instance;
+					foreach (SelectMember member in select.Members)
+					{
+						object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+						member.Member.SetValueFromColumn(instance, value);
+					}
+
+					yield return instance;
+				}
 			}
 		}
 
@@ -286,6 +288,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.Insert Parse(Insert insert)
 		{
+			if (insert == null)
+			{
+				return null;
+			}
+
 			var native = new OKHOSTING.Sql.Operations.Insert();
 			native.Into = insert.Into.Table;
 
@@ -299,6 +306,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.Update Parse(Update update)
 		{
+			if (update == null)
+			{
+				return null;
+			}
+			
 			var native = new OKHOSTING.Sql.Operations.Update();
 			native.From = update.From.Table;
 
@@ -317,6 +329,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.Delete Parse(Delete delete)
 		{
+			if (delete == null)
+			{
+				return null;
+			}
+			
 			var native = new OKHOSTING.Sql.Operations.Delete();
 			native.From = delete.From.Table;
 
@@ -330,6 +347,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.Select Parse(Select select)
 		{
+			if (select == null)
+			{
+				return null;
+			}
+			
 			if (select is SelectAggregate)
 			{
 				return Parse((SelectAggregate)select);
@@ -340,6 +362,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.SelectAggregate Parse(SelectAggregate select)
 		{
+			if (select == null)
+			{
+				return null;
+			}
+			
 			var native = (OKHOSTING.Sql.Operations.SelectAggregate)Parse(select, new OKHOSTING.Sql.Operations.SelectAggregate());
 
 			foreach (SelectAggregateMember agregateMember in select.AggregateMembers)
@@ -362,6 +389,11 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.OrderBy Parse(OrderBy orderBy)
 		{
+			if (orderBy == null)
+			{
+				return null;
+			}
+			
 			var native = new OKHOSTING.Sql.Operations.OrderBy();
 			native.Column = orderBy.Member.Column;
 			native.Direction = orderBy.Direction;
@@ -369,17 +401,27 @@ namespace OKHOSTING.Sql.ORM
 			return native;
 		}
 
-		protected Sql.Operations.SelectLimit Parse(SelectLimit orderBy)
+		protected Sql.Operations.SelectLimit Parse(SelectLimit limit)
 		{
+			if (limit == null)
+			{
+				return null;
+			}
+
 			var native = new OKHOSTING.Sql.Operations.SelectLimit();
-			native.From = orderBy.From;
-			native.To = orderBy.To;
+			native.From = limit.From;
+			native.To = limit.To;
 
 			return native;
 		}
 
 		protected Sql.Operations.SelectJoin Parse(SelectJoin join)
 		{
+			if (join == null)
+			{
+				return null;
+			}
+			
 			var native = new OKHOSTING.Sql.Operations.SelectJoin();
 			native.Table = join.Type.Table;
 			native.JoinType = join.JoinType;
@@ -394,6 +436,16 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.Select Parse(Select select, Sql.Operations.Select native)
 		{
+			if (select == null)
+			{
+				return null;
+			}
+
+			if (native == null)
+			{
+				throw new ArgumentNullException("native");
+			}
+			
 			native.From = select.From.Table;
 			native.Limit = Parse(select.Limit);
 
