@@ -152,8 +152,8 @@ namespace OKHOSTING.Sql.ORM
 			var allMembers = MemberInfos.ToList();
 			var allValues = GetValues(obj).ToList();
 
-			//ensure all nested members are not null
-			for(int i= 0; i < allValues.Count(); i++)
+			//ensure all nested members are not null, except the lastone, that can be null
+			for(int i= 0; i < allValues.Count() - 1; i++)
 			{
 				object val = allValues[i];
 				MemberInfo member = allMembers[i];

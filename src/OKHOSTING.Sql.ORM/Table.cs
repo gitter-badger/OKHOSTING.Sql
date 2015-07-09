@@ -177,10 +177,11 @@ namespace OKHOSTING.Sql.ORM
 			DataType dtype = DataType;
 			Select select = new Select();
 			select.From = dtype;
+			Random random = new Random();
 
 			foreach (DataMember member in dtype.Members)
 			{
-				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+				select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_') + random.Next()));
 			}
 
 			//go from child type to base type adding joins
@@ -188,12 +189,13 @@ namespace OKHOSTING.Sql.ORM
 			{
 				SelectJoin join = new SelectJoin();
 				join.JoinType = Sql.Operations.SelectJoinType.Inner; //could change?
-				join.Type = dtype;
+				join.Type = dtype.BaseDataType;
 				join.On.Add(GetSelectJoinFilter(dtype));
 
-				foreach (DataMember member in dtype.BaseDataType.Members)
+				//exclude primary key from base tables, to avoid duplicate values
+				foreach (DataMember member in dtype.BaseDataType.Members.Where(m => !m.Column.IsPrimaryKey))
 				{
-					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_')));
+					select.Members.Add(new SelectMember(member, member.Member.Replace('.', '_') + random.Next()));
 				}
 
 				select.Joins.Add(join);
