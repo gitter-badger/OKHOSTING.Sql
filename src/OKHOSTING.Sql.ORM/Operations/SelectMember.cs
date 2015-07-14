@@ -52,6 +52,11 @@ namespace OKHOSTING.Sql.ORM.Operations
 			Alias = alias;
 		}
 
+		public override string ToString()
+		{
+			return string.IsNullOrWhiteSpace(Alias)? Member.ToString() : Alias;
+		}
+
 		public static implicit operator SelectMember(DataMember member)
 		{
 			return new SelectMember(member);

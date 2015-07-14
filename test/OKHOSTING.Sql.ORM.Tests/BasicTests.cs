@@ -5,6 +5,7 @@ using NUnit.Framework;
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;
 using OKHOSTING.Sql.Filters;
+using OKHOSTING.Sql.ORM.Operations;
 
 namespace OKHOSTING.Sql.ORM.Tests
 {
@@ -71,7 +72,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 		}
 
 		[Test]
-		public void Insert()
+		public void InsertTest()
 		{
 			MapTypes();
 			Create();
@@ -126,11 +127,148 @@ namespace OKHOSTING.Sql.ORM.Tests
 			Drop();
 		}
 
+		[Test]
+		public void BigSelect()
+		{
+			MapTypes();
+			Create();
+
+			for (int i = 0; i < 5000; i++)
+			{
+				CustomerContact contact = new CustomerContact();
+				
+				contact.Customer = new Customer();
+				contact.Customer.LegalName = "Empresa " + i;
+				contact.Customer.Phone = i.ToString();
+				contact.Customer.Email= "empres@a.com" + i;
+				DataBase.Table<int, Customer>().Add(new KeyValuePair<int, Customer>(0, contact.Customer));
+				
+				contact.Firstname = "Argentina " + i;
+				contact.LastName = "Chichona";
+				contact.BirthDate = new DateTime(1980, 1, 1).AddDays(i);
+				DataBase.Table<int, CustomerContact>().Add(new KeyValuePair<int, CustomerContact>(0, contact));
+			}
+
+			foreach (var e in DataBase.Table<int, CustomerContact>())
+			{
+				Console.WriteLine(e.Key + " " + e.Value.Firstname);
+			}
+
+			Drop();
+		}
 
 		[Test]
-		public void manualMap()
+		public void ComplexSelect()
 		{
-			Schema.Table person = new Table();
+			MapTypes();
+			Create();
+
+			for (int i = 0; i < 20; i++)
+			{
+				CustomerContact contact = new CustomerContact();
+
+				contact.Customer = new Customer();
+				contact.Customer.LegalName = "Empresa " + i;
+				contact.Customer.Phone = i.ToString();
+				contact.Customer.Email = "empres@a.com" + i;
+				DataBase.Table<int, Customer>().Add(new KeyValuePair<int, Customer>(0, contact.Customer));
+
+				contact.Firstname = "Argentina " + i;
+				contact.LastName = "Chichona";
+				contact.BirthDate = new DateTime(1980, 1, 1).AddDays(i);
+				DataBase.Table<int, CustomerContact>().Add(new KeyValuePair<int, CustomerContact>(0, contact));
+			}
+
+			Operations.Select select = new Operations.Select();
+			
+			select.From = typeof(CustomerContact);
+			
+			foreach (var member in select.From.Members)
+			{
+				select.Members.Add(new Operations.SelectMember(member));
+			}
+
+			Operations.SelectJoin join = new Operations.SelectJoin();
+			join.JoinType = SelectJoinType.Inner;
+			join.Type = typeof(Customer);
+			join.On.Add(new Filters.MemberCompareFilter(select.From["Customer.Id"], join.Type["id"]));
+			select.Joins.Add(join);
+
+			foreach (var member in join.Type.Members.Where(m=> !m.Column.IsPrimaryKey))
+			{
+				select.Members.Add(new Operations.SelectMember(member));
+			}
+
+			foreach (var e in DataBase.Select<CustomerContact>(select))
+			{
+				Console.WriteLine(e.Firstname + " " + e.Customer.LegalName);
+			}
+
+			Drop();
+		}
+
+		[Test]
+		public void ManualMap()
+		{
+			DataType<Person> dtype = new DataType<Person>();
+			DataType.DataTypes.Add(dtype);
+			dtype.Members.Add(new DataMember<Person>(m => m.Id));
+			dtype.Members.Add(new DataMember<Person>(m => m.Firstname));
+
+			DataType<CustomerContact> dtype2 = new DataType<CustomerContact>();
+			DataType.DataTypes.Add(dtype2);
+			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Id));
+			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Id));
+			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Phone.Length));
+			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.LegalName));
+			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Phone));
+
+			DataBase.Create<CustomerContact>();
+
+			for(int i = 0; i < 30; i++)
+			{
+				CustomerContact cc = new CustomerContact();
+				cc.Firstname = "Maria " + i;
+				cc.Customer = new Customer();
+				cc.Customer.LegalName = "Empresa " + i;
+				cc.Customer.Phone= "Telefono " + i;
+
+				DataBase.Table<int, CustomerContact>().Add(0, cc);
+			}
+
+			foreach (var cc in DataBase.Table<int, CustomerContact>())
+			{
+				Console.WriteLine(cc.Value.Firstname + " " + cc.Value.Customer.LegalName);
+			}
+			
+			DataBase.Drop<CustomerContact>();
+		}
+
+		[Test]
+		public void GenericOperations()
+		{
+			DataType<Person> dtype = typeof(Person);
+
+			DataBase.Create<CustomerContact>();
+
+			for (int i = 0; i < 30; i++)
+			{
+				CustomerContact cc = new CustomerContact();
+				cc.Firstname = "Maria " + i;
+				cc.Customer = new Customer();
+				cc.Customer.LegalName = "Empresa " + i;
+				cc.Customer.Phone = "Telefono " + i;
+
+				ORM.Operations.Insert<CustomerContact> insert = new ORM.Operations.Insert<CustomerContact>(cc, x => x.LastName, x => x.BirthDate, x => x.Id, x => x.Customer.LegalName);
+				//DataBase.Table<int, CustomerContact>().Add(0, cc);
+			}
+
+			foreach (var cc in DataBase.Table<int, CustomerContact>())
+			{
+				Console.WriteLine(cc.Value.Firstname + " " + cc.Value.Customer.LegalName);
+			}
+
+			DataBase.Drop<CustomerContact>();
 		}
 	}
 }

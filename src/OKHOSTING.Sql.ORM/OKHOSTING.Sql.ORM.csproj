@@ -65,8 +65,9 @@
     <Compile Include="Converters\EncryptString.cs" />
     <Compile Include="Converters\IConverter.cs" />
     <Compile Include="Converters\Json.cs" />
-    <Compile Include="MultipleKeyTable.cs" />
-    <Compile Include="DataBase.cs" />
+    <Compile Include="DataBase.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Filters\AndFilter.cs" />
     <Compile Include="Filters\CompareFilter.cs" />
     <Compile Include="Filters\CustomFilter.cs" />
@@ -82,22 +83,22 @@
     <Compile Include="Filters\RangeFilter.cs" />
     <Compile Include="Filters\ValueCompareFilter.cs" />
     <Compile Include="DataMember.cs" />
-    <Compile Include="Operations\Delete.cs" />
-    <Compile Include="Operations\Insert.cs" />
-    <Compile Include="Operations\MemberValue.cs">
+    <Compile Include="MultipleKeyTable.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Operations\NestedDataMemberList.cs" />
+    <Compile Include="Operations\Delete.cs" />
+    <Compile Include="Operations\Insert.cs" />
+    <Compile Include="Operations\NestedDataMember.cs" />
     <Compile Include="Operations\OrderBy.cs" />
     <Compile Include="Operations\Select.cs" />
-    <Compile Include="Operations\SelectAggregate.cs" />
-    <Compile Include="Operations\SelectAggregateMember.cs" />
-    <Compile Include="Operations\SelectMember.cs" />
-    <Compile Include="Operations\SelectJoin.cs" />
     <Compile Include="Operations\SelectLimit.cs" />
     <Compile Include="Operations\Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataType.cs" />
-    <Compile Include="Table.cs" />
+    <Compile Include="Table.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Validators\CompareValidator.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -155,6 +156,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\mono.linq.expressions\Mono.Linq.Expressions.csproj">
+      <Project>{0c001d50-4176-45ae-bdc8-ba626508b0cc}</Project>
+      <Name>Mono.Linq.Expressions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
       <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
       <Name>OKHOSTING.Sql</Name>

@@ -29,6 +29,10 @@ namespace OKHOSTING.Sql.ORM
 			Table = table;
 		}
 
+		public DataType(Type innerType): this(innerType, new Schema.Table(innerType.Name))
+		{
+		}
+
 		public readonly List<DataMember> Members = new List<DataMember>();
 
 		/// <summary>
@@ -79,6 +83,14 @@ namespace OKHOSTING.Sql.ORM
 				}
 
 				return null;
+			}
+		}
+
+		public DataMember this[string name]
+		{
+			get
+			{
+				return Members.Where(m => m.Member.ToLower() == name.ToLower()).Single();
 			}
 		}
 
@@ -247,7 +259,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// List of available type mappings, system-wide
 		/// </summary>
-		protected static readonly List<DataType> DataTypes = new List<DataType>();
+		public static readonly List<DataType> DataTypes = new List<DataType>();
 
 		public static implicit operator DataType(Type type)
 		{
@@ -264,45 +276,9 @@ namespace OKHOSTING.Sql.ORM
 			return DataTypes.Where(m => m.InnerType.Equals(type)).Single();
 		}
 
-		/// <summary>
-		/// Returns a collection of members that are mapable, 
-		/// meaning they are fields or properties, public, non read-only, and non-static
-		/// </summary>
-		public static IEnumerable<System.Reflection.MemberInfo> GetMapableMembers(Type type)
+		public static void Map(DataType dtype)
 		{
-			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
-			{
-				//ignore methods, events and other members
-				if (!(memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo))
-				{
-					continue;
-				}
-
-				//ignore readonly properties
-				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
-				{
-					continue;
-				}
-
-				//ignore readonly fields
-				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
-				{
-					continue;
-				}
-
-				//ignore inherited members, except for primary keys
-				if (!memberInfo.DeclaringType.Equals(type) && !IsPrimaryKey(memberInfo))
-				{
-					continue;
-				}
-
-				yield return memberInfo;
-			}
-		}
-
-		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
-		{
-			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
+			DataTypes.Add(dtype);
 		}
 
 		public static IEnumerable<DataType> DefaultMap(IEnumerable<Tuple<Type, Schema.Table>> types)
@@ -331,7 +307,7 @@ namespace OKHOSTING.Sql.ORM
 			{
 				if (table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
 				{
-					DataMember member = new DataMember(dtype, table[memberInfo.Name], memberInfo.Name);
+					DataMember member = new DataMember(dtype, memberInfo.Name, table[memberInfo.Name]);
 					dtype.Members.Add(member);
 				}
 			}
@@ -351,30 +327,10 @@ namespace OKHOSTING.Sql.ORM
 				DataType dtype = new DataType(type, table);
 				DataTypes.Add(dtype);
 
-				foreach (var memberInfo in GetMapableMembers(type).Where(m => IsPrimaryKey(m)))
+				foreach (var memberInfo in GetMapableMembers(type).Where(m => DataMember.IsPrimaryKey(m)))
 				{
-					Schema.Column column = new Schema.Column();
-					column.Name = memberInfo.Name;
-					column.Table = table;
-					column.IsPrimaryKey = true;
-					column.IsNullable = false;
-					column.DbType = Sql.DataBase.Parse(DataMember.GetReturnType(memberInfo)); //only atomic values supported at the moment
-
-					if (column.IsString)
-					{
-						column.Length = Validators.StringLengthValidator.GetMaxLenght(memberInfo);
-					}
-
-					//only autoincrement the base table
-					if (dtype.BaseDataType == null && column.IsIntegral)
-					{
-						column.IsAutoNumber = true;
-					}
-
-					table.Columns.Add(column);
-
 					//create datamember
-					DataMember dmember = new DataMember(type, column, memberInfo.Name);
+					DataMember dmember = new DataMember(type, memberInfo.Name);
 					dtype.Members.Add(dmember);
 				}
 			}
@@ -404,7 +360,7 @@ namespace OKHOSTING.Sql.ORM
 				}
 
 				//map non primary key members now
-				foreach (var memberInfo in GetMapableMembers(type).Where(m => !IsPrimaryKey(m)))
+				foreach (var memberInfo in GetMapableMembers(type).Where(m => !DataMember.IsPrimaryKey(m)))
 				{
 					Type returnType = DataMember.GetReturnType(memberInfo);
 
@@ -437,7 +393,7 @@ namespace OKHOSTING.Sql.ORM
 							foreignKey.Columns.Add(new Tuple<Schema.Column, Schema.Column>(column, pk.Column));
 							
 							//create datamember
-							DataMember dmember = new DataMember(type, column, memberInfo.Name + "." + pk.Member);
+							DataMember dmember = new DataMember(type, memberInfo.Name + "." + pk.Member, column);
 							dtype.Members.Add(dmember);
 						}
 
@@ -453,7 +409,7 @@ namespace OKHOSTING.Sql.ORM
 						column.IsPrimaryKey = false;
 
 						//create datamember
-						DataMember dmember = new DataMember(type, column, memberInfo.Name);
+						DataMember dmember = new DataMember(type, memberInfo.Name, column);
 						dtype.Members.Add(dmember);
 
 						//is this a regular atomic value?
@@ -480,7 +436,43 @@ namespace OKHOSTING.Sql.ORM
 				yield return dtype;
 			}
 		}
-		
+
+		/// <summary>
+		/// Returns a collection of members that are mapable, 
+		/// meaning they are fields or properties, public, non read-only, and non-static
+		/// </summary>
+		protected static IEnumerable<System.Reflection.MemberInfo> GetMapableMembers(Type type)
+		{
+			foreach (var memberInfo in type.GetMembers(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public))
+			{
+				//ignore methods, events and other members
+				if (!(memberInfo is System.Reflection.FieldInfo || memberInfo is System.Reflection.PropertyInfo))
+				{
+					continue;
+				}
+
+				//ignore readonly properties
+				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
+				{
+					continue;
+				}
+
+				//ignore readonly fields
+				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
+				{
+					continue;
+				}
+
+				//ignore inherited members, except for primary keys
+				if (!memberInfo.DeclaringType.Equals(type) && !DataMember.IsPrimaryKey(memberInfo))
+				{
+					continue;
+				}
+
+				yield return memberInfo;
+			}
+		}
+
 		#endregion
 	}
 
@@ -492,6 +484,10 @@ namespace OKHOSTING.Sql.ORM
 		public DataType(Schema.Table table): base(typeof(T), table)
 		{
 			
+		}
+
+		public DataType(): base(typeof(T))
+		{
 		}
 
 		public new readonly List<DataMember<T>> Members = new List<DataMember<T>>();

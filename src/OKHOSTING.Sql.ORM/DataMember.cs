@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.ORM
 {
 	public class DataMember
 	{
-		public DataMember(DataType type, Schema.Column column, string member)
+		public DataMember(DataType type, string member, Schema.Column column)
 		{
 			if (type == null)
 			{
@@ -36,6 +36,44 @@ namespace OKHOSTING.Sql.ORM
 			Type = type;
 			Column = column;
 			Member = member;
+		}
+
+		public DataMember(DataType type, string member)
+		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+
+			if (string.IsNullOrWhiteSpace(member))
+			{
+				throw new ArgumentNullException("member");
+			}
+
+			//validate member expression
+			var x = MemberInfos;
+
+			Type = type;
+			Member = member;
+			var finalMember = FinalMemberInfo;
+			
+			Column = new Schema.Column()
+			{
+				Table = type.Table,
+				Name = member.Replace('.', '_'),
+				DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
+				IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
+				IsPrimaryKey = IsPrimaryKey(finalMember),
+			};
+
+			Column.IsAutoNumber = Column.IsNumeric && Column.IsPrimaryKey && type.BaseDataType == null;
+			
+			if (Column.IsString)
+			{
+				Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
+			}
+
+			type.Table.Columns.Add(Column);
 		}
 
 		/// <summary>
@@ -153,7 +191,7 @@ namespace OKHOSTING.Sql.ORM
 			var allValues = GetValues(obj).ToList();
 
 			//ensure all nested members are not null, except the lastone, that can be null
-			for(int i= 0; i < allValues.Count() - 1; i++)
+			for(int i= 0; i < allValues.Count - 1; i++)
 			{
 				object val = allValues[i];
 				MemberInfo member = allMembers[i];
@@ -162,12 +200,14 @@ namespace OKHOSTING.Sql.ORM
 				{
 					object container = (i == 0)? obj : allValues[i -1];
 					object newValue = Activator.CreateInstance(GetReturnType(member));
+					allValues[i] = newValue;
 
 					SetValue(member, container, newValue);
 				}
 			}
 
-			SetValue(FinalMemberInfo, obj, value);
+			object finalContainer = (allValues.Count > 1) ? allValues[allValues.Count - 2] : obj;
+			SetValue(FinalMemberInfo, finalContainer, value);
 		}
 
 		public object GetValueForColumn(object obj)
@@ -253,50 +293,46 @@ namespace OKHOSTING.Sql.ORM
 			return typeMap.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
 
+		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
+		{
+			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
+		}
+
 		#endregion
 	}
 
 	public class DataMember<T> : DataMember
 	{
-		public DataMember(Schema.Column column, string member): base(typeof(T), column, member)
+		public DataMember(string member, Schema.Column column): base(typeof(T), member, column)
 		{
 		}
 
-		public DataMember(Schema.Column column, Expression<Func<T, object>> memberExpression): base(typeof(T), column, GetMemberString(memberExpression))
+		public DataMember(Expression<Func<T, object>> memberExpression, Schema.Column column): base(typeof(T), GetMemberString(memberExpression), column)
+		{
+		}
+
+		public DataMember(string member): base(typeof(T), member)
+		{
+		}
+
+		public DataMember(Expression<Func<T, object>> memberExpression): base(typeof(T), GetMemberString(memberExpression))
 		{
 		}
 
 		#region Static
 
-		protected static string GetMemberString(Expression<Func<T, object>> member)
+		public static string GetMemberString(Expression<Func<T, object>> member)
 		{
-			if (member.Body is UnaryExpression)
-			{
-				UnaryExpression unex = (UnaryExpression) member.Body;
-				if (unex.NodeType == ExpressionType.Convert)
-				{
-					Expression ex = unex.Operand;
-					MemberExpression mex = (MemberExpression) ex;
-					return mex.Member.Name;
-				}
-			}
+			string code = Mono.Linq.Expressions.CSharp.ToCSharpCode(member);
+			
+			//get the middle line only
+			code = code.Split('\n')[2];
 
-			MemberExpression lambdaMemberExpression = (MemberExpression) member.Body;
-			MemberExpression lambdaMemberExpressionOriginal = lambdaMemberExpression;
+			//remove the prefix, until the first dot
+			code = code.Substring(code.IndexOf('.') + 1);
+			code = code.Trim().TrimEnd(';');
 
-			string path = "";
-
-			while (lambdaMemberExpression.Expression.NodeType == ExpressionType.MemberAccess)
-			{
-				var propInfo = lambdaMemberExpression.Expression.GetType().GetProperty("Member");
-				var propValue = propInfo.GetValue(lambdaMemberExpression.Expression, null) as MemberInfo;
-
-				path = propValue.Name + "." + path;
-
-				lambdaMemberExpression = lambdaMemberExpression.Expression as MemberExpression;
-			}
-
-			return path + lambdaMemberExpressionOriginal.Member.Name;
+			return code;
 		}
 
 		public static bool IsMapped(Expression<Func<T, object>> expression)

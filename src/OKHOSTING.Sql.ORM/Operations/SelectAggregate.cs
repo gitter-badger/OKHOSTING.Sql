@@ -9,9 +9,9 @@ namespace OKHOSTING.Sql.ORM.Operations
 	/// <summary>
 	/// A select statement that also contains aggreate functions, which requier a groupby element as well
 	/// </summary>
-	public class SelectAggregate: Select
+	public class SelectAggregate : Select
 	{
-		public IEnumerable<SelectAggregateMember> AggregateMembers { get; set; }
-		public IEnumerable<DataMember> GroupBy { get; set; }
+		public List<SelectAggregateMember> AggregateMembers { get; set; }
+		public List<DataMember<T>> GroupBy { get; set; }
 	}
 }
