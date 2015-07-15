@@ -86,13 +86,16 @@
     <Compile Include="MultipleKeyTable.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Operations\NestedDataMemberList.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />
-    <Compile Include="Operations\NestedDataMember.cs" />
+    <Compile Include="Operations\MemberValue.cs" />
     <Compile Include="Operations\OrderBy.cs" />
     <Compile Include="Operations\Select.cs" />
+    <Compile Include="Operations\SelectAggregate.cs" />
+    <Compile Include="Operations\SelectAggregateMember.cs" />
+    <Compile Include="Operations\SelectJoin.cs" />
     <Compile Include="Operations\SelectLimit.cs" />
+    <Compile Include="Operations\SelectMember.cs" />
     <Compile Include="Operations\Update.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataType.cs" />

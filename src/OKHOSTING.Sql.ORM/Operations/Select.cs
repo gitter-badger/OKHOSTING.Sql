@@ -18,4 +18,6 @@ namespace OKHOSTING.Sql.ORM.Operations
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
 	}
+
+
 }

@@ -12,6 +12,6 @@ namespace OKHOSTING.Sql.ORM.Operations
 	public class SelectAggregate : Select
 	{
 		public List<SelectAggregateMember> AggregateMembers { get; set; }
-		public List<DataMember<T>> GroupBy { get; set; }
+		public List<DataMember> GroupBy { get; set; }
 	}
 }

@@ -13,6 +13,12 @@ namespace OKHOSTING.Sql.ORM.Operations
 	public class SelectJoin
 	{
 		public DataType Type { get; set; }
+
+		/// <summary>
+		/// Aditional members that will be pat of the "Select" statement
+		/// </summary>
+		public readonly List<SelectMember> Members = new List<SelectMember>();
+
 		public OKHOSTING.Sql.Operations.SelectJoinType JoinType { get; set; }
 		
 		/// <summary>

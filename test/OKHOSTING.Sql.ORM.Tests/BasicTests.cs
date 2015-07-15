@@ -244,7 +244,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 			DataBase.Drop<CustomerContact>();
 		}
 
-		[Test]
+		/*[Test]
 		public void GenericOperations()
 		{
 			DataType<Person> dtype = typeof(Person);
@@ -269,6 +269,6 @@ namespace OKHOSTING.Sql.ORM.Tests
 			}
 
 			DataBase.Drop<CustomerContact>();
-		}
+		}*/
 	}
 }

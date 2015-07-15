@@ -425,6 +425,12 @@ namespace OKHOSTING.Sql.ORM
 			var native = new OKHOSTING.Sql.Operations.SelectJoin();
 			native.Table = join.Type.Table;
 			native.JoinType = join.JoinType;
+			native.Alias = join.Alias;
+
+			foreach (SelectMember selectMember in join.Members)
+			{
+				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.Member.Column, selectMember.Alias));
+			}
 
 			foreach (Filters.FilterBase filter in join.On)
 			{

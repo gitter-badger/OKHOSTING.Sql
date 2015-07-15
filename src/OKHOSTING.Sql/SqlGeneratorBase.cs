@@ -283,7 +283,7 @@ namespace OKHOSTING.Sql
 			if (select == null) throw new ArgumentNullException("select");
 
 			//Creating Select sentence
-			Command command = SelectClause(select.From, select.Columns);
+			Command command = SelectClause(select);
 			command.Append(FromClause(select));
 			command.Append(WhereClause(select.Where, LogicalOperator.And));
 			command.Append(LimitClause(select.Limit));
@@ -355,33 +355,17 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Select Clause from the Select Sql Sentence
 		/// </returns>
-		protected virtual Command SelectClause(Table table)
-		{
-			return SelectClause(table, null);
-		}
-
-		/// <summary>
-		/// Creates the Select Clause of a Select Sql Sentence
-		/// </summary>
-		/// <param name="table">
-		/// Table for Select Clause creation
-		/// </param>
-		/// <returns>
-		/// Select Clause from the Select Sql Sentence
-		/// </returns>
-		protected virtual Command SelectClause(Table table, List<SelectColumn> columns)
+		protected virtual Command SelectClause(Select select)
 		{
 			//Validating if table argument is null
-			if (table == null) throw new ArgumentNullException("table");
+			if (select == null) throw new ArgumentNullException("select");
 			
 			//use all columns if none is defined
-			if (columns == null)
+			if (select.Columns.Count == 0)
 			{
-				columns = new List<SelectColumn>();
-				
-				foreach (Column c in table.Columns)
+				foreach (Column c in select.From.Columns)
 				{
-					columns.Add(c);
+					select.Columns.Add(c);
 				}
 			}
 
@@ -389,10 +373,10 @@ namespace OKHOSTING.Sql
 			string sql = "SELECT ";
 
 			//Getting the Table DB table name
-			string tableName = EncloseName(table.Name);
+			string tableName = EncloseName(select.From.Name);
 
 			//Crossing all the loaded members
-			foreach (var c in columns)
+			foreach (var c in select.Columns)
 			{
 				sql += string.Format("{0}.{1}", EncloseName(c.Column.Table.Name), EncloseName(c.Column.Name));
 				
@@ -402,6 +386,23 @@ namespace OKHOSTING.Sql
 				}
 
 				sql += ", ";
+			}
+
+			//adding join columns
+			foreach (var join in select.Joins)
+			{
+				foreach (var joinColumn in join.Columns)
+				{
+					string joinTableAlias = string.IsNullOrWhiteSpace(join.Alias)? join.Table.Name : joinColumn.Alias;
+					sql += string.Format("{0}.{1}", EncloseName(joinTableAlias), EncloseName(joinColumn.Column.Name));
+
+					if (!string.IsNullOrWhiteSpace(joinColumn.Alias))
+					{
+						sql += string.Format(" AS {0}", joinColumn.Alias);
+					}
+
+					sql += ", ";
+				}
 			}
 
 			//Removing last ", "
@@ -740,11 +741,11 @@ namespace OKHOSTING.Sql
 			Command command = "From " + EncloseName(select.From.Name);
 
 			//Crossing the inheritance until reach the root Table
-			foreach(SelectJoin join in select.Joins)
+			foreach (SelectJoin join in select.Joins)
 			{
 				//Resolve inheritance Inner Joins
 
-				command.Script += join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + " ON ";
+				command.Script += join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : join.Alias) + " ON ";
 				command.Append(Filter(join.On, LogicalOperator.And));
 			}
 
