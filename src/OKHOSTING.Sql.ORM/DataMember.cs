@@ -335,49 +335,6 @@ namespace OKHOSTING.Sql.ORM
 			return code;
 		}
 
-		public static IEnumerable<DataMember> GetNestedDataMebers(DataType dtype, string nestedDataMembers)
-		{
-			if (dtype == null)
-			{
-				throw new ArgumentNullException("dtype");
-			}
-
-			if (string.IsNullOrWhiteSpace(nestedDataMembers))
-			{
-				throw new ArgumentNullException("nestedDataMembers");
-			}
-
-			string[] splitted = nestedDataMembers.Split('.');
-
-			for (int x = 0; x < splitted.Length; )
-			{
-				string merged = string.Empty;
-				bool found = false;
-
-				for (int y = x; y < splitted.Length; y++)
-				{
-					merged = merged + '.' + splitted[y];
-					merged = merged.Trim('.');
-
-					DataMember member = dtype.Members.Where(m => m.Member == merged).SingleOrDefault();
-
-					if (member != null)
-					{
-						yield return member;
-						dtype = member.ReturnType;
-						x++;
-						found = true;
-						break;
-					}
-				}
-
-				if (!found)
-				{
-					throw new ArgumentOutOfRangeException("nestedDataMembers", nestedDataMembers, "Cant find a sequence of DataMembers in expression");
-				}
-			}
-		}
-
 		public static bool IsMapped(Expression<Func<T, object>> expression)
 		{
 			DataType<T> typeMapping = DataType<T>.GetMap();
