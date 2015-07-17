@@ -220,18 +220,16 @@ namespace OKHOSTING.Sql.ORM.Tests
 		[Test]
 		public void ManualMap()
 		{
-			DataType<Person> dtype = new DataType<Person>();
-			DataType.DataTypes.Add(dtype);
-			dtype.Members.Add(new DataMember<Person>(m => m.Id));
-			dtype.Members.Add(new DataMember<Person>(m => m.Firstname));
+			DataType<Person> dtype = DataType<Person>.Map();
+			dtype.Map(m => m.Id);
+			dtype.Map(m => m.Firstname);
 
-			DataType<CustomerContact> dtype2 = new DataType<CustomerContact>();
-			DataType.DataTypes.Add(dtype2);
-			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Id));
-			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Id));
-			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Phone.Length));
-			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.LegalName));
-			dtype2.Members.Add(new DataMember<CustomerContact>(m => m.Customer.Phone));
+			DataType<CustomerContact> dtype2 = DataType<CustomerContact>.Map();
+			dtype2.Map(m => m.Id);
+			dtype2.Map(m => m.Customer.Id);
+			dtype2.Map(m => m.Customer.Phone.Length);
+			dtype2.Map(m => m.Customer.LegalName);
+			dtype2.Map(m => m.Customer.Phone);
 
 			DataBase.Create<CustomerContact>();
 
@@ -300,6 +298,13 @@ namespace OKHOSTING.Sql.ORM.Tests
 				c=> c.Address2.Street,
 				c=> c.Address2.Country.Name
 			);
+
+			//select.Where.Add(new Filters.ValueCompareFilter()
+			//{
+			//	Member = dtype[x=> x.BirthDate],
+			//	ValueToCompare = DateTime.Now,
+			//	Operator = Core.Data.CompareOperator.LessThanEqual,
+			//});
 
 			var result = DataBase.Select<CustomerContact>(select).ToList();
 

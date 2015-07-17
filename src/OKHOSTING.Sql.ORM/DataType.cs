@@ -13,7 +13,7 @@ namespace OKHOSTING.Sql.ORM
 	/// </summary>
 	public class DataType
 	{
-		public DataType(Type innerType, Schema.Table table)
+		protected DataType(Type innerType, Schema.Table table)
 		{
 			if (innerType == null)
 			{
@@ -29,21 +29,24 @@ namespace OKHOSTING.Sql.ORM
 			Table = table;
 		}
 
-		public DataType(Type innerType): this(innerType, new Schema.Table(innerType.Name))
+		protected DataType(Type innerType): this(innerType, new Schema.Table(innerType.Name))
 		{
 		}
 
-		public readonly List<DataMember> Members = new List<DataMember>();
+		#region Members
 
-		/// <summary>
-		/// System.Type in wich this TypeMap<T> is created from
-		/// </summary>
-		public readonly Type InnerType;
+		protected readonly List<DataMember> _Members = new List<DataMember>();
 
-		/// <summary>
-		/// The table where objects of this Type will be stored
-		/// </summary>
-		public readonly Schema.Table Table;
+		public IEnumerable<DataMember> Members
+		{
+			get
+			{
+				foreach (DataMember dmember in _Members)
+				{
+					yield return dmember;
+				}
+			}
+		}
 
 		public IEnumerable<DataMember> PrimaryKey
 		{
@@ -60,6 +63,47 @@ namespace OKHOSTING.Sql.ORM
 				return from m in Members where !m.Column.IsPrimaryKey select m;
 			}
 		}
+		
+		public DataMember Map(string member)
+		{
+			return Map(member, null);
+		}
+
+		public DataMember Map(string member, Schema.Column column)
+		{
+			var genericDataMemberType = typeof(DataMember<>).MakeGenericType(InnerType);
+			
+			var constructor = genericDataMemberType.GetConstructor(
+			  System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.CreateInstance | System.Reflection.BindingFlags.Instance,
+			  null,
+			  new[] { typeof(string), typeof(Schema.Column) },
+			  null
+			);
+
+			DataMember genericDataMember = (DataMember) constructor.Invoke(new object[] { member, column });
+
+			_Members.Add(genericDataMember);
+
+			return genericDataMember;
+		}
+
+		public void UnMap(string member)
+		{
+			DataMember dmember = this[member];
+			_Members.Remove(dmember);
+		}
+
+		#endregion
+
+		/// <summary>
+		/// System.Type in wich this TypeMap<T> is created from
+		/// </summary>
+		public readonly Type InnerType;
+
+		/// <summary>
+		/// The table where objects of this Type will be stored
+		/// </summary>
+		public readonly Schema.Table Table;
 
 		public DataType BaseDataType
 		{
@@ -256,10 +300,21 @@ namespace OKHOSTING.Sql.ORM
 		
 		#region Static
 
+		protected static readonly List<DataType> _DataTypes = new List<DataType>();
+
 		/// <summary>
 		/// List of available type mappings, system-wide
 		/// </summary>
-		public static readonly List<DataType> DataTypes = new List<DataType>();
+		protected static IEnumerable<DataType> DataTypes
+		{
+			get
+			{
+				foreach (var dtype in _DataTypes)
+				{
+					yield return dtype;
+				}
+			}
+		}
 
 		public static implicit operator DataType(Type type)
 		{
@@ -276,9 +331,32 @@ namespace OKHOSTING.Sql.ORM
 			return DataTypes.Where(m => m.InnerType.Equals(type)).Single();
 		}
 
-		public static void Map(DataType dtype)
+		public static DataType Map(Type type)
 		{
-			DataTypes.Add(dtype);
+			return Map(type, null);
+		}
+
+		public static DataType Map(Type type, Schema.Table table)
+		{
+			var genericDataTypeType = typeof(DataType<>).MakeGenericType(type);
+			var constructor = genericDataTypeType.GetConstructor(
+			  System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.CreateInstance | System.Reflection.BindingFlags.Instance,
+			  null,
+			  new[] { typeof(Schema.Table) },
+			  null
+			);
+
+			DataType genericDataType = (DataType) constructor.Invoke(new object[]{ table });
+
+			_DataTypes.Add(genericDataType);
+
+			return genericDataType;
+		}
+
+		public static void UnMap(Type type)
+		{
+			DataType dtype = type;
+			_DataTypes.Remove(dtype);
 		}
 
 		public static IEnumerable<DataType> DefaultMap(params Tuple<Type, Schema.Table>[] types)
@@ -300,15 +378,13 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentOutOfRangeException("type", "This Types is already mapped");
 			}
 
-			DataType dtype = new DataType(type, table);
-			DataTypes.Add(dtype);
+			DataType dtype = DataType.Map(type, table);
 
 			foreach (var memberInfo in GetMapableMembers(type))
 			{
 				if (table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
 				{
-					DataMember member = new DataMember(dtype, memberInfo.Name, table[memberInfo.Name]);
-					dtype.Members.Add(member);
+					DataMember member = dtype.Map(memberInfo.Name, table[memberInfo.Name]);
 				}
 			}
 
@@ -324,14 +400,12 @@ namespace OKHOSTING.Sql.ORM
 			foreach (Type type in types)
 			{
 				Schema.Table table = new Schema.Table(type.Name);
-				DataType dtype = new DataType(type, table);
-				DataTypes.Add(dtype);
+				DataType dtype = DataType.Map(type, table);
 
 				foreach (var memberInfo in GetMapableMembers(type).Where(m => DataMember.IsPrimaryKey(m)))
 				{
 					//create datamember
-					DataMember dmember = new DataMember(type, memberInfo.Name);
-					dtype.Members.Add(dmember);
+					DataMember dmember = dtype.Map(memberInfo.Name);
 				}
 			}
 
@@ -393,8 +467,7 @@ namespace OKHOSTING.Sql.ORM
 							foreignKey.Columns.Add(new Tuple<Schema.Column, Schema.Column>(column, pk.Column));
 							
 							//create datamember
-							DataMember dmember = new DataMember(type, memberInfo.Name + "." + pk.Member, column);
-							dtype.Members.Add(dmember);
+							dtype.Map(memberInfo.Name + "." + pk.Member, column);
 						}
 
 						dtype.Table.ForeignKeys.Add(foreignKey);
@@ -409,8 +482,7 @@ namespace OKHOSTING.Sql.ORM
 						column.IsPrimaryKey = false;
 
 						//create datamember
-						DataMember dmember = new DataMember(type, memberInfo.Name, column);
-						dtype.Members.Add(dmember);
+						DataMember dmember = dtype.Map(memberInfo.Name, column);
 
 						//is this a regular atomic value?
 						if (Sql.DataBase.DbTypeMap.ContainsValue(returnType) && returnType != typeof(object))
@@ -481,20 +553,71 @@ namespace OKHOSTING.Sql.ORM
 	/// </summary>
 	public class DataType<T> : DataType
 	{
-		public DataType(Schema.Table table): base(typeof(T), table)
+		protected DataType(Schema.Table table): base(typeof(T), table)
 		{
 			
 		}
 
-		public DataType(): base(typeof(T))
+		protected DataType(): base(typeof(T))
 		{
 		}
 
-		public new readonly List<DataMember<T>> Members = new List<DataMember<T>>();
+		public new IEnumerable<DataMember<T>> Members
+		{
+			get
+			{
+				foreach (DataMember dmember in base.Members)
+				{
+					yield return (DataMember<T>) dmember;
+				}
+			}
+		}
+
+		public DataMember this[System.Linq.Expressions.Expression<Func<T, object>> expression]
+		{
+			get
+			{
+				return this[DataMember<T>.GetMemberString(expression)];
+			}
+		}
+
+		public DataMember<T> Map(System.Linq.Expressions.Expression<Func<T, object>> memberExpression)
+		{
+			return Map(memberExpression, null);
+		}
+
+		public DataMember<T> Map(System.Linq.Expressions.Expression<Func<T, object>> memberExpression, Schema.Column column)
+		{
+			return (DataMember<T>) Map(DataMember<T>.GetMemberString(memberExpression), column);
+		}
+
+		public void UnMap(System.Linq.Expressions.Expression<Func<T, object>> memberExpression)
+		{
+			UnMap(DataMember<T>.GetMemberString(memberExpression));
+		}
+
+		#region Static
 
 		public static DataType GetMap()
 		{
 			return GetMap(typeof(T));
 		}
+
+		public static DataType<T> Map()
+		{
+			return (DataType<T>) Map((Schema.Table) null);
+		}
+
+		public static void UnMap()
+		{
+			UnMap(typeof(T));
+		}
+
+		public static DataType<T> Map(Schema.Table table)
+		{
+			return (DataType<T>)Map(typeof(T), table);
+		}
+
+		#endregion
 	}
 }
