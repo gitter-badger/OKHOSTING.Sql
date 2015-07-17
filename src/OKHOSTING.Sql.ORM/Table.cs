@@ -160,12 +160,21 @@ namespace OKHOSTING.Sql.ORM
 
 		protected virtual Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, TKey key)
 		{
-			return new Filters.ValueCompareFilter(dtype.PrimaryKey.First(), (IComparable) key);
+			return new Filters.ValueCompareFilter()
+			{
+				Member = dtype.PrimaryKey.First(),
+				ValueToCompare = (IComparable) key,
+				Operator = Core.Data.CompareOperator.Equal,
+			};
 		}
 
 		protected virtual Filters.FilterBase GetSelectJoinFilter(DataType dtype)
 		{
-			return new Filters.MemberCompareFilter(dtype.PrimaryKey.First(), dtype.BaseDataType.PrimaryKey.First());
+			return new Filters.MemberCompareFilter()
+			{
+				Member = dtype.PrimaryKey.First(),
+				MemberToCompare = dtype.BaseDataType.PrimaryKey.First(),
+			};
 		}
 
 		/// <summary>

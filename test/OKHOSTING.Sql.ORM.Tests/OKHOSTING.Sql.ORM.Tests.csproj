@@ -52,6 +52,8 @@
     <Compile Include="BasicTests.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Address.cs" />
+    <Compile Include="Country.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="CustomerContact.cs" />
     <Compile Include="Employee.cs" />

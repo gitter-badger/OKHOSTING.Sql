@@ -67,7 +67,12 @@ namespace OKHOSTING.Sql.ORM
 
 			for (int i = 0; i < primaryKeys.Count; i++)
 			{
-				filter.InnerFilters.Add(new Filters.ValueCompareFilter(primaryKeys[i], (IComparable)key[i]));
+				filter.InnerFilters.Add(new Filters.ValueCompareFilter()
+				{
+					Member = primaryKeys[i],
+					ValueToCompare = (IComparable)key[i],
+					Operator = Core.Data.CompareOperator.Equal,
+				});
 			}
 
 			return filter;
@@ -81,7 +86,12 @@ namespace OKHOSTING.Sql.ORM
 
 			for (int i = 0; i < primaryKeys.Count; i++)
 			{
-				filter.InnerFilters.Add(new Filters.MemberCompareFilter(primaryKeys[i], basePrimaryKeys[i]));
+				filter.InnerFilters.Add(new Filters.MemberCompareFilter()
+				{
+					Member = primaryKeys[i], 
+					MemberToCompare = basePrimaryKeys[i],
+					Operator = Core.Data.CompareOperator.Equal,
+				});
 			}
 
 			return filter;

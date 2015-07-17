@@ -25,7 +25,7 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Logical operator used in the filter
 		/// </summary>
-		public readonly LogicalOperator LogicalOperator;
+		public LogicalOperator LogicalOperator { get; set; }
 
 		/// <summary>
 		/// Constructs the filter

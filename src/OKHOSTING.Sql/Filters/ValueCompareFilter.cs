@@ -16,34 +16,6 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Value for comparison
 		/// </summary>
-		public readonly IComparable ValueToCompare;
-
-		/// <summary>
-		/// Constructs the filter
-		/// </summary>
-		/// <param name="dataMember">
-		///  DataValue for the comparison
-		/// </param>
-		/// <param name="valueToCompare">
-		/// Value for comparison
-		/// </param>
-		public ValueCompareFilter(Column column, IComparable valueToCompare) : this(column, valueToCompare, CompareOperator.Equal) { }
-
-		/// <summary>
-		/// Constructs the filter
-		/// </summary>
-		/// <param name="dataMember">
-		///  DataValue for the comparison
-		/// </param>
-		/// <param name="valueToCompare">
-		/// Value for comparison
-		/// </param>
-		/// <param name="op">
-		/// Operator for comparison
-		/// </param>
-		public ValueCompareFilter(Column column, IComparable valueToCompare, CompareOperator op) : base(column, op)
-		{
-			this.ValueToCompare = valueToCompare;
-		}
+		public IComparable ValueToCompare;
 	}
 }

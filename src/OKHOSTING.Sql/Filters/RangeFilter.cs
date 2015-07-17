@@ -15,29 +15,11 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Minimum value of the allowed range
 		/// </summary>
-		public readonly IComparable MinValue;
+		public IComparable MinValue;
 		
 		/// <summary>
 		/// Maximum value of the allowed range
 		/// </summary>
-		public readonly IComparable MaxValue;
-
-		/// <summary>
-		/// Constructs the filter 
-		/// </summary>
-		/// <param name="dataMember">
-		/// Member that must be on the specified range
-		/// </param>
-		/// <param name="minValue">
-		/// Minimum value of the allowed range
-		/// </param>
-		/// <param name="maxValue">
-		/// Maximum value of the allowed range
-		/// </param>
-		public RangeFilter(Column column, IComparable minValue, IComparable maxValue): base(column)
-		{
-			MinValue = minValue;
-			MaxValue = maxValue;
-		}
+		public IComparable MaxValue;
 	}
 }

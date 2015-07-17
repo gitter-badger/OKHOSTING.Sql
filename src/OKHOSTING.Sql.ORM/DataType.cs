@@ -281,7 +281,7 @@ namespace OKHOSTING.Sql.ORM
 			DataTypes.Add(dtype);
 		}
 
-		public static IEnumerable<DataType> DefaultMap(IEnumerable<Tuple<Type, Schema.Table>> types)
+		public static IEnumerable<DataType> DefaultMap(params Tuple<Type, Schema.Table>[] types)
 		{
 			foreach (var tuple in types)
 			{
@@ -318,7 +318,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Creates a list of new DataTypes, creating as well a list of new Tables with all members of type as columns
 		/// </summary>
-		public static IEnumerable<DataType> DefaultMap(IEnumerable<Type> types)
+		public static IEnumerable<DataType> DefaultMap(params Type[] types)
 		{
 			//map primary keys first, so we allow to foreign keys and inheritance to be correctly mapped
 			foreach (Type type in types)

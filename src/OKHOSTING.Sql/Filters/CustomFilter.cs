@@ -14,22 +14,6 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Sql filter expression
 		/// </summary>
-		public string Filter;
-
-		/// <summary>
-		/// Constructs the filter
-		/// </summary>
-		/// <param name="filtering">
-		/// Event handler of custom filter
-		/// </param>
-		public CustomFilter(string filter)
-		{
-			if (string.IsNullOrWhiteSpace(filter))
-			{
-				throw new ArgumentNullException("filter");
-			}
-
-			this.Filter = filter;
-		}
+		public string Filter { get; set; }
 	}
 }

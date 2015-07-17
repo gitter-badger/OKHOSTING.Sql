@@ -6,27 +6,16 @@ using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql.ORM.Tests
 {
-	public class Person
+	public class Address
 	{
 		public int Id;
 		
 		[System.ComponentModel.DataAnnotations.StringLength(100)]
-		public string Firstname;
+		public string Street;
 
 		[System.ComponentModel.DataAnnotations.StringLength(100)]
-		public string LastName;
-
-		public DateTime BirthDate { get; set; }
+		public string Number;
 		
-		public Address Address1 { get; set; }
-		public Address Address2 { get; set; }
-
-		public string FullName
-		{
-			get
-			{
-				return Firstname + " " + LastName;
-			}
-		}
+		public Country Country { get; set; }
 	}
 }

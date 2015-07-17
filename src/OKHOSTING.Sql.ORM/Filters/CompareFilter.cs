@@ -16,28 +16,6 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <summary>
 		/// Operator of the comparison
 		/// </summary>
-		public readonly CompareOperator Operator;
-
-		/// <summary>
-		/// Construct the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember to compare
-		/// </param>
-		protected CompareFilter(DataMember dmember) : this(dmember, CompareOperator.Equal) { }
-
-		/// <summary>
-		/// Construct the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember to compare
-		/// </param>
-		/// <param name="op">
-		/// Operator to use in the comparison
-		/// </param>
-		protected CompareFilter(DataMember dmember, CompareOperator op): base(dmember)
-		{
-			this.Operator = op;
-		}
+		public CompareOperator Operator;
 	}
 }

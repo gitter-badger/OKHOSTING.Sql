@@ -15,45 +15,11 @@ namespace OKHOSTING.Sql.Filters
 		/// <summary>
 		/// Defines the pattern for the filter
 		/// </summary>
-		public readonly string Pattern;
+		public string Pattern { get; set; }
 
 		/// <summary>
 		/// Indicates if the filter comparison will be case sensitive
 		/// </summary>
-		public readonly bool CaseSensitive;
-
-		/// <summary>
-		/// Construct the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used to filter
-		/// </param>
-		/// <param name="pattern">
-		/// Defines the pattern for the filter
-		/// </param>
-		public LikeFilter(Column column, string pattern) : this(column, pattern, false) { }
-
-		/// <summary>
-		/// Construct the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used to filter
-		/// </param>
-		/// <param name="pattern">
-		/// Defines the pattern for the filter
-		/// </param>
-		/// <param name="caseSensitive">
-		/// Indicates if the filter comparison will be case sensitive
-		/// </param>
-		public LikeFilter(Column column, string pattern, bool caseSensitive): base(column)
-		{
-			if (string.IsNullOrWhiteSpace(pattern))
-			{
-				throw new ArgumentNullException("pattern");
-			}
-
-			Pattern = pattern;
-			CaseSensitive = caseSensitive;
-		}
+		public bool CaseSensitive { get; set; }
 	}
 }

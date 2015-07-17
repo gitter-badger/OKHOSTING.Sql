@@ -393,7 +393,7 @@ namespace OKHOSTING.Sql
 			{
 				foreach (var joinColumn in join.Columns)
 				{
-					string joinTableAlias = string.IsNullOrWhiteSpace(join.Alias)? join.Table.Name : joinColumn.Alias;
+					string joinTableAlias = string.IsNullOrWhiteSpace(join.Alias) ? join.Table.Name : join.Alias;
 					sql += string.Format("{0}.{1}", EncloseName(joinTableAlias), EncloseName(joinColumn.Column.Name));
 
 					if (!string.IsNullOrWhiteSpace(joinColumn.Alias))
@@ -506,8 +506,8 @@ namespace OKHOSTING.Sql
 
 			return
 				EqualityComparison(
-					ColumnFullName(filter.Column),
-					ColumnFullName(filter.ColumnToCompare),
+					ColumnFullName(filter),
+					EncloseName(string.IsNullOrWhiteSpace(filter.ColumnToCompareTableAlias) ? filter.ColumnToCompare.Table.Name : filter.ColumnToCompareTableAlias) + "." + EncloseName(filter.ColumnToCompare.Name),
 					filter.Operator
 				);
 		}
@@ -527,7 +527,7 @@ namespace OKHOSTING.Sql
 
 			Command command = new Command();
 
-			command.Append(ColumnFullName(filter.Column));
+			command.Append(ColumnFullName(filter));
 			command.Append(InClause(filter.Values.ToList()));
 
 			return command;
@@ -544,7 +544,7 @@ namespace OKHOSTING.Sql
 
 			command.Script =
 				EqualityComparison(
-				ColumnFullName(filter.Column),
+				ColumnFullName(filter),
 				param.Name,
 				CompareOperator.Like);
 
@@ -577,13 +577,13 @@ namespace OKHOSTING.Sql
 				(
 					EqualityComparison
 					(
-						ColumnFullName(filter.Column),
+						ColumnFullName(filter),
 						minParam.Name,
 						CompareOperator.GreaterThanEqual
 					),
 					EqualityComparison
 					(
-						ColumnFullName(filter.Column),
+						ColumnFullName(filter),
 						maxParam.Name,
 						CompareOperator.LessThanEqual
 					),
@@ -607,7 +607,7 @@ namespace OKHOSTING.Sql
 			command.Script =
 				EqualityComparison
 				(
-					ColumnFullName(filter.Column),
+					ColumnFullName(filter),
 					param.Name,
 					filter.Operator
 				);
@@ -738,14 +738,13 @@ namespace OKHOSTING.Sql
 			if (select == null) throw new ArgumentNullException("select");
 
 			//Creating the From Clause
-			Command command = "From " + EncloseName(select.From.Name);
+			Command command = " From " + EncloseName(select.From.Name);
 
 			//Crossing the inheritance until reach the root Table
 			foreach (SelectJoin join in select.Joins)
 			{
-				//Resolve inheritance Inner Joins
-
-				command.Script += join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : join.Alias) + " ON ";
+				//Resolve Joins
+				command.Script += " " + join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : join.Alias) + " ON ";
 				command.Append(Filter(join.On, LogicalOperator.And));
 			}
 
@@ -1345,6 +1344,20 @@ namespace OKHOSTING.Sql
 		protected virtual string ColumnFullName(Column column)
 		{
 			return EncloseName(column.Table.Name) + "." + EncloseName(column.Name);
+		}
+
+		/// <summary>
+		/// Returns the name of the specified field completly qualified
+		/// </summary>
+		/// <param name="column">
+		/// Column to format
+		/// </param>
+		/// <returns>
+		/// Name of the specified field completly qualified
+		/// </returns>
+		protected virtual string ColumnFullName(ColumnFilter filter)
+		{
+			return EncloseName(string.IsNullOrWhiteSpace(filter.TableAlias) ? filter.Column.Table.Name : filter.TableAlias) + "." + EncloseName(filter.Column.Name);
 		}
 
 		private static readonly Random Random = new Random();

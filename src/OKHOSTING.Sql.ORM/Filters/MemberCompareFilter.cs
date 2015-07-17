@@ -16,34 +16,11 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Member to compare with the Member defined in the 
 		/// Field with the same name
 		/// </summary>
-		public readonly DataMember MemberToCompare;
+		public DataMember MemberToCompare;
 
 		/// <summary>
-		/// Constructs the filter
+		/// Optional alias used for the table
 		/// </summary>
-		/// <param name="dataMember">
-		/// First Member used to comparison
-		/// </param>
-		/// <param name="dataValueToCompare">
-		/// Second Member used to comparison
-		/// </param>
-		public MemberCompareFilter(DataMember dmember, DataMember dmemberToCompare) : this(dmember, dmemberToCompare, CompareOperator.Equal) { }
-
-		/// <summary>
-		/// Constructs the filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// First Member used to comparison
-		/// </param>
-		/// <param name="dataValueToCompare">
-		/// Second Member used to comparison
-		/// </param>
-		/// <param name="op">
-		/// Operator of comparison
-		/// </param>
-		public MemberCompareFilter(DataMember member, DataMember memberToCompare, CompareOperator op): base(member, op)
-		{
-			this.MemberToCompare = memberToCompare;
-		}
+		public string MemberToCompareTypeAlias;
 	}
 }

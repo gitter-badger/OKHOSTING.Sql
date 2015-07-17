@@ -26,7 +26,9 @@ namespace OKHOSTING.Sql.ORM.Tests
 					typeof(Person), 
 					typeof(Employee), 
 					typeof(Customer), 
-					typeof(CustomerContact) 
+					typeof(CustomerContact), 
+					typeof(Address), 
+					typeof(Country) 
 				};
 
 			var dtypes = DataType.DefaultMap(types).ToList();
@@ -40,6 +42,8 @@ namespace OKHOSTING.Sql.ORM.Tests
 
 		public void Create()
 		{
+			DataBase.Create<Country>();
+			DataBase.Create<Address>();
 			DataBase.Create<Person>();
 			DataBase.Create<Employee>();
 			DataBase.Create<Customer>();
@@ -49,6 +53,8 @@ namespace OKHOSTING.Sql.ORM.Tests
 			Assert.IsTrue(DataBase.NativeDataBase.ExistsTable("test_Employee"));
 			Assert.IsTrue(DataBase.NativeDataBase.ExistsTable("test_Customer"));
 			Assert.IsTrue(DataBase.NativeDataBase.ExistsTable("test_CustomerContact"));
+			Assert.IsTrue(DataBase.NativeDataBase.ExistsTable("test_Address"));
+			Assert.IsTrue(DataBase.NativeDataBase.ExistsTable("test_Country"));
 		}
 
 		public void Drop()
@@ -57,11 +63,15 @@ namespace OKHOSTING.Sql.ORM.Tests
 			DataBase.Drop<Customer>();
 			DataBase.Drop<Employee>();
 			DataBase.Drop<Person>();
+			DataBase.Drop<Address>();
+			DataBase.Drop<Country>();
 
 			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_Person"));
 			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_Employee"));
 			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_Customer"));
 			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_CustomerContact"));
+			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_Address"));
+			Assert.IsFalse(DataBase.NativeDataBase.ExistsTable("test_Country"));
 		}
 
 		public void CreateAndDrop()
@@ -108,7 +118,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 		}
 
 		[Test]
-		public void Select()
+		public void SelectTest()
 		{
 			MapTypes();
 			Create();
@@ -191,7 +201,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 			Operations.SelectJoin join = new Operations.SelectJoin();
 			join.JoinType = SelectJoinType.Inner;
 			join.Type = typeof(Customer);
-			join.On.Add(new Filters.MemberCompareFilter(select.From["Customer.Id"], join.Type["id"]));
+			join.On.Add(new Filters.MemberCompareFilter(){ Member = select.From["Customer.Id"], MemberToCompare = join.Type["id"], Operator = Core.Data.CompareOperator.Equal });
 			select.Joins.Add(join);
 
 			foreach (var member in join.Type.Members.Where(m=> !m.Column.IsPrimaryKey))
@@ -244,31 +254,56 @@ namespace OKHOSTING.Sql.ORM.Tests
 			DataBase.Drop<CustomerContact>();
 		}
 
-		/*[Test]
+		[Test]
 		public void GenericOperations()
 		{
-			DataType<Person> dtype = typeof(Person);
+			MapTypes();
+			Drop();
+			Create();
 
-			DataBase.Create<CustomerContact>();
-
-			for (int i = 0; i < 30; i++)
+			for (int i = 0; i < 5; i++)
 			{
 				CustomerContact cc = new CustomerContact();
-				cc.Firstname = "Maria " + i;
+				cc.Firstname = "Fulanito " + i;
+				cc.LastName = "De tal " + i;
+				cc.BirthDate = DateTime.Now;
+				
 				cc.Customer = new Customer();
-				cc.Customer.LegalName = "Empresa " + i;
-				cc.Customer.Phone = "Telefono " + i;
+				cc.Customer.LegalName = "Cliente " + i;
+				cc.Customer.Email = "Email " + i;
+				
+				cc.Address1 = new Address();
+				cc.Address1.Street = "Calle " + i;
+				cc.Address1.Number = "# " + i;
+				cc.Address1.Country = new Country();
+				cc.Address1.Country.Name = "Pais " + i;
 
-				ORM.Operations.Insert<CustomerContact> insert = new ORM.Operations.Insert<CustomerContact>(cc, x => x.LastName, x => x.BirthDate, x => x.Id, x => x.Customer.LegalName);
-				//DataBase.Table<int, CustomerContact>().Add(0, cc);
+				cc.Address2 = new Address();
+				cc.Address2.Street = "2 Calle " + i;
+				cc.Address2.Number = "2 # " + i;
+				cc.Address2.Country = cc.Address1.Country;
+
+				DataBase.Table<int, Country>().Add(0, cc.Address1.Country);
+				DataBase.Table<int, Address>().Add(0, cc.Address1);
+				DataBase.Table<int, Address>().Add(0, cc.Address2);
+				DataBase.Table<int, Customer>().Add(0, cc.Customer);
+				DataBase.Table<int, CustomerContact>().Add(0, cc);
 			}
 
-			foreach (var cc in DataBase.Table<int, CustomerContact>())
-			{
-				Console.WriteLine(cc.Value.Firstname + " " + cc.Value.Customer.LegalName);
-			}
+			Select<CustomerContact> select = new Select<CustomerContact>
+			(
+				c => c.Id, 
+				c => c.BirthDate, 
+				c => c.Customer.LegalName, 
+				c=> c.Address1.Street, 
+				c=> c.Address1.Country.Name,
+				c=> c.Address2.Street,
+				c=> c.Address2.Country.Name
+			);
 
-			DataBase.Drop<CustomerContact>();
-		}*/
+			var result = DataBase.Select<CustomerContact>(select).ToList();
+
+			Drop();
+		}
 	}
 }

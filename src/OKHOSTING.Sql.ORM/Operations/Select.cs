@@ -17,12 +17,13 @@ namespace OKHOSTING.Sql.ORM.Operations
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
+	}
 
-		public static Select Create<T>(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
+	public class Select<T> : Select
+	{
+		public Select(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
 		{
-			Select select = new Select();
-			select.From = typeof(T);
-			Random random = new Random();
+			From = typeof(T);
 
 			foreach (var expression in memberExpressions)
 			{
@@ -40,31 +41,31 @@ namespace OKHOSTING.Sql.ORM.Operations
 					{
 						currentExpression += '.' + nestedMemberInfos[y].Name;
 					}
-					
+
 					currentExpression = currentExpression.Trim('.');
 
 					//if this is a native datamember, just add a SelectMember
-					if (DataMember.IsMapped(select.From, currentExpression))
+					if (DataMember.IsMapped(From, currentExpression))
 					{
-						DataMember dmember = DataMember.GetMap(select.From, currentExpression);
+						DataMember dmember = DataMember.GetMap(From, currentExpression);
 
 						//this is a native member of this dataType
-						SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_') + random.Next());
-						select.Members.Add(sm);
+						SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
+						Members.Add(sm);
 
 						//finish iteration here
 						continue;
 					}
 
 					//if this is a dataMember from a base type, create join for that relationship
-					foreach (DataType parent in select.From.GetBaseDataTypes().Skip(1))
+					foreach (DataType parent in From.GetBaseDataTypes())
 					{
 						//if this is a native datamember, just add a SelectMember
 						if (DataMember.IsMapped(parent, currentExpression))
 						{
 							DataMember dmember = DataMember.GetMap(parent, currentExpression);
 
-							SelectJoin join = select.Joins.Where(j => j.Type == parent && j.Alias == parent.InnerType.Name + "_base").SingleOrDefault();
+							SelectJoin join = Joins.Where(j => j.Type == parent && j.Alias == parent.InnerType.Name + "_base").SingleOrDefault();
 
 							if (join == null)
 							{
@@ -73,37 +74,44 @@ namespace OKHOSTING.Sql.ORM.Operations
 								join.Type = parent;
 								join.Alias = parent.InnerType.Name + "_base";
 
-								var childPK = select.From.PrimaryKey.ToList();
+								var childPK = From.PrimaryKey.ToList();
 								var joinPK = join.Type.PrimaryKey.ToList();
 
 								for (int y = 0; y < joinPK.Count; y++)
 								{
 									//DataMember pk in join.Type.PrimaryKey
-									var filter = new Filters.MemberCompareFilter(childPK[y], joinPK[y]);
+									var filter = new Filters.MemberCompareFilter()
+									{
+										 Member = childPK[y],
+										 MemberToCompare = joinPK[y],
+										 MemberToCompareTypeAlias = join.Alias,
+									};
+
 									join.On.Add(filter);
 								}
 
-								select.Joins.Add(join);
+								Joins.Add(join);
 							}
 
 							//this is a native member of this dataType
-							SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_') + random.Next());
+							SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
 							join.Members.Add(sm);
 
 							//finish iteration here
-							continue;
+							break;
 						}
 
+						DataType referencingDataType = isTheFirstOne ? parent : DataMember.GetReturnType(nestedMemberInfos[i - 1]);
+
 						//this is not a native or inherited DataMember, so we must detect the nested members and create the respective joins
-						if (DataType.IsMapped(DataMember.GetReturnType(memberInfo)))
+						if (!isTheLastOne && DataType.IsMapped(DataMember.GetReturnType(memberInfo)))
 						{
-							DataType foregignDataType = DataMember.GetReturnType(memberInfo);
-							DataType referencingDataType = isTheFirstOne ? parent : DataMember.GetReturnType(nestedMemberInfos[i - 1]);
+							DataType foreignDataType = DataMember.GetReturnType(memberInfo);
 							bool foreignKeyIsMapped = true;
 
-							foreach (DataMember foreignKey in foregignDataType.PrimaryKey)
+							foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 							{
-								DataMember localKey = referencingDataType.Members.Where(m => m.Member == currentExpression + "." + foreignKey.Member).SingleOrDefault();
+								DataMember localKey = referencingDataType.Members.Where(m => m.Member == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
 
 								if (localKey == null)
 								{
@@ -113,38 +121,57 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 							if (foreignKeyIsMapped)
 							{
-								SelectJoin foreignJoin = select.Joins.Where(j => j.Type == foregignDataType && j.Alias == currentExpression.Replace('.', '_')).SingleOrDefault();
+								SelectJoin foreignJoin = Joins.Where(j => j.Type == foreignDataType && j.Alias == currentExpression.Replace('.', '_')).SingleOrDefault();
 
 								if (foreignJoin == null)
 								{
 									foreignJoin = new SelectJoin();
 									foreignJoin.JoinType = Sql.Operations.SelectJoinType.Inner;
-									foreignJoin.Type = foregignDataType;
+									foreignJoin.Type = foreignDataType;
 									foreignJoin.Alias = currentExpression.Replace('.', '_');
 
-									foreach (DataMember foreignKey in foregignDataType.PrimaryKey)
-									{
-										DataMember localKey = referencingDataType.Members.Where(m => m.Member == currentExpression + "." + foreignKey.Member).Single();
+									string pastJoinAlias = string.Empty;
 
-										var filter = new Filters.MemberCompareFilter(localKey, foreignKey);
+									for (int y = 0; y <= i - 1; y++)
+									{
+										pastJoinAlias += '.' + nestedMemberInfos[y].Name;
+									}
+									
+									pastJoinAlias = pastJoinAlias.Trim('.');
+
+									foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
+									{
+										DataMember localKey = referencingDataType.Members.Where(m => m.Member == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
+
+										var filter = new Filters.MemberCompareFilter()
+										{
+											Member = localKey,
+											MemberToCompare = foreignKey,
+											TypeAlias = pastJoinAlias,
+											MemberToCompareTypeAlias = foreignJoin.Alias,
+										};
+
 										foreignJoin.On.Add(filter);
 									}
+
+									Joins.Add(foreignJoin);
 								}
 
-								if (isTheLastOne)
-								{
-									DataMember dmember = DataMember.GetMap(referencingDataType, memberInfo.Name);
-
-									SelectMember sm = new SelectMember(dmember, currentExpression.Replace('.', '_') + random.Next());
-									foreignJoin.Members.Add(sm);
-								}
+								break;
 							}
+						}
+
+						if (!isTheFirstOne && isTheLastOne)
+						{
+							DataMember dmember = DataMember.GetMap(referencingDataType, memberInfo.Name);
+							SelectJoin foreignJoin = Joins.Where(j => j.Type == referencingDataType && j.Alias == currentExpression.Replace("." + memberInfo.Name, string.Empty).Replace('.', '_')).SingleOrDefault();
+							SelectMember sm = new SelectMember(dmember, currentExpression.Replace('.', '_'));
+							foreignJoin.Members.Add(sm);
+							break;
 						}
 					}
 				}
 			}
-
-			return select;
 		}
 	}
 }

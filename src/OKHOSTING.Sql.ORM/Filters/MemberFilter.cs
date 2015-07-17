@@ -13,18 +13,11 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <summary>
 		/// DataMember used to filter
 		/// </summary>
-		public readonly DataMember Member;
+		public DataMember Member;
 
 		/// <summary>
-		/// Creates the filter
+		/// Optional alias used for the type's table
 		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used to filter
-		/// </param>
-		protected MemberFilter(DataMember member)
-		{
-			//Establishing the DataMember to filter
-			this.Member = member;
-		}
+		public string TypeAlias;
 	}
 }

@@ -23,7 +23,13 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 			foreach(var pk in From.PrimaryKey)
 			{
-				var filter = new Filters.ValueCompareFilter(pk, (IComparable) pk.GetValue(instance));
+				var filter = new Filters.ValueCompareFilter()
+				{
+					Member = pk,
+					ValueToCompare = (IComparable) pk.GetValue(instance),
+					Operator = Core.Data.CompareOperator.Equal,
+				};
+
 				Where.Add(filter);
 			}
 		}

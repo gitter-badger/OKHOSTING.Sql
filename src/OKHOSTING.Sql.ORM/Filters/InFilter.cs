@@ -18,8 +18,6 @@ namespace OKHOSTING.Sql.ORM.Filters
 	/// </typeparam>
 	public class InFilter: MemberFilter
 	{
-		#region Fields
-
 		/// <summary>
 		/// List of values of the filter
 		/// </summary>
@@ -30,56 +28,5 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// when listItemsType = System.String
 		/// </summary>
 		public bool CaseSensitive;
-
-		#endregion
-
-		#region Constructors
-
-		/// <summary>
-		/// Constructs the In Filter
-		/// </summary>
-		public InFilter() : this(null, null, false) { }
-
-		/// <summary>
-		/// Constructs the In Filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used in the filter
-		/// </param>
-		public InFilter(DataMember member) : this(member, null, false) { }
-
-		/// <summary>
-		/// Constructs the In Filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used in the filter
-		/// </param>
-		/// <param name="values">
-		/// List of possible values of the filter
-		/// </param>
-		public InFilter(DataMember member, List<IComparable> values): this(member, values, false)
-		{
-		}
-
-		/// <summary>
-		/// Constructs the In Filter
-		/// </summary>
-		/// <param name="dataMember">
-		/// DataMember used in the filter
-		/// </param>
-		/// <param name="values">
-		/// List of possible values of the filter
-		/// </param>
-		/// <param name="caseSensitive">
-		/// Indicates if the filter comparison will be case sensitive
-		/// when listItemsType = System.String
-		/// </param>
-		public InFilter(DataMember member, List<IComparable> values, bool caseSensitive): base(member)
-		{
-			this.Values = values;
-			this.CaseSensitive = caseSensitive;
-		}
-
-		#endregion
 	}
 }

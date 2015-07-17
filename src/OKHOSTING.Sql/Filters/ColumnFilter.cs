@@ -15,24 +15,10 @@ namespace OKHOSTING.Sql.Filters
 		/// DataMember used to filter
 		/// </summary>
 		public Column Column;
-
+		
 		/// <summary>
-		/// Creates the filter
+		/// Optional alias used for the table
 		/// </summary>
-		protected ColumnFilter()
-		{
-		}
-
-		/// <summary>
-		/// Creates the filter
-		/// </summary>
-		/// <param name="column">
-		/// column used to filter
-		/// </param>
-		protected ColumnFilter(Column column)
-		{
-			//Establishing the DataMember to filter
-			this.Column = column;
-		}
+		public string TableAlias;
 	}
 }

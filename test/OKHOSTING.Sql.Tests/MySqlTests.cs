@@ -63,7 +63,7 @@ namespace OKHOSTING.Sql.Tests
 			select.From = table;
 			select.Columns.Add(table["id"]);
 			select.Columns.Add(table["TextField"]);
-			select.Where.Add(new ValueCompareFilter(table["TextField"], "test11"));
+			select.Where.Add(new ValueCompareFilter(){ Column = table["TextField"], ValueToCompare = "test11", Operator = Core.Data.CompareOperator.Equal });
 
 			sql = generator.Select(select);
 			var result = db.GetDataTable(sql);
@@ -72,7 +72,7 @@ namespace OKHOSTING.Sql.Tests
 			//delete
 			Delete delete = new Delete();
 			delete.From = table;
-			delete.Where.Add(new ValueCompareFilter(table["TextField"], "test11"));
+			delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Core.Data.CompareOperator.Equal });
 
 			sql = generator.Delete(delete);
 			affectedRows = db.Execute(sql);

@@ -30,12 +30,12 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentOutOfRangeException("column", column, "This column does not belong the the Table that TypeMap is mapped to");
 			}
 
-			//validate member expression
-			var x = MemberInfos;
-
 			Type = type;
 			Column = column;
 			Member = member;
+
+			//validate member expression
+			var x = MemberInfos;
 		}
 
 		public DataMember(DataType type, string member)
@@ -254,6 +254,8 @@ namespace OKHOSTING.Sql.ORM
 		/// </param>
 		public static void SetValue(MemberInfo memberInfo, object obj, object value)
 		{
+			value = Convert.ChangeType(value, GetReturnType(memberInfo));
+
 			if (memberInfo is FieldInfo)
 			{
 				((FieldInfo) memberInfo).SetValue(obj, value);
