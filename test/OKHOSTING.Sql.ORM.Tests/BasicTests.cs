@@ -305,6 +305,8 @@ namespace OKHOSTING.Sql.ORM.Tests
 				ValueToCompare = 3,
 				Operator = Core.Data.CompareOperator.LessThanEqual,
 			});
+			
+			select.OrderBy.Add(new Operations.OrderBy() { Member = dtype[x => x.Id], Direction = Core.Data.SortDirection.Descending });
 
 			var result = DataBase.Select<CustomerContact>(select).ToList();
 
