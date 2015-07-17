@@ -15,62 +15,52 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentNullException("type");
 			}
 
+			if (string.IsNullOrWhiteSpace(member))
+			{
+				throw new ArgumentNullException("member");
+			}
+
+			Type = type;
+			Member = member;
+
 			if (column == null)
 			{
-				throw new ArgumentNullException("column");
-			}
+				var finalMember = FinalMemberInfo;
 
-			if (string.IsNullOrWhiteSpace(member))
+				Column = new Schema.Column()
+				{
+					Table = type.Table,
+					Name = member.Replace('.', '_'),
+					DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
+					IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
+					IsPrimaryKey = IsPrimaryKey(finalMember),
+				};
+
+				Column.IsAutoNumber = Column.IsNumeric && Column.IsPrimaryKey && type.BaseDataType == null;
+
+				if (Column.IsString)
+				{
+					Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
+				}
+
+				Type.Table.Columns.Add(Column);
+			}
+			else
 			{
-				throw new ArgumentNullException("member");
-			}
+				if (column.Table != type.Table)
+				{
+					throw new ArgumentOutOfRangeException("column", column, "This column does not belong the the Table that TypeMap is mapped to");
+				}
 
-			if (column.Table != type.Table)
-			{
-				throw new ArgumentOutOfRangeException("column", column, "This column does not belong the the Table that TypeMap is mapped to");
+				Column = column;
 			}
-
-			Type = type;
-			Column = column;
-			Member = member;
 
 			//validate member expression
-			var x = MemberInfos;
+			var x = MemberInfos.ToList();
 		}
 
-		protected DataMember(DataType type, string member)
+		protected DataMember(DataType type, string member): this(type, member, null)
 		{
-			if (type == null)
-			{
-				throw new ArgumentNullException("type");
-			}
-
-			if (string.IsNullOrWhiteSpace(member))
-			{
-				throw new ArgumentNullException("member");
-			}
-
-			Type = type;
-			Member = member;
-			var finalMember = FinalMemberInfo;
-			
-			Column = new Schema.Column()
-			{
-				Table = type.Table,
-				Name = member.Replace('.', '_'),
-				DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
-				IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
-				IsPrimaryKey = IsPrimaryKey(finalMember),
-			};
-
-			Column.IsAutoNumber = Column.IsNumeric && Column.IsPrimaryKey && type.BaseDataType == null;
-			
-			if (Column.IsString)
-			{
-				Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
-			}
-
-			type.Table.Columns.Add(Column);
 		}
 
 		/// <summary>

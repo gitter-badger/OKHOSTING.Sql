@@ -22,14 +22,17 @@ namespace OKHOSTING.Sql.ORM
 
 			if (table == null)
 			{
-				throw new ArgumentNullException("table");
+				Table = new Schema.Table(innerType.Name);
+			}
+			else
+			{
+				Table = table;
 			}
 
 			InnerType = innerType;
-			Table = table;
 		}
 
-		protected DataType(Type innerType): this(innerType, new Schema.Table(innerType.Name))
+		protected DataType(Type innerType): this(innerType, null)
 		{
 		}
 
