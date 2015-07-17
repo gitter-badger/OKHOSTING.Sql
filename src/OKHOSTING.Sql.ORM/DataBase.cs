@@ -62,6 +62,8 @@ namespace OKHOSTING.Sql.ORM
 
 		public int Insert(Insert insert)
 		{
+			Validate(insert.Values.First().Instance);
+
 			Command sql = SqlGenerator.Insert(Parse(insert));
 			int result = NativeDataBase.Execute(sql);
 
@@ -79,6 +81,8 @@ namespace OKHOSTING.Sql.ORM
 
 		public int Update(Update update)
 		{
+			Validate(update.Set.First().Instance);
+
 			Command sql = SqlGenerator.Update(Parse(update));
 			return NativeDataBase.Execute(sql);
 		}
@@ -101,7 +105,7 @@ namespace OKHOSTING.Sql.ORM
 
 					foreach (SelectMember member in select.Members)
 					{
-						object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
 						member.Member.SetValueFromColumn(instance, value);
 					}
 
@@ -111,6 +115,16 @@ namespace OKHOSTING.Sql.ORM
 						{
 							string expression = member.Alias.Replace('_', '.');
 							object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+
+							if (member.Member.Converter != null)
+							{
+								value = member.Member.Converter.ColumnToMember(value);
+							}
+							else
+							{
+								value = Convert.ChangeType(value, member.Member.ReturnType);
+							}
+							
 							DataMember.SetValue(expression, instance, value);
 						}
 					}
@@ -173,6 +187,30 @@ namespace OKHOSTING.Sql.ORM
 
 			sql = SqlGenerator.Drop(dtype.Table);
 			NativeDataBase.Execute(sql);
+		}
+
+		public void Validate(object obj)
+		{
+			DataType dtype = obj.GetType();
+			List<Validators.ValidationError> errors = new List<Validators.ValidationError>();
+
+			foreach (var dmember in dtype.Members)
+			{
+				foreach (var validator in dmember.Validators)
+				{
+					var error = validator.Validate(obj);
+
+					if (error != null)
+					{
+						errors.Add(error);
+					}
+				}
+			}
+
+			if (errors.Count > 0)
+			{
+				throw new Validators.ValidationException(errors, obj);
+			}
 		}
 
 		#region Filter parsing

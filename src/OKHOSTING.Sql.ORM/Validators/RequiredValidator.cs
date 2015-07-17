@@ -30,10 +30,16 @@ namespace OKHOSTING.Sql.ORM.Validators
 			//Recover the value of MemberMap associated
 			object currentValue = Member.GetValue(obj);
 
+			//if this is autonumber, kust assume this is an "insert" and not an "update", and get out
+			if (Member.Column.IsAutoNumber)
+			{
+				return null;
+			}
+
 			//Validating if the value is null
 			if (currentValue == null)
 			{
-				error = new ValidationError(this, this.Member + " cannot be null");
+				error = new ValidationError(this, Member + " cannot be null");
 			}
 
 			//if this is a string, do not allow null nor empty values
