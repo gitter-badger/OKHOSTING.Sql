@@ -40,6 +40,14 @@ namespace OKHOSTING.Sql.ORM
 
 		protected readonly List<DataMember> _Members = new List<DataMember>();
 
+		public DataMember this[string name]
+		{
+			get
+			{
+				return AllMembers.Where(m => m.Member.ToLower() == name.ToLower()).Single();
+			}
+		}
+
 		public IEnumerable<DataMember> Members
 		{
 			get
@@ -47,6 +55,32 @@ namespace OKHOSTING.Sql.ORM
 				foreach (DataMember dmember in _Members)
 				{
 					yield return dmember;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns all DataMembers, including those inherited from base classes. 
+		/// </summary>
+		/// <remarks>
+		/// Does not duplicate the primary key by omitting base classes primary keys
+		/// </remarks>
+		public IEnumerable<DataMember> AllMembers
+		{
+			get
+			{
+				foreach (DataType parent in GetBaseDataTypes())
+				{
+					foreach (DataMember dmember in parent.Members)
+					{
+						//Do not duplicate the primary key by omitting base classes primary keys
+						if (parent != this && dmember.Column.IsPrimaryKey)
+						{
+							continue;
+						}
+
+						yield return dmember;
+					}
 				}
 			}
 		}
@@ -130,14 +164,6 @@ namespace OKHOSTING.Sql.ORM
 				}
 
 				return null;
-			}
-		}
-
-		public DataMember this[string name]
-		{
-			get
-			{
-				return Members.Where(m => m.Member.ToLower() == name.ToLower()).Single();
 			}
 		}
 
@@ -601,9 +627,9 @@ namespace OKHOSTING.Sql.ORM
 
 		#region Static
 
-		public static DataType GetMap()
+		public static DataType<T> GetMap()
 		{
-			return GetMap(typeof(T));
+			return (DataType<T>) GetMap(typeof(T));
 		}
 
 		public static DataType<T> Map()

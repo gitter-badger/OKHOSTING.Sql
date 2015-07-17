@@ -12,30 +12,16 @@ namespace OKHOSTING.Sql.ORM.Operations
 		{
 		}
 
-		public Update(object instance)
-		{
-			From = instance.GetType();
-
-			foreach (DataMember dmember in From.Members)
-			{
-				Set.Add(new MemberValue(dmember, instance));
-			}
-
-			foreach(var pk in From.PrimaryKey)
-			{
-				var filter = new Filters.ValueCompareFilter()
-				{
-					Member = pk,
-					ValueToCompare = (IComparable) pk.GetValue(instance),
-					Operator = Core.Data.CompareOperator.Equal,
-				};
-
-				Where.Add(filter);
-			}
-		}
-
 		public DataType From { get; set; }
 		public readonly List<MemberValue> Set = new List<MemberValue>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
+	}
+
+	public class Update<T> : Update
+	{
+		public Update()
+		{
+			From = typeof(T);
+		}
 	}
 }

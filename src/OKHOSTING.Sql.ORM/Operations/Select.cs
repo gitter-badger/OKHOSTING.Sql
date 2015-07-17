@@ -21,10 +21,13 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 	public class Select<T> : Select
 	{
-		public Select(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
+		public Select()
 		{
 			From = typeof(T);
+		}
 
+		public void AddMembers(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
+		{
 			foreach (var expression in memberExpressions)
 			{
 				string dataMemberString = DataMember<T>.GetMemberString(expression);

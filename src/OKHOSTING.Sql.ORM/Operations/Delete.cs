@@ -11,4 +11,12 @@ namespace OKHOSTING.Sql.ORM.Operations
 		public DataType From { get; set; }
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 	}
+
+	public class Delete<T> : Delete
+	{
+		public Delete()
+		{
+			From = typeof(T);
+		}
+	}
 }

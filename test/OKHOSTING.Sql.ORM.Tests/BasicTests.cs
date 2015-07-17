@@ -227,10 +227,8 @@ namespace OKHOSTING.Sql.ORM.Tests
 			DataType<CustomerContact> dtype2 = DataType<CustomerContact>.Map();
 			dtype2.Map(m => m.Id);
 			dtype2.Map(m => m.Customer.Id);
-			dtype2.Map(m => m.Customer.Phone.Length);
 			dtype2.Map(m => m.Customer.LegalName);
 			dtype2.Map(m => m.Customer.Phone);
-
 			DataBase.Create<CustomerContact>();
 
 			for(int i = 0; i < 30; i++)
@@ -288,7 +286,8 @@ namespace OKHOSTING.Sql.ORM.Tests
 				DataBase.Table<int, CustomerContact>().Add(0, cc);
 			}
 
-			Select<CustomerContact> select = new Select<CustomerContact>
+			Select<CustomerContact> select = new Select<CustomerContact>();
+			select.AddMembers
 			(
 				c => c.Id, 
 				c => c.BirthDate, 
@@ -299,12 +298,13 @@ namespace OKHOSTING.Sql.ORM.Tests
 				c=> c.Address2.Country.Name
 			);
 
-			//select.Where.Add(new Filters.ValueCompareFilter()
-			//{
-			//	Member = dtype[x=> x.BirthDate],
-			//	ValueToCompare = DateTime.Now,
-			//	Operator = Core.Data.CompareOperator.LessThanEqual,
-			//});
+			var dtype = DataType<CustomerContact>.GetMap();
+			select.Where.Add(new Filters.ValueCompareFilter()
+			{
+				Member = dtype[x => x.Id],
+				ValueToCompare = 3,
+				Operator = Core.Data.CompareOperator.LessThanEqual,
+			});
 
 			var result = DataBase.Select<CustomerContact>(select).ToList();
 
