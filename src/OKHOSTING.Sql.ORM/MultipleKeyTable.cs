@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get 
 			{
-				Select select = new Select();
+				Select<TType> select = new Select<TType>();
 				select.From = DataType;
 				
 				foreach (DataMember pk in DataType.PrimaryKey)
@@ -22,7 +22,7 @@ namespace OKHOSTING.Sql.ORM
 				var primaryKeys = DataType.PrimaryKey.ToList();
 				var keys = new List<object[]>();
 
-				foreach (TType instance in DataBase.Select<TType>(select))
+				foreach (TType instance in DataBase.Select(select))
 				{
 					object[] k = new object[primaryKeys.Count];
 					
@@ -40,10 +40,10 @@ namespace OKHOSTING.Sql.ORM
 
 		public override IEnumerator<KeyValuePair<object[], TType>> GetEnumerator()
 		{
-			Select select = CreateSelect();
+			Select<TType> select = CreateSelect();
 			List<DataMember> primaryKeys = DataType.PrimaryKey.ToList();
 
-			foreach (TType instance in DataBase.Select<TType>(select))
+			foreach (TType instance in DataBase.Select(select))
 			{
 				object[] key = new object[primaryKeys.Count];
 

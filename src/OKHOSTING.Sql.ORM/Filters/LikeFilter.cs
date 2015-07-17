@@ -14,11 +14,11 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// <summary>
 		/// Defines the pattern for the filter
 		/// </summary>
-		public readonly string Pattern;
+		public string Pattern;
 
 		/// <summary>
 		/// Indicates if the filter comparison will be case sensitive
 		/// </summary>
-		public readonly bool CaseSensitive;
+		public bool CaseSensitive;
 	}
 }

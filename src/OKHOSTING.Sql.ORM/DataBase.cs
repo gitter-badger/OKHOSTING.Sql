@@ -93,15 +93,15 @@ namespace OKHOSTING.Sql.ORM
 			return NativeDataBase.Execute(sql);
 		}
 
-		public IEnumerable<TType> Select<TType>(Select select)
+		public IEnumerable<object> Select(Select select)
 		{
 			Command sql = SqlGenerator.Select(Parse(select));
-			
+
 			using (var dataReader = NativeDataBase.GetDataReader(sql))
 			{
 				while (dataReader.Read())
 				{
-					TType instance = Activator.CreateInstance<TType>();
+					object instance = Activator.CreateInstance(select.From.InnerType);
 
 					foreach (SelectMember member in select.Members)
 					{
@@ -124,13 +124,21 @@ namespace OKHOSTING.Sql.ORM
 							{
 								value = Convert.ChangeType(value, member.Member.ReturnType);
 							}
-							
+
 							DataMember.SetValue(expression, instance, value);
 						}
 					}
 
 					yield return instance;
 				}
+			}
+		}
+
+		public IEnumerable<TType> Select<TType>(Select<TType> select)
+		{
+			foreach (object result in Select((Select) select))
+			{
+				yield return (TType) result;
 			}
 		}
 

@@ -40,20 +40,20 @@ namespace OKHOSTING.Sql.ORM
 
 		public override bool ContainsKey(TKey key)
 		{
-			Select select = new Select();
+			Select<TType> select = new Select<TType>();
 			select.From = DataType;
 			select.Members.Add(select.From.PrimaryKey.First());
 			select.Where.Add(GetPrimaryKeyFilter(DataType, key));
 
-			return DataBase.Select<TType>(select).Count() > 0;
+			return DataBase.Select(select).Count() > 0;
 		}
 
 		public override IEnumerator<KeyValuePair<TKey, TType>> GetEnumerator()
 		{
-			Select select = CreateSelect();
+			Select<TType> select = CreateSelect();
 			DataMember pkMember = select.From.PrimaryKey.First();
 			
-			foreach (TType instance in DataBase.Select<TType>(select))
+			foreach (TType instance in DataBase.Select(select))
 			{
 				TKey key = (TKey) Convert.ChangeType(pkMember.GetValue(instance), pkMember.ReturnType);
 				yield return new KeyValuePair<TKey, TType>(key, instance);
@@ -72,14 +72,14 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get 
 			{
-				Select select = new Select();
+				Select<TType> select = new Select<TType>();
 				select.From = DataType;
 				select.Members.Add(select.From.PrimaryKey.First());
 
 				List<TKey> keys = new List<TKey>();
 				DataMember pk = select.From.PrimaryKey.First();
 
-				foreach(TType instance in DataBase.Select<TType>(select))
+				foreach(TType instance in DataBase.Select(select))
 				{
 					keys.Add((TKey) pk.GetValue(instance));
 				}
@@ -109,9 +109,9 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				Select select = CreateSelect();
+				Select<TType> select = CreateSelect();
 				select.Where.Add(GetPrimaryKeyFilter(DataType, key));
-				var result = DataBase.Select<TType>(select).ToList();
+				var result = DataBase.Select(select).ToList();
 
 				if (result.Count > 0)
 				{
@@ -181,10 +181,10 @@ namespace OKHOSTING.Sql.ORM
 		/// Creates a select operation with all DataType's members and inheritance inner joins
 		/// </summary>
 		/// <returns>Select operation</returns>
-		protected Select CreateSelect()
+		protected Select<TType> CreateSelect()
 		{
+			Select<TType> select = new Select<TType>();
 			DataType dtype = DataType;
-			Select select = new Select();
 			select.From = dtype;
 			Random random = new Random();
 

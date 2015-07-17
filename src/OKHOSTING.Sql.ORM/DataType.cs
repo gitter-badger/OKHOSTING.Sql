@@ -602,11 +602,11 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public DataMember this[System.Linq.Expressions.Expression<Func<T, object>> expression]
+		public DataMember<T> this[System.Linq.Expressions.Expression<Func<T, object>> expression]
 		{
 			get
 			{
-				return this[DataMember<T>.GetMemberString(expression)];
+				return (DataMember<T>) this[DataMember<T>.GetMemberString(expression)];
 			}
 		}
 
