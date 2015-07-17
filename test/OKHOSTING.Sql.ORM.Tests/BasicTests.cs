@@ -258,10 +258,10 @@ namespace OKHOSTING.Sql.ORM.Tests
 		public void GenericOperations()
 		{
 			MapTypes();
-			Drop();
-			Create();
+			//Drop();
+			//Create();
 
-			for (int i = 0; i < 5; i++)
+			for (int i = 0; i < 0; i++)
 			{
 				CustomerContact cc = new CustomerContact();
 				cc.Firstname = "Fulanito " + i;
@@ -303,7 +303,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 
 			var result = DataBase.Select<CustomerContact>(select).ToList();
 
-			Drop();
+			//Drop();
 		}
 	}
 }

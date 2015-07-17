@@ -744,7 +744,7 @@ namespace OKHOSTING.Sql
 			foreach (SelectJoin join in select.Joins)
 			{
 				//Resolve Joins
-				command.Script += " " + join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : join.Alias) + " ON ";
+				command.Script += " " + join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : " " + join.Alias) + " ON ";
 				command.Append(Filter(join.On, LogicalOperator.And));
 			}
 

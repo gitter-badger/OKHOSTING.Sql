@@ -105,6 +105,16 @@ namespace OKHOSTING.Sql.ORM
 						member.Member.SetValueFromColumn(instance, value);
 					}
 
+					foreach (SelectJoin join in select.Joins)
+					{
+						foreach (SelectMember member in join.Members)
+						{
+							string expression = member.Alias.Replace('_', '.');
+							object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
+							DataMember.SetValue(expression, instance, value);
+						}
+					}
+
 					yield return instance;
 				}
 			}

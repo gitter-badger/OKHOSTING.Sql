@@ -266,6 +266,43 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
+		public static void SetValue(string memberExpression, object obj, object value)
+		{
+			Type type = obj.GetType();
+			var allMembers = GetMemberInfos(type, memberExpression).ToList();
+			var allValues = new List<object>();
+			object result = obj;
+
+			foreach (MemberInfo memberInfo in allMembers)
+			{
+				if (result != null)
+				{
+					result = GetValue(memberInfo, result);
+				}
+
+				allValues.Add(result);
+			}
+
+			//ensure all nested members are not null, except the lastone, that can be null
+			for (int i = 0; i < allValues.Count - 1; i++)
+			{
+				object val = allValues[i];
+				MemberInfo member = allMembers[i];
+
+				if (val == null)
+				{
+					object container = (i == 0) ? obj : allValues[i - 1];
+					object newValue = Activator.CreateInstance(GetReturnType(member));
+					allValues[i] = newValue;
+
+					SetValue(member, container, newValue);
+				}
+			}
+
+			object finalContainer = (allValues.Count > 1) ? allValues[allValues.Count - 2] : obj;
+			SetValue(allMembers.Last(), finalContainer, value);
+		}
+
 		public static bool IsMapped(DataType typeMap, string member)
 		{
 			return typeMap.Members.Where(c => c.Member.Equals(member)).Count() > 0;

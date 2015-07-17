@@ -132,12 +132,19 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 									string pastJoinAlias = string.Empty;
 
-									for (int y = 0; y <= i - 1; y++)
+									if (!isTheFirstOne)
 									{
-										pastJoinAlias += '.' + nestedMemberInfos[y].Name;
+										for (int y = 0; y <= i - 1; y++)
+										{
+											pastJoinAlias += '.' + nestedMemberInfos[y].Name;
+										}
+
+										pastJoinAlias = pastJoinAlias.Trim('.');
 									}
-									
-									pastJoinAlias = pastJoinAlias.Trim('.');
+									else if(parent != From)
+									{
+										pastJoinAlias = parent.InnerType.Name + "_base";
+									}
 
 									foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 									{
