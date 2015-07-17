@@ -50,9 +50,6 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentNullException("member");
 			}
 
-			//validate member expression
-			var x = MemberInfos;
-
 			Type = type;
 			Member = member;
 			var finalMember = FinalMemberInfo;
@@ -132,28 +129,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				string[] splittedMembers = Member.Split(new[] { '.' }, StringSplitOptions.None);
-
-				Type memberType = Type.InnerType;
-				
-				for (int x = 0; x < splittedMembers.Length; x++)
-				{
-					MemberInfo memberInfo = memberType.GetProperty(splittedMembers[x]);
-
-					if (memberInfo == null)
-					{
-						memberInfo = memberType.GetField(splittedMembers[x]);
-					
-						if (memberInfo == null)
-						{
-							throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
-						}
-					}
-				
-					memberType = GetReturnType(memberInfo);
-
-					yield return memberInfo;
-				}
+				return GetMemberInfos(Type.InnerType, Member);
 			}
 		}
 
@@ -293,11 +269,47 @@ namespace OKHOSTING.Sql.ORM
 			return typeMap.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
 
+		public static DataMember GetMap(DataType typeMap, string member)
+		{
+			return typeMap.Members.Where(c => c.Member.Equals(member)).Single();
+		}
+
 		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
 		{
 			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
 		}
 
+		/// <summary>
+		/// Returns an enumeration of MemberInfos that are interpreted from a string
+		/// </summary>
+		/// <param name="type">Type declaring the member expression</param>
+		/// <param name="memberExpression">A member expression, pe: Address.Country.Name</param>
+		public static IEnumerable<System.Reflection.MemberInfo> GetMemberInfos(Type type, string memberExpression)
+		{
+			string[] splittedMembers = memberExpression.Split(new[] { '.' }, StringSplitOptions.None);
+
+			Type memberType = type;
+
+			for (int x = 0; x < splittedMembers.Length; x++)
+			{
+				MemberInfo memberInfo = memberType.GetProperty(splittedMembers[x].Trim());
+
+				if (memberInfo == null)
+				{
+					memberInfo = memberType.GetField(splittedMembers[x].Trim());
+
+					if (memberInfo == null)
+					{
+						throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
+					}
+				}
+
+				memberType = GetReturnType(memberInfo);
+
+				yield return memberInfo;
+			}
+		}
+		
 		#endregion
 	}
 
@@ -337,23 +349,18 @@ namespace OKHOSTING.Sql.ORM
 
 		public static bool IsMapped(Expression<Func<T, object>> expression)
 		{
-			DataType<T> typeMapping = DataType<T>.GetMap();
+			DataType typeMapping = DataType<T>.GetMap();
 			string member = GetMemberString(expression);
 
 			return typeMapping.Members.Where(c => c.Member.Equals(member)).Count() > 0;
 		}
 
-		public static DataMember<T> GetMap(Expression<Func<T, object>> expression)
+		public static DataMember GetMap(Expression<Func<T, object>> expression)
 		{
-			DataType<T> typeMapping = DataType<T>.GetMap();
+			DataType typeMapping = DataType<T>.GetMap();
 			string member = GetMemberString(expression);
 
 			return typeMapping.Members.Where(c => c.Member.Equals(member)).Single();
-		}
-
-		public static implicit operator DataMember<T>(Expression<Func<T, object>> expression)
-		{
-			return GetMap(expression);
 		}
 
 		#endregion

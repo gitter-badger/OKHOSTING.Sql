@@ -492,14 +492,9 @@ namespace OKHOSTING.Sql.ORM
 
 		public new readonly List<DataMember<T>> Members = new List<DataMember<T>>();
 
-		public static DataType<T> GetMap()
+		public static DataType GetMap()
 		{
-			return (DataType<T>) GetMap(typeof(T));
-		}
-
-		public static implicit operator DataType<T>(Type type)
-		{
-			return (DataType<T>) GetMap(type);
+			return GetMap(typeof(T));
 		}
 	}
 }
