@@ -82,16 +82,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				var memberInfo = FinalMemberInfo;
-
-				if (memberInfo is FieldInfo)
-				{
-					return ((FieldInfo)memberInfo).FieldType;
-				}
-				else
-				{
-					return ((PropertyInfo)memberInfo).PropertyType;
-				}
+				return GetReturnType(FinalMemberInfo);
 			}
 		}
 
@@ -244,7 +235,7 @@ namespace OKHOSTING.Sql.ORM
 		/// </param>
 		public static void SetValue(MemberInfo memberInfo, object obj, object value)
 		{
-			value = Convert.ChangeType(value, GetReturnType(memberInfo));
+			value = OKHOSTING.Core.Data.TypeConverter.ChangeType(value, GetReturnType(memberInfo));
 
 			if (memberInfo is FieldInfo)
 			{
@@ -311,6 +302,23 @@ namespace OKHOSTING.Sql.ORM
 		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
 		{
 			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
+		}
+
+		public static bool IsReadOnly(System.Reflection.MemberInfo memberInfo)
+		{
+			//ignore readonly properties
+			if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
+			{
+				return true;
+			}
+
+			//ignore readonly fields
+			if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>

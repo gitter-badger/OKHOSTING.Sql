@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dapper;
 using System.Data;
 
 namespace OKHOSTING.Sql.ORM
@@ -334,7 +333,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// List of available type mappings, system-wide
 		/// </summary>
-		protected static IEnumerable<DataType> DataTypes
+		public static IEnumerable<DataType> DataTypes
 		{
 			get
 			{
@@ -518,6 +517,10 @@ namespace OKHOSTING.Sql.ORM
 						{
 							column.DbType = Sql.DataBase.Parse(returnType);
 						}
+						else if (returnType.IsEnum)
+						{
+							column.DbType = DbType.Int32;
+						}
 						//this is an non-atomic object, but its not mapped as a DataType, so we serialize it as json
 						else
 						{
@@ -552,14 +555,8 @@ namespace OKHOSTING.Sql.ORM
 					continue;
 				}
 
-				//ignore readonly properties
-				if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
-				{
-					continue;
-				}
-
-				//ignore readonly fields
-				if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
+				//ignore readonly properties and fields
+				if (DataMember.IsReadOnly(memberInfo))
 				{
 					continue;
 				}

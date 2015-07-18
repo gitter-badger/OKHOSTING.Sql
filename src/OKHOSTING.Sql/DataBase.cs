@@ -881,6 +881,11 @@ namespace OKHOSTING.Sql
 
 		public static DbType Parse(Type dbType)
 		{
+			if (dbType.IsEnum)
+			{
+				return DbType.Int32;
+			}
+
 			return DbTypeMap.Reverse(dbType);
 		}
 

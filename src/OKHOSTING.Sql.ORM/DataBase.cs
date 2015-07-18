@@ -105,27 +105,29 @@ namespace OKHOSTING.Sql.ORM
 
 					foreach (SelectMember member in select.Members)
 					{
-						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
-						member.Member.SetValueFromColumn(instance, value);
+						if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
+						{
+							object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
+							member.Member.SetValueFromColumn(instance, value);
+						}
 					}
 
 					foreach (SelectJoin join in select.Joins)
 					{
 						foreach (SelectMember member in join.Members)
 						{
-							string expression = member.Alias.Replace('_', '.');
-							object value = Convert.ChangeType(string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias], member.Member.ReturnType);
-
-							if (member.Member.Converter != null)
+							if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
 							{
-								value = member.Member.Converter.ColumnToMember(value);
-							}
-							else
-							{
-								value = Convert.ChangeType(value, member.Member.ReturnType);
-							}
+								string expression = member.Alias.Replace('_', '.');
+								object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
 
-							DataMember.SetValue(expression, instance, value);
+								if (member.Member.Converter != null)
+								{
+									value = member.Member.Converter.ColumnToMember(value);
+								}
+
+								DataMember.SetValue(expression, instance, value);
+							}
 						}
 					}
 
