@@ -94,7 +94,6 @@
     <Compile Include="Schema\Trigger.cs" />
     <Compile Include="Schema\User.cs" />
     <Compile Include="Schema\View.cs" />
-    <Compile Include="SqlDataBase.cs" />
     <Compile Include="SqlException.cs" />
     <Compile Include="SqlServer\DataBase.cs">
       <SubType>Code</SubType>

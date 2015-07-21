@@ -48,9 +48,9 @@ namespace OKHOSTING.Sql.ORM.Operations
 					currentExpression = currentExpression.Trim('.');
 
 					//if this is a native datamember, just add a SelectMember
-					if (DataMember.IsMapped(From, currentExpression))
+					if (From.IsMapped(currentExpression))
 					{
-						DataMember dmember = DataMember.GetMap(From, currentExpression);
+						DataMember dmember = From[currentExpression];
 
 						//this is a native member of this dataType
 						SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
@@ -64,9 +64,9 @@ namespace OKHOSTING.Sql.ORM.Operations
 					foreach (DataType parent in From.GetBaseDataTypes())
 					{
 						//if this is a native datamember, just add a SelectMember
-						if (DataMember.IsMapped(parent, currentExpression))
+						if (parent.IsMapped(currentExpression))
 						{
-							DataMember dmember = DataMember.GetMap(parent, currentExpression);
+							DataMember dmember = parent[currentExpression];
 
 							SelectJoin join = Joins.Where(j => j.Type == parent && j.Alias == parent.InnerType.Name + "_base").SingleOrDefault();
 
@@ -173,7 +173,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 						if (!isTheFirstOne && isTheLastOne)
 						{
-							DataMember dmember = DataMember.GetMap(referencingDataType, memberInfo.Name);
+							DataMember dmember = referencingDataType[memberInfo.Name];
 							SelectJoin foreignJoin = Joins.Where(j => j.Type == referencingDataType && j.Alias == currentExpression.Replace("." + memberInfo.Name, string.Empty).Replace('.', '_')).SingleOrDefault();
 							SelectMember sm = new SelectMember(dmember, currentExpression.Replace('.', '_'));
 							foreignJoin.Members.Add(sm);

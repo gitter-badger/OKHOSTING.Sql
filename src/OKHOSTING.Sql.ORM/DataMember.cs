@@ -8,6 +8,10 @@ namespace OKHOSTING.Sql.ORM
 {
 	public class DataMember
 	{
+		protected DataMember(DataType type, string member): this(type, member, null)
+		{
+		}
+
 		protected DataMember(DataType type, string member, Schema.Column column)
 		{
 			if (type == null)
@@ -57,10 +61,6 @@ namespace OKHOSTING.Sql.ORM
 
 			//validate member expression
 			var x = MemberInfos.ToList();
-		}
-
-		protected DataMember(DataType type, string member): this(type, member, null)
-		{
 		}
 
 		/// <summary>
@@ -284,21 +284,6 @@ namespace OKHOSTING.Sql.ORM
 			SetValue(allMembers.Last(), finalContainer, value);
 		}
 
-		public static bool IsMapped(DataType typeMap, string member)
-		{
-			return typeMap.Members.Where(c => c.Member.Equals(member)).Count() > 0;
-		}
-
-		public static DataMember GetMap(DataType typeMap, string member)
-		{
-			return typeMap.Members.Where(c => c.Member.Equals(member)).Single();
-		}
-
-		public static DataMember Map(DataType typeMap, string member)
-		{
-			return typeMap.Members.Where(c => c.Member.Equals(member)).Single();
-		}
-
 		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
 		{
 			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
@@ -357,19 +342,19 @@ namespace OKHOSTING.Sql.ORM
 
 	public class DataMember<T> : DataMember
 	{
-		protected DataMember(string member, Schema.Column column): base(typeof(T), member, column)
-		{
-		}
-
-		protected DataMember(Expression<Func<T, object>> memberExpression, Schema.Column column): base(typeof(T), GetMemberString(memberExpression), column)
-		{
-		}
-
 		protected DataMember(string member): base(typeof(T), member)
 		{
 		}
 
+		protected DataMember(string member, Schema.Column column): base(typeof(T), member, column)
+		{
+		}
+
 		protected DataMember(Expression<Func<T, object>> memberExpression): base(typeof(T), GetMemberString(memberExpression))
+		{
+		}
+
+		protected DataMember(Expression<Func<T, object>> memberExpression, Schema.Column column): base(typeof(T), GetMemberString(memberExpression), column)
 		{
 		}
 
@@ -387,22 +372,6 @@ namespace OKHOSTING.Sql.ORM
 			code = code.Trim().TrimEnd(';');
 
 			return code;
-		}
-
-		public static bool IsMapped(Expression<Func<T, object>> expression)
-		{
-			DataType typeMapping = DataType<T>.GetMap();
-			string member = GetMemberString(expression);
-
-			return typeMapping.Members.Where(c => c.Member.Equals(member)).Count() > 0;
-		}
-
-		public static DataMember GetMap(Expression<Func<T, object>> expression)
-		{
-			DataType typeMapping = DataType<T>.GetMap();
-			string member = GetMemberString(expression);
-
-			return typeMapping.Members.Where(c => c.Member.Equals(member)).Single();
 		}
 
 		#endregion

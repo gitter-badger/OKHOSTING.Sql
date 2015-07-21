@@ -99,7 +99,12 @@ namespace OKHOSTING.Sql.ORM
 				return from m in Members where !m.Column.IsPrimaryKey select m;
 			}
 		}
-		
+
+		public bool IsMapped(string member)
+		{
+			return _Members.Where(m => m.Member == member).Count() > 0;
+		}
+
 		public DataMember Map(string member)
 		{
 			return Map(member, null);
@@ -605,6 +610,11 @@ namespace OKHOSTING.Sql.ORM
 			{
 				return (DataMember<T>) this[DataMember<T>.GetMemberString(expression)];
 			}
+		}
+
+		public bool IsMapped(System.Linq.Expressions.Expression<Func<T, object>> memberExpression)
+		{
+			return IsMapped(DataMember<T>.GetMemberString(memberExpression));
 		}
 
 		public DataMember<T> Map(System.Linq.Expressions.Expression<Func<T, object>> memberExpression)
