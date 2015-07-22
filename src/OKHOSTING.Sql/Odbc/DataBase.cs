@@ -19,7 +19,7 @@ namespace OKHOSTING.Sql.Odbc
 		/// <param name="ConnectionString"> 
 		/// The connection string to use to connect to the DataBase
 		/// </param>
-		public DataBase(string connectionString): base(connectionString, System.Data.Odbc.OdbcFactory.Instance){}
+		public DataBase(): base(System.Data.Odbc.OdbcFactory.Instance){}
 
 		/// <summary>
 		/// Returns the Date and Hour from the database Server

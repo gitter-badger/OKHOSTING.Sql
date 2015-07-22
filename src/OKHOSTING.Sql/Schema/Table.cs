@@ -21,6 +21,8 @@ namespace OKHOSTING.Sql.Schema
 			Name = name;
 		}
 
+		public int Id { get; set; }
+
 		/// <summary>
 		/// The name of the table
 		/// </summary>

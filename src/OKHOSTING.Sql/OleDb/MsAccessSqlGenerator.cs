@@ -15,7 +15,6 @@ namespace OKHOSTING.Sql.OleDb
 	/// </summary>
 	public class MsAccessSqlGenerator: SqlGeneratorBase
 	{
-
 		/// <summary>
 		/// Constructs the Sql Generator
 		/// </summary>

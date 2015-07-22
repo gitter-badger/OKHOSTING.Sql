@@ -12,9 +12,7 @@ namespace OKHOSTING.Sql.Schema
 	[System.ComponentModel.DefaultProperty("Name")]
 	public class ForeignKey
 	{
-		public ForeignKey()
-		{
-		}
+		public int Id { get; set; }
 
 		/// <summary>
 		/// Name of the foreign key

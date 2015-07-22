@@ -20,24 +20,16 @@ namespace OKHOSTING.Sql
 		/// <param name="ConnectionString"> 
 		/// The connection string to use to connect to the DataBase
 		/// </param>
-		protected DataBase(string connectionString, DbProviderFactory providerFactory)
+		protected DataBase(DbProviderFactory providerFactory)
 		{
-			//validate connection string
-			if (string.IsNullOrWhiteSpace(connectionString))
-			{
-				throw new ArgumentNullException("connectionString");
-			}
-
 			if (providerFactory == null)
 			{
 				throw new ArgumentNullException("providerFactory");
 			}
 
 			//Assigning the Connection String
-			ConnectionString = connectionString;
 			ProviderFactory = providerFactory;
 			Connection = providerFactory.CreateConnection();
-			Connection.ConnectionString = connectionString;
 		}
 
 		/// <summary>
@@ -59,7 +51,7 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// Object used for lock operations
 		/// </summary>
-		object Locker = new object();
+		private readonly object Locker = new object();
 
 		/// <summary>
 		/// Connection in which all the operations are performed
@@ -76,12 +68,11 @@ namespace OKHOSTING.Sql
 		/// </summary>
 		protected DbProviderFactory ProviderFactory;
 
-		/// <summary>
-		/// Connection string to use to connect to the database
-		/// </summary>
-		public readonly string ConnectionString;
+		protected OKHOSTING.Sql.Schema.DataBaseSchema _Schema;
 
-		OKHOSTING.Sql.Schema.DataBaseSchema _Schema;
+		public int Id { get; set; }
+
+		public string Name { get; set; }
 
 		public OKHOSTING.Sql.Schema.DataBaseSchema Schema
 		{
@@ -95,6 +86,11 @@ namespace OKHOSTING.Sql
 				return _Schema;
 			}
 		}
+
+		/// <summary>
+		/// Connection string to use to connect to the database
+		/// </summary>
+		public string ConnectionString { get; set; }
 
 		#endregion
 

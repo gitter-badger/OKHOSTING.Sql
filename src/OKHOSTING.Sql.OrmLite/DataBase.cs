@@ -6,12 +6,14 @@ namespace OKHOSTING.Sql.OrmLite
 {
 	public class DataBase : IOrmDataBase, IDisposable
 	{
-		public readonly System.Data.IDbConnection Connection;
-		protected readonly Dictionary<Type, object> Tables;
+		public int Id { get; set; }
+		
+		public System.Data.IDbConnection Connection { get; set; }
+		
+		protected readonly Dictionary<Type, object> Tables = new Dictionary<Type,object>();
 
-		public DataBase(System.Data.IDbConnection connection)
+		public DataBase()
 		{
-			Connection = connection;
 		}
 
 		public Table<TKey, TValue> Table<TKey, TValue>() where TValue : class
@@ -24,7 +26,8 @@ namespace OKHOSTING.Sql.OrmLite
 			}
 			else
 			{
-				table = new Table<TKey, TValue>(Connection);
+				table = new Table<TKey, TValue>();
+				table.Connection = Connection;
 				Tables.Add(typeof(TValue), table);
 			}
 

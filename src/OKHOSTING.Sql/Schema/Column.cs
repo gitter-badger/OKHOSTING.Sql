@@ -13,6 +13,8 @@ namespace OKHOSTING.Sql.Schema
 	[System.ComponentModel.DefaultProperty("Name")]
 	public class Column
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Name of the column
 		/// </summary>

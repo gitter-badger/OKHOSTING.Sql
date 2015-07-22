@@ -12,6 +12,7 @@ namespace OKHOSTING.Sql.Schema
 	[System.ComponentModel.DefaultProperty("Name")]
 	public class User
 	{
+		public int Id { get; set; }
 		public string Name { get; set; }
 		public DataBaseSchema DataBase { get; set; }
 	}

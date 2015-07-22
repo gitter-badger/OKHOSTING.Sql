@@ -8,12 +8,11 @@ namespace OKHOSTING.Sql.EF
 {
 	public class Table<TKey, TValue> : DictionaryBase<TKey, TValue>, IDisposable where TValue : class
 	{
-		public readonly DbContext Context;
+		public DbContext Context { get; set; }
 		public readonly System.Reflection.PropertyInfo PrimaryKey;
 
-		public Table(DbContext context)
+		public Table()
 		{
-			Context = context;
 			System.Reflection.PropertyInfo[] properties = typeof(TValue).GetProperties();
 
 			foreach (System.Reflection.PropertyInfo property in properties)

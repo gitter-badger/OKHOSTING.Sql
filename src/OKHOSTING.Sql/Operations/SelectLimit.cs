@@ -10,6 +10,8 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class SelectLimit
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Starting 0-basex index for the list you want to select
 		/// </summary>

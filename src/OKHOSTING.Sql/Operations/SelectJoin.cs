@@ -12,6 +12,8 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class SelectJoin
 	{
+		public int Id { get; set; }
+
 		public Table Table { get; set; }
 		
 		/// <summary>

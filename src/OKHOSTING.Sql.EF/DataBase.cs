@@ -6,12 +6,11 @@ namespace OKHOSTING.Sql.EF
 {
 	public class DataBase : IOrmDataBase, IDisposable
 	{
-		public readonly System.Data.Entity.DbContext Context;
+		public System.Data.Entity.DbContext Context;
 		protected readonly Dictionary<Type, object> Tables;
 
-		public DataBase(System.Data.Entity.DbContext context)
+		public DataBase()
 		{
-			Context = context;
 		}
 
 		public Table<TKey, TValue> Table<TKey, TValue>() where TValue : class
@@ -24,7 +23,8 @@ namespace OKHOSTING.Sql.EF
 			}
 			else
 			{
-				table = new Table<TKey, TValue>(Context);
+				table = new Table<TKey, TValue>();
+				table.Context = Context;
 				Tables.Add(typeof(TValue), table);
 			}
 

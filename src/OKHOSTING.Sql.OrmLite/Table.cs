@@ -11,12 +11,7 @@ namespace OKHOSTING.Sql.OrmLite
 {
 	public class Table<TKey, TValue> : DictionaryBase<TKey, TValue>, IDisposable where TValue : class
 	{
-		public readonly System.Data.IDbConnection Connection;
-
-		public Table(System.Data.IDbConnection connection)
-		{
-			Connection = connection;
-		}
+		public System.Data.IDbConnection Connection { get; set; }
 
 		public override void Add(KeyValuePair<TKey, TValue> item)
 		{

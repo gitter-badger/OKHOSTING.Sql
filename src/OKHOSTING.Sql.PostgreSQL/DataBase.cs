@@ -9,7 +9,7 @@ namespace OKHOSTING.Sql.PostgreSQL
 {
 	public class DataBase : OKHOSTING.Sql.DataBase
 	{
-		public DataBase(string connectionString): base(connectionString, NpgsqlFactory.Instance)
+		public DataBase(): base(NpgsqlFactory.Instance)
 		{
 		}
 

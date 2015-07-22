@@ -59,6 +59,8 @@ namespace OKHOSTING.Sql
 			}
 		}
 
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Name of the parameter
 		/// </summary>

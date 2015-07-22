@@ -19,7 +19,7 @@ namespace OKHOSTING.Sql.SqlServer
 		/// <param name="ConnectionString"> 
 		/// The connection string to use to connect to the DataBase
 		/// </param>
-		public DataBase(string connectionString): base(connectionString, System.Data.SqlClient.SqlClientFactory.Instance)
+		public DataBase(): base(System.Data.SqlClient.SqlClientFactory.Instance)
 		{
 		}
 

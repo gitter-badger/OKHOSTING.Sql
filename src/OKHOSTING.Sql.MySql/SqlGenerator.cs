@@ -12,7 +12,6 @@ namespace OKHOSTING.Sql.MySql
 	/// </summary>
 	public class SqlGenerator: SqlGeneratorBase
 	{
-
 		/// <summary>
 		/// Constructs the class
 		/// </summary>

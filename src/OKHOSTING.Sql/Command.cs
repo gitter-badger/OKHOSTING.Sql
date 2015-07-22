@@ -11,6 +11,8 @@ namespace OKHOSTING.Sql
 	/// </summary>
 	public class Command
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// A SQL script that you want to execute on a DataBase
 		/// </summary>

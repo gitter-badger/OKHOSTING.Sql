@@ -5,7 +5,7 @@ namespace OKHOSTING.Sql.SQLite
 {
 	public class DataBase : OKHOSTING.Sql.DataBase
 	{
-		public DataBase(string connectionString): base(connectionString, SQLiteFactory.Instance)
+		public DataBase(): base(SQLiteFactory.Instance)
 		{
 		}
 

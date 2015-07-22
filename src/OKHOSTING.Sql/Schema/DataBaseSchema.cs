@@ -11,12 +11,8 @@ namespace OKHOSTING.Sql.Schema
 {
 	public class DataBaseSchema
 	{
-		protected DataBaseSchema(DataBase nativeDatabase)
-		{
-			DataBase = nativeDatabase;
-		}
-
-		public DataBase DataBase;
+		public int Id { get; set; }
+		public DataBase DataBase { get; set; }
 		public readonly List<Table> Tables = new List<Table>();
 		public readonly List<View> Views = new List<View>();
 		public readonly List<User> Users = new List<User>();
@@ -62,7 +58,7 @@ namespace OKHOSTING.Sql.Schema
 		/// </remarks>
 		internal static DataBaseSchema Load(DataBase nativeDatabase, string schemaProvider)
 		{
-			DataBaseSchema schema = new DataBaseSchema(nativeDatabase);
+			DataBaseSchema schema = new DataBaseSchema();
 			DatabaseSchema schemaReader;
 
 			using (var dbReader = new DatabaseSchemaReader.DatabaseReader(schema.DataBase.ConnectionString, schemaProvider))

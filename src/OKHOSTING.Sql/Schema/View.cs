@@ -12,6 +12,7 @@ namespace OKHOSTING.Sql.Schema
 	[System.ComponentModel.DefaultProperty("Name")]
 	public class View
 	{
+		public int Id { get; set; }
 		/// <summary>
 		/// The name of the table
 		/// </summary>

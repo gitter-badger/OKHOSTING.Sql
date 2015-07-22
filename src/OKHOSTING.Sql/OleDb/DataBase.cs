@@ -20,7 +20,7 @@ namespace OKHOSTING.Sql.OleDb
 		/// <param name="ConnectionString"> 
 		/// The connection string to use to connect to the DataBase
 		/// </param>
-		public DataBase(string connectionString): base(connectionString, System.Data.OleDb.OleDbFactory.Instance)
+		public DataBase(): base(System.Data.OleDb.OleDbFactory.Instance)
 		{
 		}
 

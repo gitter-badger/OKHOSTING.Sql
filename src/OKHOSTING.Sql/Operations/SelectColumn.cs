@@ -12,6 +12,8 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class SelectColumn
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Alias name of the resulting field
 		/// </summary>

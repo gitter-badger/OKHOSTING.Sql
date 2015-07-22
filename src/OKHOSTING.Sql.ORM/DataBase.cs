@@ -12,14 +12,9 @@ namespace OKHOSTING.Sql.ORM
 	{
 		protected readonly Dictionary<Type, object> Tables = new Dictionary<Type,object>();
 
-		public readonly Sql.DataBase NativeDataBase;
-		public readonly SqlGeneratorBase SqlGenerator;
-
-		public DataBase(Sql.DataBase nativeDataBase, SqlGeneratorBase sqlGenerator)
-		{
-			NativeDataBase = nativeDataBase;
-			SqlGenerator = sqlGenerator;
-		}
+		public Sql.DataBase NativeDataBase { get; set; }
+		
+		public SqlGeneratorBase SqlGenerator { get; set; }
 
 		public Table<TKey, TType> Table<TKey, TType>()
 		{
@@ -31,7 +26,8 @@ namespace OKHOSTING.Sql.ORM
 			}
 			else
 			{
-				table = new Table<TKey, TType>(this);
+				table = new Table<TKey, TType>();
+				table.DataBase = this;
 				Tables.Add(typeof(TType), table);
 			}
 
@@ -48,7 +44,8 @@ namespace OKHOSTING.Sql.ORM
 			}
 			else
 			{
-				table = new MultipleKeyTable<TType>(this);
+				table = new MultipleKeyTable<TType>();
+				table.DataBase = this;
 				Tables.Add(typeof(TType), table);
 			}
 

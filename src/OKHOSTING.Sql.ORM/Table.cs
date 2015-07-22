@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.ORM
 {
 	public class Table<TKey, TType>: Core.Data.DictionaryBase<TKey, TType>
 	{
-		public readonly DataBase DataBase;
+		public DataBase DataBase { get; set; }
 		public readonly DataType DataType = typeof(TType);
 
 		public override void Add(KeyValuePair<TKey, TType> item)
@@ -152,11 +152,6 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		#region Non public
-
-		internal Table(DataBase database)
-		{
-			DataBase = database;
-		}
 
 		protected virtual Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, TKey key)
 		{

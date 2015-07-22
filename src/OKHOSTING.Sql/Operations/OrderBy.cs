@@ -10,6 +10,8 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class OrderBy
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Column which determines the sorting
 		/// </summary>

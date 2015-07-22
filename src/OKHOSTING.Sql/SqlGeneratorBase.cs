@@ -25,6 +25,8 @@ namespace OKHOSTING.Sql
 
 		#region Properties
 
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Represents the secuence of characters used to separate SQL scripts
 		/// </summary>

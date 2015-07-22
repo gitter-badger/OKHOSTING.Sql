@@ -56,10 +56,6 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		internal MultipleKeyTable(DataBase database): base(database)
-		{
-		}
-
 		protected override Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, object[] key)
 		{
 			Filters.AndFilter filter = new Filters.AndFilter();

@@ -12,6 +12,7 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class ColumnValue
 	{
+		public int Id { get; set; }
 		public readonly Column Column;
 		public readonly object Value;
 

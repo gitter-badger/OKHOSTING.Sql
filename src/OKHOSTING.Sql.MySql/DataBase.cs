@@ -19,7 +19,7 @@ namespace OKHOSTING.Sql.MySql
 		/// <param name="connectionString"> 
 		/// The connection string to use to connect to the DataBase
 		/// </param>
-		public DataBase(string connectionString): base(connectionString, MySqlClientFactory.Instance)
+		public DataBase(): base(MySqlClientFactory.Instance)
 		{
 		}
 
