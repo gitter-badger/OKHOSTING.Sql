@@ -17,21 +17,12 @@ namespace OKHOSTING.Sql.ORM.Operations
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
-	}
 
-	public class Select<T> : Select
-	{
-		public Select()
-		{
-			From = typeof(T);
-		}
-
-		public void AddMembers(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
+		public void AddMembers(params string[] memberExpressions)
 		{
 			foreach (var expression in memberExpressions)
 			{
-				string dataMemberString = DataMember<T>.GetMemberString(expression);
-				List<System.Reflection.MemberInfo> nestedMemberInfos = DataMember.GetMemberInfos(typeof(T), dataMemberString).ToList();
+				List<System.Reflection.MemberInfo> nestedMemberInfos = DataMember.GetMemberInfos(From.InnerType, expression).ToList();
 
 				for (int i = 0; i < nestedMemberInfos.Count; i++)
 				{
@@ -85,9 +76,9 @@ namespace OKHOSTING.Sql.ORM.Operations
 									//DataMember pk in join.Type.PrimaryKey
 									var filter = new Filters.MemberCompareFilter()
 									{
-										 Member = childPK[y],
-										 MemberToCompare = joinPK[y],
-										 MemberToCompareTypeAlias = join.Alias,
+										Member = childPK[y],
+										MemberToCompare = joinPK[y],
+										MemberToCompareTypeAlias = join.Alias,
 									};
 
 									join.On.Add(filter);
@@ -144,7 +135,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 										pastJoinAlias = pastJoinAlias.Trim('.');
 									}
-									else if(parent != From)
+									else if (parent != From)
 									{
 										pastJoinAlias = parent.InnerType.Name + "_base";
 									}
@@ -182,6 +173,40 @@ namespace OKHOSTING.Sql.ORM.Operations
 					}
 				}
 			}
+		}
+		
+		public void AddMembers(params DataMember[] dataMembers)
+		{
+			List<string> stringExpressions = new List<string>();
+
+			foreach (var dm in dataMembers)
+			{
+				string dataMemberString = dm.Member;
+				stringExpressions.Add(dataMemberString);
+			}
+
+			AddMembers(stringExpressions.ToArray());
+		}
+	}
+
+	public class Select<T> : Select
+	{
+		public Select()
+		{
+			From = typeof(T);
+		}
+
+		public void AddMembers(params System.Linq.Expressions.Expression<Func<T, object>>[] memberExpressions)
+		{
+			List<string> stringExpressions = new List<string>();
+
+			foreach (var expression in memberExpressions)
+			{
+				string dataMemberString = DataMember<T>.GetMemberString(expression);
+				stringExpressions.Add(dataMemberString);
+			}
+
+			AddMembers(stringExpressions.ToArray());
 		}
 	}
 }

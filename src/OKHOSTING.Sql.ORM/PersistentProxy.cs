@@ -11,9 +11,8 @@ namespace OKHOSTING.Sql.ORM
 	/// </summary>
 	/// <typeparam name="TKey">Type of primary key we want for this object</typeparam>
 	/// <typeparam name="TType">Type of object we need to store</typeparam>
-	public class PersistentProxy<TKey, TType>
+	public class PersistentProxy<TKey, TType>: PersistentClass<TKey>
 	{
-		public TKey Id { get; set; }
 		public string Name { get; set; }
 		public TType Instance { get; set; }
 	}

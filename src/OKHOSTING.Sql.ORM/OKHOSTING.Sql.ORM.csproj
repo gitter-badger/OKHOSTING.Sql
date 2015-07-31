@@ -93,7 +93,12 @@
     <Compile Include="Operations\SelectLimit.cs" />
     <Compile Include="Operations\SelectMember.cs" />
     <Compile Include="Operations\Update.cs" />
-    <Compile Include="PersistentProxy.cs" />
+    <Compile Include="PersistentClass.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PersistentProxy.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Table.cs">

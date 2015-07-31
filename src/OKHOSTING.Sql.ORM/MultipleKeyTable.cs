@@ -73,24 +73,5 @@ namespace OKHOSTING.Sql.ORM
 
 			return filter;
 		}
-
-		protected override Filters.FilterBase GetSelectJoinFilter(DataType dtype)
-		{
-			Filters.AndFilter filter = new Filters.AndFilter();
-			var primaryKeys = dtype.PrimaryKey.ToList();
-			var basePrimaryKeys = dtype.BaseDataType.PrimaryKey.ToList();
-
-			for (int i = 0; i < primaryKeys.Count; i++)
-			{
-				filter.InnerFilters.Add(new Filters.MemberCompareFilter()
-				{
-					Member = primaryKeys[i], 
-					MemberToCompare = basePrimaryKeys[i],
-					Operator = Core.Data.CompareOperator.Equal,
-				});
-			}
-
-			return filter;
-		}
 	}
 }
