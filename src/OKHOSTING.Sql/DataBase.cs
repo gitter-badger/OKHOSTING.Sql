@@ -518,14 +518,14 @@ namespace OKHOSTING.Sql
 		/// Returns a boolean value that indicates if the 
 		/// SQL Sentence return data
 		/// </summary>
-		/// <param name="sqlSentence">
+		/// <param name="command">
 		/// Sentence to verify
 		/// </param>
 		/// <returns>
 		/// Boolean value that indicates if the 
 		/// SQL Sentence return data
 		/// </returns>
-		public bool ExistsData(string sqlSentence)
+		public bool ExistsData(Command command)
 		{
 			//Local Vars
 			bool result = false;
@@ -537,7 +537,7 @@ namespace OKHOSTING.Sql
 			try
 			{
 				//Query the Database
-				reader = GetDataReader(sqlSentence);
+				reader = GetDataReader(command);
 
 				//Validating if exists data
 				result = (reader.Read());

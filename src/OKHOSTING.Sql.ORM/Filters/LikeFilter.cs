@@ -20,5 +20,20 @@ namespace OKHOSTING.Sql.ORM.Filters
 		/// Indicates if the filter comparison will be case sensitive
 		/// </summary>
 		public bool CaseSensitive;
+
+		public LikeFilter()
+		{
+		}
+
+		public LikeFilter(DataMember member, string pattern): this(member, pattern, false)
+		{
+		}
+
+		public LikeFilter(DataMember member, string pattern, bool caseSensitive)
+		{
+			Member = member;
+			Pattern = pattern;
+			CaseSensitive = caseSensitive;
+		}
 	}
 }

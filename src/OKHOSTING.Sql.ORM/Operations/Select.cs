@@ -18,6 +18,11 @@ namespace OKHOSTING.Sql.ORM.Operations
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 		public readonly List<OrderBy> OrderBy = new List<OrderBy>();
 
+		public void AddMembers(IEnumerable<string> memberExpressions)
+		{
+			AddMembers(memberExpressions.ToArray());
+		}
+
 		public void AddMembers(params string[] memberExpressions)
 		{
 			foreach (var expression in memberExpressions)
@@ -174,7 +179,12 @@ namespace OKHOSTING.Sql.ORM.Operations
 				}
 			}
 		}
-		
+
+		public void AddMembers(IEnumerable<DataMember> dataMembers)
+		{
+			AddMembers(dataMembers.ToArray());
+		}
+
 		public void AddMembers(params DataMember[] dataMembers)
 		{
 			List<string> stringExpressions = new List<string>();

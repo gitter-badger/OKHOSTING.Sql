@@ -110,6 +110,58 @@ namespace OKHOSTING.Sql.ORM
 
 		//instance & generic operations
 
+		/// <summary>
+		/// Returns a value indicating if the specified DataObject exists on the DataBase (based on its primary key)
+		/// </summary>
+		/// <param name="dobj">
+		/// DataObject to be searched in the DataBase
+		/// </param>
+		/// <returns>
+		/// True if the DataObject exists, False otherwise
+		/// </returns>
+		public bool Exist<TType>(TType instance)
+		{
+			DataType dtype = instance.GetType();
+
+			return Exist(dtype, instance);
+		}
+
+		/// <summary>
+		/// Returns a value indicating if the specified DataObject exists (based on its primary key)
+		/// as a specific DataType
+		/// </summary>
+		/// <remarks>
+		/// Use this method to see if a DataObject exists in the Database as a base class.
+		/// A DataObject could exist in the DataBase as a base class, but not as the final class.
+		/// </remarks>
+		/// <example>
+		///	Class Dog inherits from Class Animal. In your Database, you have an Animal with Id = 5, 
+		///	but it's not a Dog, it's just an animal. 
+		///	Dog dog = new Dog();
+		///	dog.Id = 5;
+		///	DataBase.Current.Exist(dog);					//will return false
+		///	DataBase.Current.Exist(dog, typeof(Dog));		//will return false
+		///	DataBase.Current.Exist(dog, typeof(Animal));	//will return true
+		/// </example>
+		/// <param name="dobj">
+		/// DataObject to be searched in the DataBase
+		/// </param>
+		/// <param name="dtype">
+		/// DataType (must be a base class of dobj) that will be searched in the DataBase
+		/// </param>
+		/// <returns>
+		/// True if the DataObject exists as the specified DataType, False otherwise
+		/// </returns>
+		public bool Exist<TType>(DataType dtype, TType instance)
+		{
+			Select<TType> select = new Select<TType>();
+
+			select.AddMembers(dtype.PrimaryKey.ToArray());
+			select.Where.Add(GetPrimaryKeyFilter(dtype, instance));
+
+			return NativeDataBase.ExistsData(SqlGenerator.Select(Parse(select)));
+		}
+
 		public int Insert<TType>(TType instance)
 		{
 			DataType dtype = instance.GetType();
@@ -186,7 +238,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			DataType dtype = instance.GetType();
 			Select<TType> select = new Select<TType>();
-			select.AddMembers(dtype.Members.ToArray());
+			select.AddMembers(dtype.AllMembers);
 
 			select.Where.Add(GetPrimaryKeyFilter(dtype, instance));
 
@@ -211,6 +263,70 @@ namespace OKHOSTING.Sql.ORM
 			foreach (object result in Select((Select) select))
 			{
 				yield return (TType) result;
+			}
+		}
+
+		/// <summary>
+		/// Returns all objects in a table
+		/// </summary>
+		public IEnumerable<TType> Select<TType>()
+		{
+			Select<TType> select = new Select<TType>();
+			select.AddMembers(select.From.AllMembers);
+
+			return Select(select);
+		}
+
+		/// <summary>
+		/// Returns a list of objects filtered by one of the members
+		/// </summary>
+		/// <typeparam name="TType"></typeparam>
+		/// <param name="member">DataMember that will be evaluated for filtering</param>
+		/// <param name="value">Value that the DataMember must match</param>
+		/// <returns>List of filtered objects</returns>
+		public IEnumerable<TType> Select<TType>(DataMember<TType> member, IComparable value)
+		{
+			Select<TType> select = new Select<TType>();
+			select.AddMembers(select.From.AllMembers);
+			select.Where.Add(new ValueCompareFilter(member, value));
+
+			return Select(select);
+		}
+
+		public IEnumerable<TType> SearchInheritedFrom<TType>(TType instance)
+		{
+			DataType dtype = typeof(TType);
+			Command command = new Command();
+			List<Tuple<DataType, Select>> selects = new List<Tuple<DataType, Select>>();
+
+			//Crossing the DataTypes
+			foreach (DataType subType in dtype.GetSubDataTypesRecursive())
+			{
+				Select select = new Select();
+				select.From = subType;
+				select.AddMembers(subType.AllMembers);
+				select.Where.Add(GetPrimaryKeyFilter(subType, instance)); //Creating Primary Key filter
+				//append all selects into a single command for beter performance
+				Command subCommand = SqlGenerator.Select(Parse(select));
+				command.Append(subCommand);
+
+				selects.Add(new Tuple<DataType, Select>(subType, select));
+			}
+
+			using (var reader = NativeDataBase.GetDataReader(command))
+			{
+				foreach (var item in selects)
+				{
+					while (reader.Read())
+					{
+						TType childInstance = (TType) Activator.CreateInstance(item.Item1.InnerType);
+						ParseFromSelect(item.Item2, reader, childInstance);
+
+						yield return childInstance;
+					}
+
+					reader.NextResult();
+				}
 			}
 		}
 
@@ -653,6 +769,11 @@ namespace OKHOSTING.Sql.ORM
 			
 			native.From = select.From.Table;
 			native.Limit = Parse(select.Limit);
+			
+			if (select.Members.Count == 0)
+			{
+				select.AddMembers(select.From.AllMembers);
+			}
 
 			foreach (SelectMember selectMember in select.Members)
 			{

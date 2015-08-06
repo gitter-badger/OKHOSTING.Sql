@@ -227,10 +227,10 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		/// <summary>
-		/// Searches for all DataTypes inherited from this TypeMap<T> in a recursive way
+		/// Searches for all DataTypes inherited from this TypeMap in a recursive way
 		/// </summary>
 		/// <returns>
-		/// All DataTypes that directly and indirectly inherit from the current TypeMap<T>. 
+		/// All DataTypes that directly and indirectly inherit from the current TypeMap. 
 		/// Returns the hole tree of subclasses.
 		/// </returns>
 		public IEnumerable<DataType> GetSubDataTypesRecursive()
@@ -295,7 +295,7 @@ namespace OKHOSTING.Sql.ORM
 			{
 				return this.Equals((Type) obj);
 			}
-			//Validating if the argument is a OKHOSTING.Softosis.TypeMap<T>
+			//Validating if the argument is a DataType
 			else if (obj is DataType)
 			{
 				return this.Equals((DataType) obj);

@@ -100,7 +100,6 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		
 		#region Non public
 
 		protected virtual Filters.FilterBase GetPrimaryKeyFilter(DataType dtype, TKey key)
@@ -121,7 +120,6 @@ namespace OKHOSTING.Sql.ORM
 		{
 			Select<TType> select = new Select<TType>();
 			DataType dtype = DataType;
-			select.From = dtype;
 			select.AddMembers(dtype.Members.ToArray());
 
 			return select;
