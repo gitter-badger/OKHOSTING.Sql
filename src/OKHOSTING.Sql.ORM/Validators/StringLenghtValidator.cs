@@ -130,7 +130,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// </summary>
 		/// <param name="dmember">String DataValue that has a StringLengthValidator attribute</param>
 		/// <returns>Maximum lenght of the string DataValue. 0 if no max lenght is defined.</returns>
-		public static int GetMaxLenght(System.Reflection.MemberInfo member)
+		public static int	GetMaxLenght(System.Reflection.MemberInfo member)
 		{
 			//Validating if the MemberInfo is null
 			if (member == null) throw new ArgumentNullException("member");
@@ -156,8 +156,8 @@ namespace OKHOSTING.Sql.ORM.Validators
 				return validator.MaximumLength;
 			}
 
-			//if operator is not one of the previous, return null
-			return 0;
+			//if no attribute was found, return the default 255 lenght for varchar strings
+			return 255;
 		}
 
 		/// <summary>

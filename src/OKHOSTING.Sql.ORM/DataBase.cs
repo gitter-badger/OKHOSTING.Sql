@@ -12,6 +12,18 @@ namespace OKHOSTING.Sql.ORM
 	{
 		protected readonly Dictionary<Type, object> Tables = new Dictionary<Type,object>();
 
+		public DataBase()
+		{
+		}
+
+		public DataBase(Sql.DataBase nativeDataBase, SqlGeneratorBase sqlGenerator)
+		{
+			NativeDataBase = nativeDataBase;
+			SqlGenerator = sqlGenerator;
+		}
+
+		#region Properties
+
 		public Sql.DataBase NativeDataBase { get; set; }
 		
 		public SqlGeneratorBase SqlGenerator { get; set; }
@@ -57,7 +69,9 @@ namespace OKHOSTING.Sql.ORM
 			return this.Table<TKey, TType>();
 		}
 
-		//operations
+		#endregion
+		
+		#region Operations
 
 		public int Insert(Insert insert)
 		{
@@ -108,7 +122,9 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		//instance & generic operations
+		#endregion
+
+		#region Instance & generic operations
 
 		/// <summary>
 		/// Returns a value indicating if the specified DataObject exists on the DataBase (based on its primary key)
@@ -330,11 +346,58 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public void Create<TType>()
+		public void Validate<TType>(TType obj)
 		{
-			DataType dtype = typeof(TType);
+			DataType dtype = obj.GetType();
+			List<Validators.ValidationError> errors = new List<Validators.ValidationError>();
+
+			foreach (var dmember in dtype.Members)
+			{
+				foreach (var validator in dmember.Validators)
+				{
+					var error = validator.Validate(obj);
+
+					if (error != null)
+					{
+						errors.Add(error);
+					}
+				}
+			}
+
+			if (errors.Count > 0)
+			{
+				throw new Validators.ValidationException(errors, obj);
+			}
+		}
+
+		#endregion
+
+		#region Create and drop
+
+		public void Create(IEnumerable<DataType> dtypes)
+		{
+			//create all tables and indexes first
+			foreach (DataType dt in dtypes)
+			{
+				Create(dt);
+			}
+
+			//create all foreign keys next
+			foreach (DataType dt in dtypes)
+			{
+				foreach (var fk in dt.Table.ForeignKeys)
+				{
+					Command sql = SqlGenerator.Create(fk);
+					NativeDataBase.Execute(sql);
+				}
+			}
+		}
+
+		public void Create(DataType dtype)
+		{
 			Command sql;
 
+			//create all tables and indexes
 			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 			{
 				if (NativeDataBase.ExistsTable(parent.Table.Name))
@@ -350,7 +413,11 @@ namespace OKHOSTING.Sql.ORM
 					sql = SqlGenerator.Create(index);
 					NativeDataBase.Execute(sql);
 				}
+			}
 
+			//once all tables are created, proceed with inheritance foreign keys
+			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
+			{
 				foreach (Sql.Schema.ForeignKey fk in parent.Table.ForeignKeys)
 				{
 					sql = SqlGenerator.Create(fk);
@@ -359,9 +426,13 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public void Drop<TType>()
+		public void Create<TType>()
 		{
-			DataType dtype = typeof(TType);
+			Create(typeof(TType));
+		}
+
+		public void Drop(DataType dtype)
+		{
 			Command sql;
 
 			if (!NativeDataBase.ExistsTable(dtype.Table.Name))
@@ -385,60 +456,12 @@ namespace OKHOSTING.Sql.ORM
 			NativeDataBase.Execute(sql);
 		}
 
-		public void Validate(object obj)
+		public void Drop<TType>()
 		{
-			DataType dtype = obj.GetType();
-			List<Validators.ValidationError> errors = new List<Validators.ValidationError>();
-
-			foreach (var dmember in dtype.Members)
-			{
-				foreach (var validator in dmember.Validators)
-				{
-					var error = validator.Validate(obj);
-
-					if (error != null)
-					{
-						errors.Add(error);
-					}
-				}
-			}
-
-			if (errors.Count > 0)
-			{
-				throw new Validators.ValidationException(errors, obj);
-			}
+			Drop(typeof(TType));
 		}
-		
-		protected void ParseFromSelect<T>(Select select, System.Data.IDataReader dataReader, T instance)
-		{
-			foreach (SelectMember member in select.Members)
-			{
-				if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
-				{
-					object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
-					member.Member.SetValueFromColumn(instance, value);
-				}
-			}
 
-			foreach (SelectJoin join in select.Joins)
-			{
-				foreach (SelectMember member in join.Members)
-				{
-					if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
-					{
-						string expression = member.Alias.Replace('_', '.');
-						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
-
-						if (member.Member.Converter != null)
-						{
-							value = member.Member.Converter.ColumnToMember(value);
-						}
-
-						DataMember.SetValue(expression, instance, value);
-					}
-				}
-			}
-		}
+		#endregion
 
 		#region Filter parsing
 
@@ -800,6 +823,8 @@ namespace OKHOSTING.Sql.ORM
 
 		#endregion
 
+		#region Protected & static
+
 		/// <summary>
 		/// A default database that will be used from any places and that should be initialized at the very beginning of the app
 		/// </summary>
@@ -815,12 +840,45 @@ namespace OKHOSTING.Sql.ORM
 				filter.InnerFilters.Add(new Filters.ValueCompareFilter()
 				{
 					Member = primaryKeys[i],
-					ValueToCompare = (IComparable) primaryKeys[i].GetValue(instance),
+					ValueToCompare = (IComparable)primaryKeys[i].GetValue(instance),
 					Operator = Core.Data.CompareOperator.Equal,
 				});
 			}
 
 			return filter;
 		}
+
+		protected void ParseFromSelect<T>(Select select, System.Data.IDataReader dataReader, T instance)
+		{
+			foreach (SelectMember member in select.Members)
+			{
+				if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
+				{
+					object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
+					member.Member.SetValueFromColumn(instance, value);
+				}
+			}
+
+			foreach (SelectJoin join in select.Joins)
+			{
+				foreach (SelectMember member in join.Members)
+				{
+					if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
+					{
+						string expression = member.Alias.Replace('_', '.');
+						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
+
+						if (member.Member.Converter != null)
+						{
+							value = member.Member.Converter.ColumnToMember(value);
+						}
+
+						DataMember.SetValue(expression, instance, value);
+					}
+				}
+			}
+		}
+
+		#endregion
 	}
 }

@@ -12,7 +12,7 @@ namespace OKHOSTING.Sql.Tests
 	{
 		public DataBase Connect()
 		{
-			return new MySql.DataBase(System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString);
+			return new MySql.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString };
 		}
 
 		[Test]

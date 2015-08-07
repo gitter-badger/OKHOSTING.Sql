@@ -37,8 +37,6 @@ namespace OKHOSTING.Sql.ORM
 
 		#region Members
 
-		protected readonly List<DataMember> _Members = new List<DataMember>();
-
 		public DataMember this[string name]
 		{
 			get
@@ -133,6 +131,8 @@ namespace OKHOSTING.Sql.ORM
 			DataMember dmember = this[member];
 			_Members.Remove(dmember);
 		}
+
+		protected readonly List<DataMember> _Members = new List<DataMember>();
 
 		#endregion
 
@@ -427,25 +427,42 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Creates a list of new DataTypes, creating as well a list of new Tables with all members of type as columns
 		/// </summary>
-		public static IEnumerable<DataType> DefaultMap(params Type[] types)
+		public static IEnumerable<DataType> DefaultMap(IEnumerable<Type> types)
 		{
+			//we will store here all types that are actually persistent
+			List<DataType> persistentTypes = new List<DataType>();
+
 			//map primary keys first, so we allow to foreign keys and inheritance to be correctly mapped
 			foreach (Type type in types)
 			{
+				//skip enums and interfaces
+				if (type.IsEnum || type.IsInterface)
+				{
+					continue;
+				}
+
+				//ignore types with no primary key
+				var pk = GetMapableMembers(type).Where(m => DataMember.IsPrimaryKey(m));
+
+				if (pk.Count() == 0)
+				{
+					continue;
+				}
+
 				Schema.Table table = new Schema.Table(type.Name);
 				DataType dtype = DataType.Map(type, table);
 
-				foreach (var memberInfo in GetMapableMembers(type).Where(m => DataMember.IsPrimaryKey(m)))
+				foreach (var memberInfo in pk)
 				{
 					//create datamember
 					DataMember dmember = dtype.Map(memberInfo.Name);
 				}
+
+				persistentTypes.Add(dtype);
 			}
 
-			foreach (Type type in types)
+			foreach (DataType dtype in persistentTypes)
 			{
-				DataType dtype = type;
-
 				//create inheritance foreign keys
 				if (dtype.BaseDataType != null)
 				{
@@ -467,7 +484,7 @@ namespace OKHOSTING.Sql.ORM
 				}
 
 				//map non primary key members now
-				foreach (var memberInfo in GetMapableMembers(type).Where(m => !DataMember.IsPrimaryKey(m)))
+				foreach (var memberInfo in GetMapableMembers(dtype.InnerType).Where(m => !DataMember.IsPrimaryKey(m)))
 				{
 					Type returnType = DataMember.GetReturnType(memberInfo);
 
@@ -482,7 +499,7 @@ namespace OKHOSTING.Sql.ORM
 						foreignKey.RemoteTable = returnDataType.Table;
 						foreignKey.Name = "FK_" + dtype.Table.Name + "_" + memberInfo.Name;
 
-						foreach (DataMember pk in returnDataType.PrimaryKey)
+						foreach (DataMember pk in returnDataType.PrimaryKey.ToList())
 						{
 							Schema.Column column = new Schema.Column();
 							column.Name = memberInfo.Name + "_" + pk.Member.Replace('.', '_');
@@ -498,7 +515,7 @@ namespace OKHOSTING.Sql.ORM
 
 							dtype.Table.Columns.Add(column);
 							foreignKey.Columns.Add(new Tuple<Schema.Column, Schema.Column>(column, pk.Column));
-							
+
 							//create datamember
 							dtype.Map(memberInfo.Name + "." + pk.Member, column);
 						}
@@ -544,6 +561,14 @@ namespace OKHOSTING.Sql.ORM
 
 				yield return dtype;
 			}
+		}
+
+		/// <summary>
+		/// Creates a list of new DataTypes, creating as well a list of new Tables with all members of type as columns
+		/// </summary>
+		public static IEnumerable<DataType> DefaultMap(params Type[] types)
+		{
+			return DefaultMap((IEnumerable<Type>) types);
 		}
 
 		/// <summary>

@@ -16,7 +16,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 
 		public BasicTests()
 		{
-			DataBase = new DataBase(new MySql.DataBase(System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString), new MySql.SqlGenerator());
+			DataBase = new DataBase(new MySql.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString }, new MySql.SqlGenerator());
 		}
 
 		public void MapTypes()
@@ -189,9 +189,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 				DataBase.Table<int, CustomerContact>().Add(new KeyValuePair<int, CustomerContact>(0, contact));
 			}
 
-			Operations.Select select = new Operations.Select();
-			
-			select.From = typeof(CustomerContact);
+			Operations.Select<CustomerContact> select = new Operations.Select<CustomerContact>();
 			
 			foreach (var member in select.From.Members)
 			{
@@ -209,7 +207,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 				select.Members.Add(new Operations.SelectMember(member));
 			}
 
-			foreach (var e in DataBase.Select<CustomerContact>(select))
+			foreach (CustomerContact e in DataBase.Select(select))
 			{
 				Console.WriteLine(e.Firstname + " " + e.Customer.LegalName);
 			}
