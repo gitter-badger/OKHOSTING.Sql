@@ -391,7 +391,7 @@ namespace OKHOSTING.Sql
 				
 				if (!string.IsNullOrWhiteSpace(c.Alias))
 				{
-					sql += string.Format(" AS {0}", c.Alias);
+					sql += string.Format(" AS {0}", EncloseName(c.Alias));
 				}
 
 				sql += ", ";
@@ -1234,10 +1234,9 @@ namespace OKHOSTING.Sql
 			fieldText += (selectAggregateColumn.AggregateFunction != SelectAggregateFunction.None ? ")" : string.Empty);
 
 			//Adding alias 
-			fieldText +=
-				(selectAggregateColumn.Alias != null && selectAggregateColumn.Alias.Trim() != string.Empty ?
-				" as " + selectAggregateColumn.Alias :
-				string.Empty);
+			fieldText += string.IsNullOrWhiteSpace(selectAggregateColumn.Alias)?
+				" AS " + selectAggregateColumn.Alias :
+				string.Empty;
 
 			//Returning the aggregate field
 			return fieldText;

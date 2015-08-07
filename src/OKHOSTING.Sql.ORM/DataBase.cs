@@ -122,6 +122,43 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
+		public IEnumerable<object> SearchInherited(DataType dtype, IEnumerable<FilterBase> where)
+		{
+			Command command = new Command();
+			List<Tuple<DataType, Select>> selects = new List<Tuple<DataType, Select>>();
+
+			//Crossing the DataTypes
+			foreach (DataType subType in dtype.GetSubDataTypesRecursive())
+			{
+				Select select = new Select();
+				select.From = subType;
+				select.AddMembers(subType.AllMembers);
+				select.Where.AddRange(where); //add filter
+
+				//append all selects into a single command for beter performance
+				Command subCommand = SqlGenerator.Select(Parse(select));
+				command.Append(subCommand);
+
+				selects.Add(new Tuple<DataType, Select>(subType, select));
+			}
+
+			using (var reader = NativeDataBase.GetDataReader(command))
+			{
+				foreach (var item in selects)
+				{
+					while (reader.Read())
+					{
+						object childInstance = Activator.CreateInstance(item.Item1.InnerType);
+						ParseFromSelect(item.Item2, reader, childInstance);
+
+						yield return childInstance;
+					}
+
+					reader.NextResult();
+				}
+			}
+		}
+
 		#endregion
 
 		#region Instance & generic operations
@@ -309,41 +346,20 @@ namespace OKHOSTING.Sql.ORM
 			return Select(select);
 		}
 
-		public IEnumerable<TType> SearchInheritedFrom<TType>(TType instance)
+		public IEnumerable<TType> SearchInherited<TType>(DataType<TType> dtype, IEnumerable<FilterBase> where)
 		{
-			DataType dtype = typeof(TType);
-			Command command = new Command();
-			List<Tuple<DataType, Select>> selects = new List<Tuple<DataType, Select>>();
-
-			//Crossing the DataTypes
-			foreach (DataType subType in dtype.GetSubDataTypesRecursive())
+			foreach (object item in SearchInherited((DataType) dtype, where))
 			{
-				Select select = new Select();
-				select.From = subType;
-				select.AddMembers(subType.AllMembers);
-				select.Where.Add(GetPrimaryKeyFilter(subType, instance)); //Creating Primary Key filter
-				//append all selects into a single command for beter performance
-				Command subCommand = SqlGenerator.Select(Parse(select));
-				command.Append(subCommand);
-
-				selects.Add(new Tuple<DataType, Select>(subType, select));
+				yield return (TType) item;
 			}
+		}
 
-			using (var reader = NativeDataBase.GetDataReader(command))
-			{
-				foreach (var item in selects)
-				{
-					while (reader.Read())
-					{
-						TType childInstance = (TType) Activator.CreateInstance(item.Item1.InnerType);
-						ParseFromSelect(item.Item2, reader, childInstance);
+		public IEnumerable<TType> SearchInherited<TType>(TType instance)
+		{
+			DataType<TType> dtype = DataType<TType>.GetMap();
+			var filter = GetPrimaryKeyFilter(dtype, instance); //Creating Primary Key filter
 
-						yield return childInstance;
-					}
-
-					reader.NextResult();
-				}
-			}
+			return SearchInherited(dtype, new FilterBase[] { filter });
 		}
 
 		public void Validate<TType>(TType obj)
@@ -387,11 +403,8 @@ namespace OKHOSTING.Sql.ORM
 			{
 				foreach (var fk in dt.Table.ForeignKeys)
 				{
-					if (!NativeDataBase.ExistsConstraint(dt.Table.Name + "." + fk.Name))
-					{
-						Command sql = SqlGenerator.Create(fk);
-						NativeDataBase.Execute(sql);
-					}
+					Command sql = SqlGenerator.Create(fk);
+					NativeDataBase.Execute(sql);
 				}
 			}
 		}
@@ -401,21 +414,13 @@ namespace OKHOSTING.Sql.ORM
 			Command sql;
 
 			//create all tables and indexes
-			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
+			sql = SqlGenerator.Create(dtype.Table);
+			NativeDataBase.Execute(sql);
+
+			foreach (Sql.Schema.Index index in dtype.Table.Indexes)
 			{
-				if (NativeDataBase.ExistsTable(parent.Table.Name))
-				{
-					continue;
-				}
-
-				sql = SqlGenerator.Create(parent.Table);
+				sql = SqlGenerator.Create(index);
 				NativeDataBase.Execute(sql);
-
-				foreach (Sql.Schema.Index index in parent.Table.Indexes)
-				{
-					sql = SqlGenerator.Create(index);
-					NativeDataBase.Execute(sql);
-				}
 			}
 		}
 
@@ -424,24 +429,32 @@ namespace OKHOSTING.Sql.ORM
 			Create(typeof(TType));
 		}
 
+		public void Drop(IEnumerable<DataType> dtypes)
+		{
+			//drop all foreign keys first to avoid dependency errors
+			foreach (DataType dt in dtypes)
+			{
+				foreach (var fk in dt.Table.ForeignKeys)
+				{
+					Command sql = SqlGenerator.Drop(fk);
+					NativeDataBase.Execute(sql);
+				}
+			}
+
+			//create all tables and indexes next
+			foreach (DataType dt in dtypes)
+			{
+				Drop(dt);
+			}
+		}
+
 		public void Drop(DataType dtype)
 		{
 			Command sql;
 
-			if (!NativeDataBase.ExistsTable(dtype.Table.Name))
-			{
-				return;
-			}
-
 			foreach (Sql.Schema.Index index in dtype.Table.Indexes)
 			{
 				sql = SqlGenerator.Drop(index);
-				NativeDataBase.Execute(sql);
-			}
-
-			foreach (Sql.Schema.ForeignKey fk in dtype.Table.ForeignKeys)
-			{
-				sql = SqlGenerator.Drop(fk);
 				NativeDataBase.Execute(sql);
 			}
 

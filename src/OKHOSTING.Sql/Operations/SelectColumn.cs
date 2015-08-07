@@ -17,12 +17,12 @@ namespace OKHOSTING.Sql.Operations
 		/// <summary>
 		/// Alias name of the resulting field
 		/// </summary>
-		public string Alias;
+		public string Alias { get; set; }
 
 		/// <summary>
 		/// DataMember for build the field definition
 		/// </summary>
-		public Column Column;
+		public Column Column { get; set; }
 
 		/// <summary>
 		/// Constructs the AggegateSelectField

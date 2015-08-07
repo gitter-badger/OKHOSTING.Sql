@@ -27,8 +27,23 @@ namespace OKHOSTING.Sql.ORM.Operations
 		{
 			foreach (var expression in memberExpressions)
 			{
+				//if this is a native datamember, just add a SelectMember
+				if (From.IsMapped(expression))
+				{
+					DataMember dmember = From[expression];
+
+					//this is a native member of this dataType
+					SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
+					Members.Add(sm);
+
+					//finish iteration here
+					continue;
+				}
+
+				//of the expression was not found as a datamember, split it
 				List<System.Reflection.MemberInfo> nestedMemberInfos = DataMember.GetMemberInfos(From.InnerType, expression).ToList();
 
+				//check every part of the expression
 				for (int i = 0; i < nestedMemberInfos.Count; i++)
 				{
 					System.Reflection.MemberInfo memberInfo = nestedMemberInfos[i];
