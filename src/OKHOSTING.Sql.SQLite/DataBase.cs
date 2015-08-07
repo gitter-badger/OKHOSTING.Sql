@@ -19,12 +19,12 @@ namespace OKHOSTING.Sql.SQLite
 			throw new NotImplementedException();
 		}
 
-		public override bool ConstraintExists(string Name)
+		public override bool ExistsConstraint(string Name)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override bool IndexExists(string Name)
+		public override bool ExistsIndex(string Name)
 		{
 			throw new NotImplementedException();
 		}

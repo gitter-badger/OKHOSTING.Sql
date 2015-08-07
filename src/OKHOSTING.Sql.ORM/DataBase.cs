@@ -387,8 +387,11 @@ namespace OKHOSTING.Sql.ORM
 			{
 				foreach (var fk in dt.Table.ForeignKeys)
 				{
-					Command sql = SqlGenerator.Create(fk);
-					NativeDataBase.Execute(sql);
+					if (!NativeDataBase.ExistsConstraint(dt.Table.Name + "." + fk.Name))
+					{
+						Command sql = SqlGenerator.Create(fk);
+						NativeDataBase.Execute(sql);
+					}
 				}
 			}
 		}
@@ -411,16 +414,6 @@ namespace OKHOSTING.Sql.ORM
 				foreach (Sql.Schema.Index index in parent.Table.Indexes)
 				{
 					sql = SqlGenerator.Create(index);
-					NativeDataBase.Execute(sql);
-				}
-			}
-
-			//once all tables are created, proceed with inheritance foreign keys
-			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
-			{
-				foreach (Sql.Schema.ForeignKey fk in parent.Table.ForeignKeys)
-				{
-					sql = SqlGenerator.Create(fk);
 					NativeDataBase.Execute(sql);
 				}
 			}

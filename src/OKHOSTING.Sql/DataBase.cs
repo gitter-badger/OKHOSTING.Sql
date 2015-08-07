@@ -87,10 +87,24 @@ namespace OKHOSTING.Sql
 			}
 		}
 
-		/// <summary>
-		/// Connection string to use to connect to the database
-		/// </summary>
-		public string ConnectionString { get; set; }
+		string _ConnectionString;
+
+		public string ConnectionString 
+		{
+			get
+			{
+				return _ConnectionString;
+			}
+			set
+			{
+				_ConnectionString = value;
+				
+				if (Connection != null)
+				{
+					Connection.ConnectionString = value;
+				}
+			}
+		}
 
 		#endregion
 
@@ -724,7 +738,7 @@ namespace OKHOSTING.Sql
 		/// Value that indicates if the Constrainst 
 		/// exists in the Underlying Database 
 		/// </returns>
-		public abstract bool ConstraintExists(string Name);
+		public abstract bool ExistsConstraint(string Name);
 
 		/// <summary>
 		/// Verify if exists the specified index on the Database
@@ -736,7 +750,7 @@ namespace OKHOSTING.Sql
 		/// Boolean value that indicates if exists 
 		/// the specified index on the Database
 		/// </returns>
-		public abstract bool IndexExists(string Name);
+		public abstract bool ExistsIndex(string Name);
 
 		#endregion
 

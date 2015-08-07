@@ -361,7 +361,7 @@ namespace OKHOSTING.Sql.ORM
 
 		public static DataType GetMap(Type type)
 		{
-			return DataTypes.Where(m => m.InnerType.Equals(type)).Single();
+			return _DataTypes.Where(m => m.InnerType.Equals(type)).Single();
 		}
 
 		public static DataType Map(Type type)

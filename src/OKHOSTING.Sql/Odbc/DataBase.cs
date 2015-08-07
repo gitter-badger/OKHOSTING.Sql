@@ -54,7 +54,7 @@ namespace OKHOSTING.Sql.Odbc
 		/// Value that indicates if the Constrainst 
 		/// exists in the Underlying Database 
 		/// </returns>
-		public override bool ConstraintExists(string Name)
+		public override bool ExistsConstraint(string Name)
 		{
 			throw new NotSupportedException("OdbcExecuter is not compatible with the method BaseExecuter.ConstraintExists()");
 		}
@@ -69,7 +69,7 @@ namespace OKHOSTING.Sql.Odbc
 		/// Boolean value that indicates if exists 
 		/// the specified index on the Database
 		/// </returns>
-		public override bool IndexExists(string Name)
+		public override bool ExistsIndex(string Name)
 		{
 			throw new NotSupportedException("OdbcExecuter is not compatible with the method BaseExecuter.IndexExists()");
 		}

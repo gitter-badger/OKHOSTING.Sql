@@ -92,7 +92,7 @@ namespace OKHOSTING.Sql.SqlServer
 		/// Value that indicates if the Constrainst 
 		/// exists in the Underlying Database 
 		/// </returns>
-		public override bool ConstraintExists(string Name)
+		public override bool ExistsConstraint(string Name)
 		{
 			//Local vars
 			bool existsConstraint = false;
@@ -179,7 +179,7 @@ namespace OKHOSTING.Sql.SqlServer
 		/// Boolean value that indicates if exists 
 		/// the specified index on the Database
 		/// </returns>
-		public override bool IndexExists(string Name)
+		public override bool ExistsIndex(string Name)
 		{
 			//Local vars
 			bool existsIndex = false;

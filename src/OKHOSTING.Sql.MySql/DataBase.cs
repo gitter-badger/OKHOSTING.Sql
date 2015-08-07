@@ -81,14 +81,14 @@ namespace OKHOSTING.Sql.MySql
 		/// Returns a value that indicates if the Constrainst 
 		/// exists in the Underlying Database 
 		/// </summary>
-		/// <param name="Name">
+		/// <param name="name">
 		/// Name of the constraint to validate
 		/// </param>
 		/// <returns>
 		/// Value that indicates if the Constrainst 
 		/// exists in the Underlying Database 
 		/// </returns>
-		public override bool ConstraintExists(string Name)
+		public override bool ExistsConstraint(string name)
 		{
 			//Local vars
 			bool existsIndex = false;
@@ -96,7 +96,7 @@ namespace OKHOSTING.Sql.MySql
 			DbDataReader reader = null;
 
 			//Validating if the name is correctly specified
-			if (Name.IndexOf(".") == -1)
+			if (name.IndexOf(".") == -1)
 			{
 				throw new ArgumentException(
 					"For MySql constraints, the constraint name must be completly qualified with the syntax Table.Constraint",
@@ -104,8 +104,8 @@ namespace OKHOSTING.Sql.MySql
 			}
 
 			//Desglosando el nombre del índice en tabla e indice
-			Table = Name.Substring(0, Name.IndexOf("."));
-			Constraint = Name.Substring(Name.IndexOf(".") + 1);
+			Table = name.Substring(0, name.IndexOf("."));
+			Constraint = name.Substring(name.IndexOf(".") + 1);
 
 			try
 			{
@@ -177,7 +177,7 @@ namespace OKHOSTING.Sql.MySql
 		/// Boolean value that indicates if exists 
 		/// the specified index on the Database
 		/// </returns>
-		public override bool IndexExists(string Name)
+		public override bool ExistsIndex(string Name)
 		{
 			throw new NotSupportedException("MySqlExecuter is not compatible with the method BaseExecuter.IndexExists()");
 		}
