@@ -122,24 +122,32 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public IEnumerable<object> SearchInherited(DataType dtype, IEnumerable<FilterBase> where)
+		public IEnumerable<object> SearchInherited(Select select)
 		{
 			Command command = new Command();
 			List<Tuple<DataType, Select>> selects = new List<Tuple<DataType, Select>>();
 
 			//Crossing the DataTypes
-			foreach (DataType subType in dtype.GetSubDataTypesRecursive())
+			foreach (DataType subType in select.From.GetSubDataTypesRecursive())
 			{
-				Select select = new Select();
-				select.From = subType;
-				select.AddMembers(subType.AllMembers);
-				select.Where.AddRange(where); //add filter
+				//create a copy of the select but for the subtype
+				Select subSelect = new Select();
+				subSelect.From = subType;
+				subSelect.Where.AddRange(select.Where);
+				subSelect.OrderBy.AddRange(select.OrderBy);
+				subSelect.Joins.AddRange(select.Joins);
+				subSelect.Limit = select.Limit;
+
+				foreach (var member in select.Members)
+				{
+					subSelect.AddMember(member.Member);
+				}
 
 				//append all selects into a single command for beter performance
-				Command subCommand = SqlGenerator.Select(Parse(select));
+				Command subCommand = SqlGenerator.Select(Parse(subSelect));
 				command.Append(subCommand);
 
-				selects.Add(new Tuple<DataType, Select>(subType, select));
+				selects.Add(new Tuple<DataType, Select>(subType, subSelect));
 			}
 
 			using (var reader = NativeDataBase.GetDataReader(command))
@@ -346,9 +354,9 @@ namespace OKHOSTING.Sql.ORM
 			return Select(select);
 		}
 
-		public IEnumerable<TType> SearchInherited<TType>(DataType<TType> dtype, IEnumerable<FilterBase> where)
+		public IEnumerable<TType> SearchInherited<TType>(Select<TType> select)
 		{
-			foreach (object item in SearchInherited((DataType) dtype, where))
+			foreach (object item in SearchInherited((Select) select))
 			{
 				yield return (TType) item;
 			}
@@ -356,10 +364,10 @@ namespace OKHOSTING.Sql.ORM
 
 		public IEnumerable<TType> SearchInherited<TType>(TType instance)
 		{
-			DataType<TType> dtype = DataType<TType>.GetMap();
-			var filter = GetPrimaryKeyFilter(dtype, instance); //Creating Primary Key filter
+			Select<TType> select = new Select<TType>();
+			select.Where.Add(GetPrimaryKeyFilter(select.From, instance)); //Creating Primary Key filter
 
-			return SearchInherited(dtype, new FilterBase[] { filter });
+			return SearchInherited(select);
 		}
 
 		public void Validate<TType>(TType obj)
@@ -861,7 +869,11 @@ namespace OKHOSTING.Sql.ORM
 				if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
 				{
 					object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
-					member.Member.SetValueFromColumn(instance, value);
+
+					if (value != null && value != DBNull.Value)
+					{
+						member.Member.SetValueFromColumn(instance, value);
+					}
 				}
 			}
 
@@ -879,7 +891,10 @@ namespace OKHOSTING.Sql.ORM
 							value = member.Member.Converter.ColumnToMember(value);
 						}
 
-						DataMember.SetValue(expression, instance, value);
+						if (value != null && value != DBNull.Value)
+						{
+							DataMember.SetValue(expression, instance, value);
+						}
 					}
 				}
 			}

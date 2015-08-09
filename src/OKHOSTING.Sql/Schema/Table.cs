@@ -82,7 +82,13 @@ namespace OKHOSTING.Sql.Schema
 		{
 			if (obj is Table)
 			{
-				return ((Table) obj).Name == Name;
+				bool equals;
+				equals = ((Table) obj).Name == Name;
+
+				if (((Table)obj).DataBase != null && DataBase != null && ((Table)obj).DataBase.DataBase != null && DataBase.DataBase != null)
+				{
+					equals = equals && ((Table)obj).DataBase.DataBase.Name == DataBase.DataBase.Name;
+				}
 			}
 
 			return base.Equals(obj);

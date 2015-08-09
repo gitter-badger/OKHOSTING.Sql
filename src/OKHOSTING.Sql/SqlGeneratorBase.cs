@@ -288,6 +288,23 @@ namespace OKHOSTING.Sql
 			//Validating if the table argument is null
 			if (select == null) throw new ArgumentNullException("select");
 
+			//fix column filters tables names, if they come from a join, we should use the join alias if it exist
+			foreach (ColumnFilter filter in select.Where.Where(f => f is ColumnFilter))
+			{
+				//this filter is using a join table's column, so we need to the join's table alias
+				if (filter.Column.Table != select.From)
+				{
+					foreach (SelectJoin join in select.Joins)
+					{
+						//this filter is unsong this join's table, so we assign it the table alias from the join
+						if (filter.Column.Table == join.Table && !string.IsNullOrWhiteSpace(join.Alias) && join.Table.Name != join.Alias)
+						{
+							filter.TableAlias = join.Alias;
+						}
+					}
+				}
+			}
+
 			//Creating Select sentence
 			Command command = SelectClause(select);
 			command.Append(FromClause(select));
@@ -389,7 +406,7 @@ namespace OKHOSTING.Sql
 			{
 				sql += string.Format("{0}.{1}", EncloseName(c.Column.Table.Name), EncloseName(c.Column.Name));
 				
-				if (!string.IsNullOrWhiteSpace(c.Alias))
+				if (!string.IsNullOrWhiteSpace(c.Alias) && c.Alias != c.Column.Name)
 				{
 					sql += string.Format(" AS {0}", EncloseName(c.Alias));
 				}
@@ -405,9 +422,9 @@ namespace OKHOSTING.Sql
 					string joinTableAlias = string.IsNullOrWhiteSpace(join.Alias) ? join.Table.Name : join.Alias;
 					sql += string.Format("{0}.{1}", EncloseName(joinTableAlias), EncloseName(joinColumn.Column.Name));
 
-					if (!string.IsNullOrWhiteSpace(joinColumn.Alias))
+					if (!string.IsNullOrWhiteSpace(joinColumn.Alias) && joinColumn.Alias != joinColumn.Column.Name)
 					{
-						sql += string.Format(" AS {0}", joinColumn.Alias);
+						sql += string.Format(" AS {0}", EncloseName(joinColumn.Alias));
 					}
 
 					sql += ", ";
@@ -430,7 +447,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Group By Clause for the Select Sentence
 		/// </returns>
-		protected virtual Command GroupByClause(List<Column> dataValuesToGroup)
+		protected virtual Command GroupByClause(IEnumerable<Column> dataValuesToGroup)
 		{
 			//Local Vars
 			string groupByClause = string.Empty;
@@ -465,7 +482,7 @@ namespace OKHOSTING.Sql
 		/// Clause order by corresponding to the 
 		/// Order definition specified
 		/// </returns>
-		protected virtual Command OrderByClause(List<OrderBy> orderBy)
+		protected virtual Command OrderByClause(IEnumerable<OrderBy> orderBy)
 		{
 			//local variables
 			string orderString = "ORDER BY ";
@@ -624,7 +641,7 @@ namespace OKHOSTING.Sql
 			return command;
 		}
 
-		protected virtual Command Filter(List<FilterBase> filters, LogicalOperator logicalOperator)
+		protected virtual Command Filter(IEnumerable<FilterBase> filters, LogicalOperator logicalOperator)
 		{
 			//Local Vars
 			Command command = new Command();
@@ -654,6 +671,34 @@ namespace OKHOSTING.Sql
 		#endregion
 
 		#region Where, From, Limit, On, In
+
+		/// <summary>
+		/// Creates the From Clause for a Select Sql Sentence
+		/// </summary>
+		/// <param name="table">
+		/// Table for From Clause creation
+		/// </param>
+		/// <returns>
+		/// From Clause from the Select Sql Sentence
+		/// </returns>
+		protected virtual Command FromClause(Select select)
+		{
+			//Validating if table argument is null
+			if (select == null) throw new ArgumentNullException("select");
+
+			//Creating the From Clause
+			Command command = " From " + EncloseName(select.From.Name);
+
+			//resolve joins 
+			foreach (SelectJoin join in select.Joins)
+			{
+				command.Script += " " + join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : " " + join.Alias) + " ON ";
+				command.Append(Filter(join.On, LogicalOperator.And));
+			}
+
+			//Returning the From sql Clause	
+			return command;
+		}
 
 		/// <summary>
 		/// Creates the Where Clause for a Select, Update and Delete Sql Sentence
@@ -690,7 +735,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Where Clause for a Select, Update and Delete Sql Sentence
 		/// </returns>
-		protected virtual Command WhereClause(List<FilterBase> filters)
+		protected virtual Command WhereClause(IEnumerable<FilterBase> filters)
 		{
 			return WhereClause(filters, LogicalOperator.And);
 		}
@@ -708,7 +753,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Where Clause for a Select, Update and Delete Sql Sentence
 		/// </returns>
-		protected virtual Command WhereClause(List<FilterBase> filters, LogicalOperator logicalOperator)
+		protected virtual Command WhereClause(IEnumerable<FilterBase> filters, LogicalOperator logicalOperator)
 		{
 			//Validating if there are filters defined
 			if (filters == null || filters.Count() == 0) return null;
@@ -720,44 +765,15 @@ namespace OKHOSTING.Sql
 			return command;
 		}
 
-		protected virtual Command OnClause(List<FilterBase> filters, LogicalOperator logicalOperator)
+		protected virtual Command OnClause(IEnumerable<FilterBase> filters, LogicalOperator logicalOperator)
 		{
 			//Validating if there are filters defined
-			if (filters == null || filters.Count == 0) return null;
+			if (filters == null || filters.Count() == 0) return null;
 
 			//Adding ON clause
 			Command command = " ON ";
 			command.Append(Filter(filters, logicalOperator));
 
-			return command;
-		}
-
-		/// <summary>
-		/// Creates the From Clause for a Select Sql Sentence
-		/// </summary>
-		/// <param name="table">
-		/// Table for From Clause creation
-		/// </param>
-		/// <returns>
-		/// From Clause from the Select Sql Sentence
-		/// </returns>
-		protected virtual Command FromClause(Select select)
-		{
-			//Validating if table argument is null
-			if (select == null) throw new ArgumentNullException("select");
-
-			//Creating the From Clause
-			Command command = " From " + EncloseName(select.From.Name);
-
-			//Crossing the inheritance until reach the root Table
-			foreach (SelectJoin join in select.Joins)
-			{
-				//Resolve Joins
-				command.Script += " " + join.JoinType.ToString().ToUpper() + " JOIN " + EncloseName(join.Table.Name) + (string.IsNullOrWhiteSpace(join.Alias)? string.Empty : " " + join.Alias) + " ON ";
-				command.Append(Filter(join.On, LogicalOperator.And));
-			}
-
-			//Returning the From sql Clause	
 			return command;
 		}
 

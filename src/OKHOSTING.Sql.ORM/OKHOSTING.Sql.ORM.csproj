@@ -38,12 +38,6 @@
       <HintPath>..\..\test\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OKHOSTING.Core">
-      <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="OKHOSTING.Core.Cryptography">
-      <HintPath>..\References\OKHOSTING.Core.Cryptography.dll</HintPath>
-    </Reference>
     <Reference Include="SharpAESCrypt">
       <HintPath>..\References\SharpAESCrypt.dll</HintPath>
     </Reference>
@@ -165,6 +159,14 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core.Cryptography\OKHOSTING.Core.Cryptography.csproj">
+      <Project>{88fa702f-1354-4abc-abc3-540cd659bd57}</Project>
+      <Name>OKHOSTING.Core.Cryptography</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
       <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
       <Name>OKHOSTING.Sql</Name>
