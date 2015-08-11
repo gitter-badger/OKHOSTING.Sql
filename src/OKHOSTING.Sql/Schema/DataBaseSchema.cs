@@ -181,6 +181,8 @@ namespace OKHOSTING.Sql.Schema
 						{
 							foreignKey.Columns.Add(new Tuple<Column,Column>(table[dbcons.Columns[i]], foreignKey.RemoteTable[referencedColumns[i]]));
 						}
+
+						table.ForeignKeys.Add(foreignKey);
 					}
 				}
 			}

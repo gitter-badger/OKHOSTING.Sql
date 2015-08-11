@@ -11,6 +11,8 @@ namespace OKHOSTING.Sql.Schema
 	/// </summary>
 	public class CheckConstraint
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// The table that contains this constraint
 		/// </summary>

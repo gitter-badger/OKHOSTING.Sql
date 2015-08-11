@@ -228,6 +228,8 @@ namespace OKHOSTING.Sql.ORM
 			DataType dtype = instance.GetType();
 			int result = 0;
 
+			Validate(instance);
+
 			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 			{
 				Insert insert = new Insert();
@@ -257,6 +259,8 @@ namespace OKHOSTING.Sql.ORM
 		{
 			DataType dtype = instance.GetType();
 			int result = 0;
+
+			Validate(instance);
 
 			foreach (DataType parent in dtype.GetBaseDataTypes().Reverse())
 			{
@@ -368,6 +372,80 @@ namespace OKHOSTING.Sql.ORM
 			select.Where.Add(GetPrimaryKeyFilter(select.From, instance)); //Creating Primary Key filter
 
 			return SearchInherited(select);
+		}
+
+		/// <summary>
+		/// Loads a list of related objects and populates the collection
+		/// </summary>
+		/// <param name="memberName">Name of the collection member</param>
+		/// <returns>Number of loaded objects</returns>
+		public int LoadCollection<TType>(TType instance, System.Linq.Expressions.Expression<Func<TType, object>> memberExpression)
+		{
+			string memberString = DataMember<TType>.GetMemberString(memberExpression);
+			System.Reflection.MemberInfo memberInfo = instance.GetType().GetMember(memberString).Single();
+			System.Type memberReturnType = DataMember.GetReturnType(memberInfo);
+
+			DataType collectionDataType = null;
+
+			//determine the type of objects to be loaded
+			if (memberReturnType.IsArray)
+			{
+				collectionDataType = memberReturnType.GetElementType();
+			}
+			else if (memberReturnType.IsGenericType)
+			{
+				collectionDataType = memberReturnType.GenericTypeArguments[0];
+			}
+
+			//get the foreign key member
+			var fk = collectionDataType.InnerType.GetMembers().Where(m => (m is System.Reflection.FieldInfo || m is System.Reflection.PropertyInfo) && DataMember.GetReturnType(m) == memberInfo.DeclaringType);
+
+			//this method is valid only if there is only 1 foreign key in the nested datatype, so we can determine the relationship correctly
+			if (fk.Count() != 1)
+			{
+				throw new ArgumentException("memberName", string.Format("Could not automatically determine the correct foreign key since there is more than one member with return type {0} declared in {1}", memberInfo.DeclaringType, collectionDataType));
+			}
+
+			//create select and add filter
+			var select = new OKHOSTING.Sql.ORM.Operations.Select();
+			select.From = collectionDataType;
+			select.AddMembers(collectionDataType.AllMembers);
+
+			DataType dtype = instance.GetType();
+			foreach (var pk in dtype.PrimaryKey)
+			{
+				select.Where.Add(new Sql.ORM.Filters.ValueCompareFilter(collectionDataType[fk.First().Name + "." + pk.Member], (IComparable) pk.GetValue(instance)));
+			}
+
+			//get list of objects
+			var result = DataBase.Default.SearchInherited(select).ToList();
+
+			//if the list is an array, try to "set"
+			if (memberReturnType.IsArray)
+			{
+				DataMember.SetValue(memberInfo, this, result.ToArray());
+			}
+			else
+			{
+				//if the list is not an array, we asume it's a List and just add the results
+				System.Collections.IList currentList = (System.Collections.IList) DataMember.GetValue(memberInfo, instance);
+
+				//if list is null, initialize
+				if (currentList == null)
+				{
+					currentList = (System.Collections.IList) Activator.CreateInstance(memberReturnType);
+					DataMember.SetValue(memberInfo, instance, currentList);
+				}
+
+				//add objects
+				foreach (var item in result)
+				{
+					currentList.Add(item);
+				}
+			}
+
+			//return number of objects loaded
+			return result.Count;
 		}
 
 		public void Validate<TType>(TType obj)
