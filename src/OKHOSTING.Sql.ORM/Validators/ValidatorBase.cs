@@ -5,8 +5,10 @@ namespace OKHOSTING.Sql.ORM.Validators
 	/// <summary>
 	/// Defines the behavior that must be have the validation classes
 	/// </summary>
-	public interface IValidator
+	public abstract class ValidatorBase
 	{
+		public int Id { get; set; }
+
 		/// <summary>
 		/// Performs the validation
 		/// </summary>
@@ -14,10 +16,10 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// ValidationError object with the error founded if the validation fails,
 		/// otherwise returns null
 		/// </returns>
-		ValidationError Validate(object obj);
+		public abstract ValidationError Validate(object obj);
 	}
 
-	public interface IValidator<T> : IValidator
+	public abstract class ValidatorBase<T> : ValidatorBase
 	{
 		/// <summary>
 		/// Performs the validation
@@ -26,6 +28,11 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// ValidationError object with the error founded if the validation fails,
 		/// otherwise returns null
 		/// </returns>
-		ValidationError Validate(T obj);
+		public abstract ValidationError Validate(T obj);
+
+		public override ValidationError Validate(object obj)
+		{
+			return Validate((T) obj);
+		}
 	}
 }

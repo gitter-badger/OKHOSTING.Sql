@@ -34,10 +34,6 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OKHOSTING.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\src\References\OKHOSTING.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -53,6 +49,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Address.cs" />
+    <Compile Include="ValidationTest.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="CustomerContact.cs" />
@@ -61,6 +58,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OKHOSTING.Sql.MySql\OKHOSTING.Sql.MySql.csproj">
       <Project>{0a304a16-0f65-4ce6-a878-41263293021c}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>

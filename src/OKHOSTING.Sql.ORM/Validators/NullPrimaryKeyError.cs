@@ -26,7 +26,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <param name="message">
 		/// Description of the error
 		/// </param>
-		public NullPrimaryKeyError(DataMember member, IValidator validator, string message): base(validator, message)
+		public NullPrimaryKeyError(DataMember member, ValidatorBase validator, string message): base(validator, message)
 		{
 			//Validating if the dataValue argument is null
 			if (member == null) throw new ArgumentNullException("member");

@@ -10,7 +10,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <summary>
 		/// Reference to the validator that fails
 		/// </summary>
-		public readonly IValidator Validator;
+		public readonly ValidatorBase Validator;
 
 		/// <summary>
 		/// Description of the error
@@ -26,7 +26,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <param name="description">
 		/// Description of the error
 		/// </param>
-		public ValidationError(IValidator validator, string description)
+		public ValidationError(ValidatorBase validator, string description)
 		{
 			Validator = validator;
 			Description = description;

@@ -53,11 +53,11 @@
   <ItemGroup>
     <Compile Include="Converters\ConverterBase.cs" />
     <Compile Include="Converters\EncryptBinary.cs" />
+    <Compile Include="Converters\TypeStringConverter.cs" />
     <Compile Include="Converters\Uppercase.cs" />
     <Compile Include="Converters\Lowercase.cs" />
     <Compile Include="Converters\Trim.cs" />
     <Compile Include="Converters\EncryptString.cs" />
-    <Compile Include="Converters\IConverter.cs" />
     <Compile Include="Converters\Json.cs" />
     <Compile Include="DataBase.cs">
       <SubType>Code</SubType>
@@ -100,61 +100,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataType.cs" />
     <Compile Include="Table.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\CompareValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\CustomValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\DirectoryValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\FileValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\IValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\MemberCompareValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\MemberValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\NullPrimaryKeyError.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\PrimaryKeyValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\RangeValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\RegexValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\RequiredValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\StringLenghtValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\TypeValidator.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\ValidationError.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\ValidationEventArgs.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\ValidationEventHandler.cs" />
-    <Compile Include="Validators\ValidationException.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Validators\ValueCompareValidator.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

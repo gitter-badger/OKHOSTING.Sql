@@ -7,7 +7,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 	/// <summary>
 	/// Validate if the primary key of an DataObject is correctly defined
 	/// </summary>
-	public class PrimaryKeyValidator: IValidator
+	public class PrimaryKeyValidator: ValidatorBase
 	{
 		/// <summary>
 		/// Constructs the validator
@@ -22,7 +22,7 @@ namespace OKHOSTING.Sql.ORM.Validators
 		/// <returns>
 		/// Error information if validation fails, otherwise null
 		/// </returns>
-		public ValidationError Validate(object obj)
+		public override ValidationError Validate(object obj)
 		{
 			//Local Vars
 			NullPrimaryKeyError error = null;

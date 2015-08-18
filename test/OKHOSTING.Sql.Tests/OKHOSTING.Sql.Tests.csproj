@@ -34,10 +34,6 @@
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="OKHOSTING.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\src\References\OKHOSTING.Core.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -52,6 +48,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\dbschemareader\DatabaseSchemaReader\DatabaseSchemaReader.csproj">
       <Project>{aa652f8e-0b96-484c-a146-c4183e4a0a25}</Project>
       <Name>DatabaseSchemaReader</Name>

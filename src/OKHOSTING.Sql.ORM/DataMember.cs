@@ -8,11 +8,15 @@ namespace OKHOSTING.Sql.ORM
 {
 	public class DataMember
 	{
-		protected DataMember(DataType type, string member): this(type, member, null)
+		public DataMember()
 		{
 		}
 
-		protected DataMember(DataType type, string member, Schema.Column column)
+		public DataMember(DataType type, string member): this(type, member, null)
+		{
+		}
+
+		public DataMember(DataType type, string member, Schema.Column column)
 		{
 			if (type == null)
 			{
@@ -24,30 +28,12 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentNullException("member");
 			}
 
-			Type = type;
+			DataType = type;
 			Member = member;
 
 			if (column == null)
 			{
-				var finalMember = FinalMemberInfo;
-
-				Column = new Schema.Column()
-				{
-					Table = type.Table,
-					Name = member.Replace('.', '_'),
-					DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
-					IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
-					IsPrimaryKey = IsPrimaryKey(finalMember),
-				};
-
-				Column.IsAutoNumber = Column.IsNumeric && Column.IsPrimaryKey && type.BaseDataType == null;
-
-				if (Column.IsString)
-				{
-					Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
-				}
-
-				Type.Table.Columns.Add(Column);
+				CreateColumn();
 			}
 			else
 			{
@@ -66,36 +52,31 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// The type map that contains this object
 		/// </summary>
-		public readonly DataType Type;
+		public DataType DataType { get; set; }
 		
 		/// <summary>
 		/// The database column where this field will be stored
 		/// </summary>
-		public readonly Schema.Column Column;
+		public Schema.Column Column { get; set; }
 
 		/// <summary>
 		/// String representing the member (property or field) that is being mapped
 		/// </summary>
-		public readonly string Member;
+		public MemberExpression Member { get; set; }
 
-		public Type ReturnType
+		/// <summary>
+		/// Conversions to apply when writing yo or reading from the database
+		/// </summary>
+		public Converters.ConverterBase Converter { get; set; }
+
+		//read only
+
+		public System.Type ReturnType
 		{
 			get
 			{
 				return GetReturnType(FinalMemberInfo);
 			}
-		}
-
-		public readonly List<Validators.IValidator> Validators = new List<Validators.IValidator>();
-
-		/// <summary>
-		/// Conversions to apply when writing yo or reading from the database
-		/// </summary>
-		public Converters.IConverter Converter;
-
-		public override string ToString()
-		{
-			return Member;
 		}
 
 		/// <summary>
@@ -110,7 +91,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				return GetMemberInfos(Type.InnerType, Member);
+				return GetMemberInfos(DataType.InnerType, Member);
 			}
 		}
 
@@ -121,6 +102,8 @@ namespace OKHOSTING.Sql.ORM
 				return MemberInfos.Last();
 			}
 		}
+
+		//methods
 
 		public IEnumerable<object> GetValues(object obj)
 		{
@@ -187,6 +170,34 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			SetValue(obj, value);
+		}
+
+		public void CreateColumn()
+		{
+			var finalMember = FinalMemberInfo;
+
+			Column = new Schema.Column()
+			{
+				Table = DataType.Table,
+				Name = Member.Replace('.', '_'),
+				DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
+				IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
+				IsPrimaryKey = IsPrimaryKey(finalMember),
+			};
+
+			Column.IsAutoNumber = Column.IsNumeric && Column.IsPrimaryKey && DataType.BaseDataType == null;
+
+			if (Column.IsString)
+			{
+				Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
+			}
+
+			DataType.Table.Columns.Add(Column);
+		}
+
+		public override string ToString()
+		{
+			return Member;
 		}
 
 		#region Static

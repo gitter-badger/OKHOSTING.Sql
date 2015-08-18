@@ -11,5 +11,5 @@ namespace OKHOSTING.Sql.ORM.Validators
 	/// <param name="e">
 	/// Information about the event
 	/// </param>
-	public delegate void ValidationEventHandler(IValidator sender, ValidationEventArgs e);
+	public delegate void ValidationEventHandler(ValidatorBase sender, ValidationEventArgs e);
 }
