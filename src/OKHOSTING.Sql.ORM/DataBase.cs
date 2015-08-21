@@ -191,6 +191,22 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		/// <summary>
+		/// Inserts the object if it's not saved (does not have a primary key), otherwise it updates it
+		/// </summary>
+		/// <returns>Number of database rows affected by the operation</returns>
+		public int Save<T>(T instance)
+		{
+			if (IsSaved(instance))
+			{
+				return Update(instance);
+			}
+			else
+			{
+				return Insert(instance);
+			}
+		}
+
+		/// <summary>
 		/// Returns a value indicating if the specified DataObject exists on the DataBase (based on its primary key)
 		/// </summary>
 		/// <param name="dobj">
