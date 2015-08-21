@@ -57,8 +57,14 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>True if the current DataObject was found in the DataBase, false otherwise</returns>
 		public bool Select()
 		{
-			return DataBase.Default.Select<PersistentClass<TKey>>(this);
+			return DataBase.Default.Select(this);
 		}
+
+		public bool IsSaved()
+		{
+			return DataBase.Default.IsSaved(this);
+		}
+
 
 		/// <summary>
 		/// Loads a list of related objects and populates the collection

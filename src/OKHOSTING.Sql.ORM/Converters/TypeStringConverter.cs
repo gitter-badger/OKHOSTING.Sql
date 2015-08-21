@@ -17,5 +17,15 @@ namespace OKHOSTING.Sql.ORM.Converters
 		{
 			return Type.GetType(columnValue);
 		}
+
+		public override object MemberToColumn(object memberValue)
+		{
+			return MemberToColumn((string)memberValue);
+		}
+
+		public override object ColumnToMember(object columnValue)
+		{
+			return ColumnToMember((string)columnValue);
+		}
 	}
 }

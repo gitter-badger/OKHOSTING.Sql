@@ -49,7 +49,11 @@ namespace OKHOSTING.Sql.MySql
 			finally
 			{
 				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed) reader.Close();
+				if (reader != null && !reader.IsClosed)
+				{
+					reader.Close();
+					reader.Dispose();
+				}
 			}
 
 			//Returning the Date and time
@@ -91,41 +95,39 @@ namespace OKHOSTING.Sql.MySql
 		public override bool ExistsConstraint(string name)
 		{
 			//Local vars
-			bool existsIndex = false;
-			string Table, Constraint;
+			bool exists = false;
+			string table, constraint;
 			DbDataReader reader = null;
 
 			//Validating if the name is correctly specified
 			if (name.IndexOf(".") == -1)
 			{
-				throw new ArgumentException(
-					"For MySql constraints, the constraint name must be completly qualified with the syntax Table.Constraint",
-					"Name");
+				throw new ArgumentException("For MySql constraints, the constraint name must be completly qualified with the syntax Table.Constraint", "Name");
 			}
 
 			//Desglosando el nombre del índice en tabla e indice
-			Table = name.Substring(0, name.IndexOf("."));
-			Constraint = name.Substring(name.IndexOf(".") + 1);
+			table = name.Substring(0, name.IndexOf("."));
+			constraint = name.Substring(name.IndexOf(".") + 1);
 
 			try
 			{
 				//Creating the reader and searching for the index
-				reader = this.GetDataReader("show keys from `" + Table + "` where key_Name = '" + Constraint + "'");
-
-				existsIndex = (reader.Read());
+				reader = this.GetDataReader(string.Format("SELECT `constraint_name` FROM `information_schema`.`key_column_usage` WHERE `referenced_table_name` IS NOT NULL AND `table_name`='{0}' AND `constraint_name` = '{1}'", table, constraint));
+				exists = reader.Read();
 			}
 			catch
 			{
-				throw;
+				exists = false;
 			}
-			finally
+			//Closing the reader if apply
+			if (reader != null && !reader.IsClosed)
 			{
-				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed) reader.Close();
+				reader.Close();
+				reader.Dispose();
 			}
 
 			//Setting the return value
-			return existsIndex;
+			return exists;
 		}
 
 		/// <summary>
@@ -160,7 +162,11 @@ namespace OKHOSTING.Sql.MySql
 			finally
 			{
 				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed) reader.Close();
+				if (reader != null && !reader.IsClosed)
+				{
+					reader.Close();
+					reader.Dispose();
+				}
 			}
 
 			//Setting the return value
@@ -177,9 +183,43 @@ namespace OKHOSTING.Sql.MySql
 		/// Boolean value that indicates if exists 
 		/// the specified index on the Database
 		/// </returns>
-		public override bool ExistsIndex(string Name)
+		public override bool ExistsIndex(string name)
 		{
-			throw new NotSupportedException("MySqlExecuter is not compatible with the method BaseExecuter.IndexExists()");
+			//Local vars
+			bool exists = false;
+			string table, index;
+			DbDataReader reader = null;
+
+			//Validating if the name is correctly specified
+			if (name.IndexOf(".") == -1)
+			{
+				throw new ArgumentException("For MySql indexes, the index name must be completly qualified with the syntax Table.Index","Name");
+			}
+
+			//Desglosando el nombre del índice en tabla e indice
+			table = name.Substring(0, name.IndexOf("."));
+			index = name.Substring(name.IndexOf(".") + 1);
+
+			try
+			{
+				//Creating the reader and searching for the index
+				reader = this.GetDataReader(string.Format("SHOW KEYS FROM `{0}` WHERE key_Name = '{1}'", table, index));
+				exists = reader.Read();
+			}
+			catch
+			{
+				exists = false;
+				//throw;
+			}
+			//Closing the reader if apply
+			if (reader != null && !reader.IsClosed)
+			{
+				reader.Close();
+				reader.Dispose();
+			}
+
+			//Setting the return value
+			return exists;
 		}
 
 		private static Dictionary<DbType, MySqlDbType> DbTypeMap;

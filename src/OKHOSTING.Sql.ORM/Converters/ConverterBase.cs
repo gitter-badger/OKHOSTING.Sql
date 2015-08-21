@@ -25,15 +25,5 @@ namespace OKHOSTING.Sql.ORM.Converters
 	{
 		public abstract TColumn MemberToColumn(TType memberValue);
 		public abstract TType ColumnToMember(TColumn columnValue);
-
-		public override object MemberToColumn(object memberValue)
-		{
-			return MemberToColumn((TType) memberValue);
-		}
-
-		public override object ColumnToMember(object columnValue)
-		{
-			return ColumnToMember((TColumn) columnValue);
-		}
 	}
 }

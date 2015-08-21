@@ -1,4 +1,5 @@
-﻿using OKHOSTING.Sql.ORM.Filters;
+﻿using OKHOSTING.Core.Data.Validation;
+using OKHOSTING.Sql.ORM.Filters;
 using OKHOSTING.Sql.ORM.Operations;
 using OKHOSTING.Sql.Schema;
 using System;
@@ -28,45 +29,45 @@ namespace OKHOSTING.Sql.ORM
 		
 		public SqlGeneratorBase SqlGenerator { get; set; }
 
-		public Table<TKey, TType> Table<TKey, TType>()
+		public Table<TKey, T> Table<TKey, T>()
 		{
-			Table<TKey, TType> table = null;
+			Table<TKey, T> table = null;
 
-			if (Tables.ContainsKey(typeof(TType)))
+			if (Tables.ContainsKey(typeof(T)))
 			{
-				table = (Table<TKey, TType>) Tables[typeof(TType)];
+				table = (Table<TKey, T>) Tables[typeof(T)];
 			}
 			else
 			{
-				table = new Table<TKey, TType>();
+				table = new Table<TKey, T>();
 				table.DataBase = this;
-				Tables.Add(typeof(TType), table);
+				Tables.Add(typeof(T), table);
 			}
 
 			return table;
 		}
 
-		public MultipleKeyTable<TType> MultipleKeyTable<TType>()
+		public MultipleKeyTable<T> MultipleKeyTable<T>()
 		{
-			MultipleKeyTable<TType> table = null;
+			MultipleKeyTable<T> table = null;
 
-			if (Tables.ContainsKey(typeof(TType)))
+			if (Tables.ContainsKey(typeof(T)))
 			{
-				table = (MultipleKeyTable<TType>) Tables[typeof(TType)];
+				table = (MultipleKeyTable<T>) Tables[typeof(T)];
 			}
 			else
 			{
-				table = new MultipleKeyTable<TType>();
+				table = new MultipleKeyTable<T>();
 				table.DataBase = this;
-				Tables.Add(typeof(TType), table);
+				Tables.Add(typeof(T), table);
 			}
 
 			return table;
 		}
 
-		IDictionary<TKey, TType> IOrmDataBase.Table<TKey, TType>() 
+		IDictionary<TKey, T> IOrmDataBase.Table<TKey, T>() 
 		{
-			return this.Table<TKey, TType>();
+			return this.Table<TKey, T>();
 		}
 
 		#endregion
@@ -140,7 +141,7 @@ namespace OKHOSTING.Sql.ORM
 
 				foreach (var member in select.Members)
 				{
-					subSelect.AddMember(member.Member);
+					subSelect.AddMember(member.DataMember);
 				}
 
 				//append all selects into a single command for beter performance
@@ -171,6 +172,24 @@ namespace OKHOSTING.Sql.ORM
 
 		#region Instance & generic operations
 
+		public bool IsSaved<T>(T instance)
+		{
+			DataType dtype = instance.GetType();
+			
+			//see if all primery key members has values
+			foreach (var pk in dtype.PrimaryKey)
+			{
+				var value = pk.Member.GetValue(instance);
+
+				if (!RequiredValidator.HasValue(value) || (Core.Extensions.TypeExtensions.IsNumeric(pk.Member.ReturnType) && Convert.ToInt64(value) == 0))
+				{
+					return false;
+				}
+			}
+
+			return true;
+		}
+
 		/// <summary>
 		/// Returns a value indicating if the specified DataObject exists on the DataBase (based on its primary key)
 		/// </summary>
@@ -180,7 +199,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// True if the DataObject exists, False otherwise
 		/// </returns>
-		public bool Exist<TType>(TType instance)
+		public bool Exist<T>(T instance)
 		{
 			DataType dtype = instance.GetType();
 
@@ -213,9 +232,9 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// True if the DataObject exists as the specified DataType, False otherwise
 		/// </returns>
-		public bool Exist<TType>(DataType dtype, TType instance)
+		public bool Exist<T>(DataType dtype, T instance)
 		{
-			Select<TType> select = new Select<TType>();
+			Select<T> select = new Select<T>();
 
 			select.AddMembers(dtype.PrimaryKey.ToArray());
 			select.Where.Add(GetPrimaryKeyFilter(dtype, instance));
@@ -223,7 +242,75 @@ namespace OKHOSTING.Sql.ORM
 			return NativeDataBase.ExistsData(SqlGenerator.Select(Parse(select)));
 		}
 
-		public int Insert<TType>(TType instance)
+		public int InsertAll<T>(T instance)
+		{
+			DataType dtype = instance.GetType();
+			int result = 0;
+			
+			//look for unsaved foreign keys to insert
+			foreach (var parent in dtype.GetBaseDataTypes())
+			{
+				foreach (var member in DataType.GetMapableMembers(parent.InnerType))
+				{
+					var returnType = MemberExpression.GetReturnType(member);
+
+					//found a foreign key, see if it has a primary key with values, if it does not, we will insert it
+					if (DataType.IsMapped(returnType))
+					{
+						var fkInstance = MemberExpression.GetValue(member, instance);
+
+						//if not saved, insert recursively
+						if (fkInstance != null && !IsSaved(fkInstance))
+						{
+							result += InsertAll(fkInstance);
+						}
+					}
+				}
+			}
+
+			//insert the instance itself, if it has not been saved yet
+			if (!IsSaved(instance))
+			{
+				result += Insert(instance);
+			}
+
+			//look for unsaved collections
+			foreach (var member in DataType.GetMapableMembers(dtype.InnerType))
+			{
+				var returnType = MemberExpression.GetReturnType(member);
+
+				//this is a collection of items
+				if (OKHOSTING.Core.Extensions.TypeExtensions.IsCollection(returnType))
+				{
+					var collection = (System.Collections.IEnumerable)MemberExpression.GetValue(member, instance);
+
+					if (collection == null)
+					{
+						continue;
+					}
+
+					//is this a collection of persistent items?
+					foreach (var item in collection)
+					{
+						if (!DataType.IsMapped(item.GetType()))
+						{
+							//this is not a collection of persisten items
+							break;
+						}
+
+						//insert collection item recursively
+						if (!IsSaved(item))
+						{
+							InsertAll(item);
+						}
+					}
+				}
+			}
+
+			return result;
+		}
+
+		public int Insert<T>(T instance)
 		{
 			DataType dtype = instance.GetType();
 			int result = 0;
@@ -237,7 +324,12 @@ namespace OKHOSTING.Sql.ORM
 
 				foreach (DataMember dmember in parent.Members)
 				{
-					insert.Values.Add(new MemberValue(dmember, instance));
+					var value = dmember.Member.GetValue(instance);
+
+					if (RequiredValidator.HasValue(value))
+					{
+						insert.Values.Add(new MemberValue(dmember, instance));
+					}
 				}
 
 				result += Insert(insert);
@@ -247,7 +339,7 @@ namespace OKHOSTING.Sql.ORM
 
 				if (parent.BaseDataType == null && autoIncrementMember != null)
 				{
-					object autoincrement = Convert.ChangeType(NativeDataBase.GetScalar(SqlGenerator.LastAutogeneratedId(parent.Table)), autoIncrementMember.ReturnType);
+					object autoincrement = Convert.ChangeType(NativeDataBase.GetScalar(SqlGenerator.LastAutogeneratedId(parent.Table)), autoIncrementMember.Member.ReturnType);
 					autoIncrementMember.SetValueFromColumn(instance, autoincrement);
 				}
 			}
@@ -255,7 +347,7 @@ namespace OKHOSTING.Sql.ORM
 			return result;
 		}
 
-		public int Update<TType>(TType instance)
+		public int Update<T>(T instance)
 		{
 			DataType dtype = instance.GetType();
 			int result = 0;
@@ -281,7 +373,7 @@ namespace OKHOSTING.Sql.ORM
 			return result;
 		}
 
-		public int Delete<TType>(TType instance)
+		public int Delete<T>(T instance)
 		{
 			DataType dtype = instance.GetType();
 			int result = 0;
@@ -299,10 +391,10 @@ namespace OKHOSTING.Sql.ORM
 			return result;
 		}
 
-		public bool Select<TType>(TType instance)
+		public bool Select<T>(T instance)
 		{
 			DataType dtype = instance.GetType();
-			Select<TType> select = new Select<TType>();
+			Select<T> select = new Select<T>();
 			select.AddMembers(dtype.AllMembers);
 
 			select.Where.Add(GetPrimaryKeyFilter(dtype, instance));
@@ -323,20 +415,20 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public IEnumerable<TType> Select<TType>(Select<TType> select)
+		public IEnumerable<T> Select<T>(Select<T> select)
 		{
 			foreach (object result in Select((Select) select))
 			{
-				yield return (TType) result;
+				yield return (T) result;
 			}
 		}
 
 		/// <summary>
 		/// Returns all objects in a table
 		/// </summary>
-		public IEnumerable<TType> Select<TType>()
+		public IEnumerable<T> Select<T>()
 		{
-			Select<TType> select = new Select<TType>();
+			Select<T> select = new Select<T>();
 			select.AddMembers(select.From.AllMembers);
 
 			return Select(select);
@@ -345,33 +437,37 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Returns a list of objects filtered by one of the members
 		/// </summary>
-		/// <typeparam name="TType"></typeparam>
+		/// <typeparam name="T"></typeparam>
 		/// <param name="member">DataMember that will be evaluated for filtering</param>
 		/// <param name="value">Value that the DataMember must match</param>
 		/// <returns>List of filtered objects</returns>
-		public IEnumerable<TType> Select<TType>(DataMember<TType> member, IComparable value)
+		public IEnumerable<T> Select<T>(DataMember<T> member, IComparable value)
 		{
-			Select<TType> select = new Select<TType>();
+			Select<T> select = new Select<T>();
 			select.AddMembers(select.From.AllMembers);
 			select.Where.Add(new ValueCompareFilter(member, value));
 
 			return Select(select);
 		}
 
-		public IEnumerable<TType> SearchInherited<TType>(Select<TType> select)
+		public IEnumerable<T> SearchInherited<T>(Select<T> select)
 		{
 			foreach (object item in SearchInherited((Select) select))
 			{
-				yield return (TType) item;
+				yield return (T) item;
 			}
 		}
 
-		public IEnumerable<TType> SearchInherited<TType>(TType instance)
+		public IEnumerable<T> SearchInherited<T>(T instance)
 		{
-			Select<TType> select = new Select<TType>();
+			Select select = new Select();
+			select.From = instance.GetType();
 			select.Where.Add(GetPrimaryKeyFilter(select.From, instance)); //Creating Primary Key filter
 
-			return SearchInherited(select);
+			foreach (var item in SearchInherited(select))
+			{
+				yield return (T) item;
+			}
 		}
 
 		/// <summary>
@@ -379,11 +475,11 @@ namespace OKHOSTING.Sql.ORM
 		/// </summary>
 		/// <param name="memberName">Name of the collection member</param>
 		/// <returns>Number of loaded objects</returns>
-		public int LoadCollection<TType>(TType instance, System.Linq.Expressions.Expression<Func<TType, object>> memberExpression)
+		public int LoadCollection<T>(T instance, System.Linq.Expressions.Expression<Func<T, object>> memberExpression)
 		{
-			string memberString = DataMember<TType>.GetMemberString(memberExpression);
+			string memberString = MemberExpression<T>.GetMemberString(memberExpression);
 			System.Reflection.MemberInfo memberInfo = instance.GetType().GetMember(memberString).Single();
-			System.Type memberReturnType = DataMember.GetReturnType(memberInfo);
+			System.Type memberReturnType = MemberExpression.GetReturnType(memberInfo);
 
 			DataType collectionDataType = null;
 
@@ -398,7 +494,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			//get the foreign key member
-			var fk = collectionDataType.InnerType.GetMembers().Where(m => (m is System.Reflection.FieldInfo || m is System.Reflection.PropertyInfo) && DataMember.GetReturnType(m) == memberInfo.DeclaringType);
+			var fk = collectionDataType.InnerType.GetMembers().Where(m => (m is System.Reflection.FieldInfo || m is System.Reflection.PropertyInfo) && MemberExpression.GetReturnType(m) == memberInfo.DeclaringType);
 
 			//this method is valid only if there is only 1 foreign key in the nested datatype, so we can determine the relationship correctly
 			if (fk.Count() != 1)
@@ -414,7 +510,7 @@ namespace OKHOSTING.Sql.ORM
 			DataType dtype = instance.GetType();
 			foreach (var pk in dtype.PrimaryKey)
 			{
-				select.Where.Add(new Sql.ORM.Filters.ValueCompareFilter(collectionDataType[fk.First().Name + "." + pk.Member], (IComparable) pk.GetValue(instance)));
+				select.Where.Add(new Sql.ORM.Filters.ValueCompareFilter(collectionDataType[fk.First().Name + "." + pk.Member], (IComparable) pk.Member.GetValue(instance)));
 			}
 
 			//get list of objects
@@ -423,18 +519,18 @@ namespace OKHOSTING.Sql.ORM
 			//if the list is an array, try to "set"
 			if (memberReturnType.IsArray)
 			{
-				DataMember.SetValue(memberInfo, this, result.ToArray());
+				MemberExpression.SetValue(memberInfo, this, result.ToArray());
 			}
 			else
 			{
 				//if the list is not an array, we asume it's a List and just add the results
-				System.Collections.IList currentList = (System.Collections.IList) DataMember.GetValue(memberInfo, instance);
+				System.Collections.IList currentList = (System.Collections.IList) MemberExpression.GetValue(memberInfo, instance);
 
 				//if list is null, initialize
 				if (currentList == null)
 				{
 					currentList = (System.Collections.IList) Activator.CreateInstance(memberReturnType);
-					DataMember.SetValue(memberInfo, instance, currentList);
+					MemberExpression.SetValue(memberInfo, instance, currentList);
 				}
 
 				//add objects
@@ -448,27 +544,18 @@ namespace OKHOSTING.Sql.ORM
 			return result.Count;
 		}
 
-		public void Validate<TType>(TType obj)
+		public IEnumerable<ValidationError> Validate<T>(T obj)
 		{
 			DataType dtype = obj.GetType();
-			List<Validators.ValidationError> errors = new List<Validators.ValidationError>();
 
-			foreach (var dmember in dtype.Members)
+			foreach (var validator in dtype.Validators)
 			{
-				foreach (var validator in dmember.Validators)
+				var error = validator.Validate(obj);
+
+				if (error != null)
 				{
-					var error = validator.Validate(obj);
-
-					if (error != null)
-					{
-						errors.Add(error);
-					}
+					yield return error;
 				}
-			}
-
-			if (errors.Count > 0)
-			{
-				throw new Validators.ValidationException(errors, obj);
 			}
 		}
 
@@ -510,11 +597,15 @@ namespace OKHOSTING.Sql.ORM
 			}
 		}
 
-		public void Create<TType>()
+		public void Create<T>()
 		{
-			Create(typeof(TType));
+			Create(typeof(T));
 		}
 
+		/// <summary>
+		/// Drop all tables mapped to a list of DataTypes
+		/// </summary>
+		/// <param name="dtypes">List of DataTypes which tables will be dropped</param>
 		public void Drop(IEnumerable<DataType> dtypes)
 		{
 			//drop all foreign keys first to avoid dependency errors
@@ -522,12 +613,20 @@ namespace OKHOSTING.Sql.ORM
 			{
 				foreach (var fk in dt.Table.ForeignKeys)
 				{
-					Command sql = SqlGenerator.Drop(fk);
-					NativeDataBase.Execute(sql);
+					if (NativeDataBase.ExistsConstraint(fk.FullName))
+					{
+						Command sql = SqlGenerator.Drop(fk);
+
+						try
+						{
+							NativeDataBase.Execute(sql);
+						}
+						catch { }
+					}
 				}
 			}
 
-			//create all tables and indexes next
+			//now we delete all tables
 			foreach (DataType dt in dtypes)
 			{
 				Drop(dt);
@@ -538,19 +637,25 @@ namespace OKHOSTING.Sql.ORM
 		{
 			Command sql;
 
-			foreach (Sql.Schema.Index index in dtype.Table.Indexes)
+			//foreach (Sql.Schema.Index index in dtype.Table.Indexes)
+			//{
+			//	if (NativeDataBase.ExistsIndex(index.FullName))
+			//	{
+			//		sql = SqlGenerator.Drop(index);
+			//		NativeDataBase.Execute(sql);
+			//	}
+			//}
+
+			if (NativeDataBase.ExistsTable(dtype.Table.Name))
 			{
-				sql = SqlGenerator.Drop(index);
+				sql = SqlGenerator.Drop(dtype.Table);
 				NativeDataBase.Execute(sql);
 			}
-
-			sql = SqlGenerator.Drop(dtype.Table);
-			NativeDataBase.Execute(sql);
 		}
 
-		public void Drop<TType>()
+		public void Drop<T>()
 		{
-			Drop(typeof(TType));
+			Drop(typeof(T));
 		}
 
 		#endregion
@@ -814,7 +919,7 @@ namespace OKHOSTING.Sql.ORM
 
 		protected Sql.Operations.SelectAggregateColumn Parse(SelectAggregateMember aggregateMember)
 		{
-			return new Sql.Operations.SelectAggregateColumn(aggregateMember.Member.Column, aggregateMember.AggregateFunction, aggregateMember.Alias, aggregateMember.Distinct);
+			return new Sql.Operations.SelectAggregateColumn(aggregateMember.DataMember.Column, aggregateMember.AggregateFunction, aggregateMember.Alias, aggregateMember.Distinct);
 		}
 
 		protected Sql.Operations.OrderBy Parse(OrderBy orderBy)
@@ -859,7 +964,7 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (SelectMember selectMember in join.Members)
 			{
-				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.Member.Column, selectMember.Alias));
+				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.DataMember.Column, selectMember.Alias));
 			}
 
 			foreach (Filters.FilterBase filter in join.On)
@@ -892,7 +997,7 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (SelectMember selectMember in select.Members)
 			{
-				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.Member.Column, selectMember.Alias));
+				native.Columns.Add(new Sql.Operations.SelectColumn(selectMember.DataMember.Column, selectMember.Alias));
 			}
 
 			foreach (SelectJoin join in select.Joins)
@@ -922,7 +1027,7 @@ namespace OKHOSTING.Sql.ORM
 		/// </summary>
 		public static DataBase Default { get; set; }
 
-		protected Filters.FilterBase GetPrimaryKeyFilter<TType>(DataType dtype, TType instance)
+		protected Filters.FilterBase GetPrimaryKeyFilter<T>(DataType dtype, T instance)
 		{
 			Filters.AndFilter filter = new Filters.AndFilter();
 			var primaryKeys = dtype.PrimaryKey.ToList();
@@ -932,7 +1037,7 @@ namespace OKHOSTING.Sql.ORM
 				filter.InnerFilters.Add(new Filters.ValueCompareFilter()
 				{
 					Member = primaryKeys[i],
-					ValueToCompare = (IComparable)primaryKeys[i].GetValue(instance),
+					ValueToCompare = (IComparable)primaryKeys[i].Member.GetValue(instance),
 					Operator = Core.Data.CompareOperator.Equal,
 				});
 			}
@@ -944,13 +1049,13 @@ namespace OKHOSTING.Sql.ORM
 		{
 			foreach (SelectMember member in select.Members)
 			{
-				if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
+				if (!MemberExpression.IsReadOnly(member.DataMember.Member.FinalMemberInfo))
 				{
-					object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
+					object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.DataMember.Column.Name] : dataReader[member.Alias];
 
 					if (value != null && value != DBNull.Value)
 					{
-						member.Member.SetValueFromColumn(instance, value);
+						member.DataMember.SetValueFromColumn(instance, value);
 					}
 				}
 			}
@@ -959,19 +1064,19 @@ namespace OKHOSTING.Sql.ORM
 			{
 				foreach (SelectMember member in join.Members)
 				{
-					if (!DataMember.IsReadOnly(member.Member.FinalMemberInfo))
+					if (!MemberExpression.IsReadOnly(member.DataMember.Member.FinalMemberInfo))
 					{
 						string expression = member.Alias.Replace('_', '.');
-						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.Member.Column.Name] : dataReader[member.Alias];
+						object value = string.IsNullOrWhiteSpace(member.Alias) ? dataReader[member.DataMember.Column.Name] : dataReader[member.Alias];
 
-						if (member.Member.Converter != null)
+						if (member.DataMember.Converter != null)
 						{
-							value = member.Member.Converter.ColumnToMember(value);
+							value = member.DataMember.Converter.ColumnToMember(value);
 						}
 
 						if (value != null && value != DBNull.Value)
 						{
-							DataMember.SetValue(expression, instance, value);
+							MemberExpression.SetValue(expression, instance, value);
 						}
 					}
 				}

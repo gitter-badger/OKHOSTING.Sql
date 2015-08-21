@@ -33,7 +33,7 @@ namespace OKHOSTING.Sql.ORM
 			
 			foreach (TType instance in DataBase.Select(select))
 			{
-				TKey key = (TKey) Convert.ChangeType(pkMember.GetValue(instance), pkMember.ReturnType);
+				TKey key = (TKey) Convert.ChangeType(pkMember.Member.GetValue(instance), pkMember.Member.ReturnType);
 				yield return new KeyValuePair<TKey, TType>(key, instance);
 			}
 		}
@@ -59,7 +59,7 @@ namespace OKHOSTING.Sql.ORM
 
 				foreach(TType instance in DataBase.Select(select))
 				{
-					keys.Add((TKey) pk.GetValue(instance));
+					keys.Add((TKey) pk.Member.GetValue(instance));
 				}
 
 				return keys;
@@ -76,7 +76,7 @@ namespace OKHOSTING.Sql.ORM
 			get
 			{
 				TType instance = Activator.CreateInstance<TType>();
-				DataType.PrimaryKey.First().SetValue(instance, key);
+				DataType.PrimaryKey.First().Member.SetValue(instance, key);
 
 				if (DataBase.Select(instance))
 				{

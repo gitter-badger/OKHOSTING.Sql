@@ -28,7 +28,7 @@ namespace OKHOSTING.Sql.ORM
 					
 					for (int i = 0; i < primaryKeys.Count; i++)
 					{
-						k[i] = Convert.ChangeType(primaryKeys[i].GetValue(instance), primaryKeys[i].ReturnType);
+						k[i] = Convert.ChangeType(primaryKeys[i].Member.GetValue(instance), primaryKeys[i].Member.ReturnType);
 					}
 					
 					keys.Add(k);
@@ -49,7 +49,7 @@ namespace OKHOSTING.Sql.ORM
 
 				for (int i = 0; i < primaryKeys.Count; i++)
 				{
-					key[i] = Convert.ChangeType(primaryKeys[i].GetValue(instance), primaryKeys[i].ReturnType);
+					key[i] = Convert.ChangeType(primaryKeys[i].Member.GetValue(instance), primaryKeys[i].Member.ReturnType);
 				}
 
 				yield return new KeyValuePair<object[], TType>(key, instance);

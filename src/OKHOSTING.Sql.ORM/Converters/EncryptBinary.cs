@@ -29,5 +29,15 @@ namespace OKHOSTING.Sql.ORM.Converters
 		{
 			return OKHOSTING.Core.Cryptography.SimpleEncryption.Decrypt(columnValue, Password);
 		}
+
+		public override object MemberToColumn(object memberValue)
+		{
+			return MemberToColumn((byte[]) memberValue);
+		}
+
+		public override object ColumnToMember(object columnValue)
+		{
+			return ColumnToMember((byte[]) columnValue);
+		}
 	}
 }

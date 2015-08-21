@@ -19,6 +19,21 @@ namespace OKHOSTING.Sql.Schema
 		/// </summary>
 		public string Name { get; set; }
 
+		public string FullName
+		{
+			get
+			{
+				if (Table != null)
+				{
+					return Table.Name + "." + Name;
+				}
+				else
+				{
+					return Name;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Table where this foreign key is defined
 		/// </summary>

@@ -53,12 +53,14 @@
   <ItemGroup>
     <Compile Include="Converters\ConverterBase.cs" />
     <Compile Include="Converters\EncryptBinary.cs" />
+    <Compile Include="Converters\Json.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Converters\TypeStringConverter.cs" />
     <Compile Include="Converters\Uppercase.cs" />
     <Compile Include="Converters\Lowercase.cs" />
     <Compile Include="Converters\Trim.cs" />
     <Compile Include="Converters\EncryptString.cs" />
-    <Compile Include="Converters\Json.cs" />
     <Compile Include="DataBase.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -20,7 +20,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		/// <summary>
 		/// DataMember for build the field definition
 		/// </summary>
-		public DataMember Member { get; set; }
+		public DataMember DataMember { get; set; }
 
 		/// <summary>
 		/// Constructs the AggegateSelectField
@@ -48,13 +48,13 @@ namespace OKHOSTING.Sql.ORM.Operations
 				throw new ArgumentNullException("member");
 			}
 
-			Member = member;
+			DataMember = member;
 			Alias = alias;
 		}
 
 		public override string ToString()
 		{
-			return string.IsNullOrWhiteSpace(Alias)? Member.ToString() : Alias;
+			return string.IsNullOrWhiteSpace(Alias)? DataMember.ToString() : Alias;
 		}
 
 		public static implicit operator SelectMember(DataMember member)

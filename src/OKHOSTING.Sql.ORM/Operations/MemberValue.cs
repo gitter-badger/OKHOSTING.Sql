@@ -19,7 +19,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 		{
 			get
 			{
-				return DataMember.GetValue(Instance);
+				return DataMember.Member.GetValue(Instance);
 			}
 		}
 

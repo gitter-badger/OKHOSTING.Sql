@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OKHOSTING.Core.Data.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 				DataMember dmember = From[memberExpression];
 
 				//this is a native member of this dataType
-				SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
+				SelectMember sm = new SelectMember(dmember, dmember.Member.Expression.Replace('.', '_'));
 				Members.Add(sm);
 
 				//finish iteration here
@@ -74,7 +75,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 				}
 
 				//this is a native member of this dataType
-				SelectMember sm = new SelectMember(dmember, dmember.Member.Replace('.', '_'));
+				SelectMember sm = new SelectMember(dmember, dmember.Member.Expression.Replace('.', '_'));
 				join.Members.Add(sm);
 
 				//finish iteration here
@@ -83,7 +84,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 
 			//if the expression was not found as a single datamember, split it in nested members
-			List<System.Reflection.MemberInfo> nestedMemberInfos = DataMember.GetMemberInfos(From.InnerType, memberExpression).ToList();
+			List<System.Reflection.MemberInfo> nestedMemberInfos = MemberExpression.GetMemberInfos(From.InnerType, memberExpression).ToList();
 
 			//check every part of the expression
 			for (int i = 0; i < nestedMemberInfos.Count; i++)
@@ -103,17 +104,17 @@ namespace OKHOSTING.Sql.ORM.Operations
 				//if this is a dataMember from a base type, create join for that relationship
 				foreach (DataType parent in From.GetBaseDataTypes())
 				{
-					DataType referencingDataType = isTheFirstOne ? parent : DataMember.GetReturnType(nestedMemberInfos[i - 1]);
+					DataType referencingDataType = isTheFirstOne ? parent : MemberExpression.GetReturnType(nestedMemberInfos[i - 1]);
 
 					//this is not a native or inherited DataMember, so we must detect the nested members and create the respective joins
-					if (!isTheLastOne && DataType.IsMapped(DataMember.GetReturnType(memberInfo)))
+					if (!isTheLastOne && DataType.IsMapped(MemberExpression.GetReturnType(memberInfo)))
 					{
-						DataType foreignDataType = DataMember.GetReturnType(memberInfo);
+						DataType foreignDataType = MemberExpression.GetReturnType(memberInfo);
 						bool foreignKeyIsMapped = true;
 
 						foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 						{
-							DataMember localKey = referencingDataType.Members.Where(m => m.Member == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
+							DataMember localKey = referencingDataType.Members.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
 
 							if (localKey == null)
 							{
@@ -150,7 +151,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 								foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 								{
-									DataMember localKey = referencingDataType.Members.Where(m => m.Member == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
+									DataMember localKey = referencingDataType.Members.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
 
 									var filter = new Filters.MemberCompareFilter()
 									{
@@ -184,7 +185,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 		public void AddMember(DataMember dataMember)
 		{
-			AddMember(dataMember.Member);
+			AddMember(dataMember.Member.Expression);
 		}
 
 		public void AddMembers(IEnumerable<string> memberExpressions)
@@ -211,7 +212,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 			foreach (var dm in dataMembers)
 			{
-				string dataMemberString = dm.Member;
+				string dataMemberString = dm.Member.Expression;
 				stringExpressions.Add(dataMemberString);
 			}
 
@@ -232,7 +233,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 			foreach (var expression in memberExpressions)
 			{
-				string dataMemberString = DataMember<T>.GetMemberString(expression);
+				string dataMemberString = MemberExpression<T>.GetMemberString(expression);
 				stringExpressions.Add(dataMemberString);
 			}
 

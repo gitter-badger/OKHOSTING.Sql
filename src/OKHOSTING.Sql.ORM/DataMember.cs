@@ -1,7 +1,7 @@
-﻿using System;
+﻿using OKHOSTING.Core.Data.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 
 namespace OKHOSTING.Sql.ORM
@@ -29,7 +29,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			DataType = type;
-			Member = member;
+			Member = new MemberExpression(type.InnerType, member);
 
 			if (column == null)
 			{
@@ -44,9 +44,6 @@ namespace OKHOSTING.Sql.ORM
 
 				Column = column;
 			}
-
-			//validate member expression
-			var x = MemberInfos.ToList();
 		}
 
 		/// <summary>
@@ -69,90 +66,9 @@ namespace OKHOSTING.Sql.ORM
 		/// </summary>
 		public Converters.ConverterBase Converter { get; set; }
 
-		//read only
-
-		public System.Type ReturnType
-		{
-			get
-			{
-				return GetReturnType(FinalMemberInfo);
-			}
-		}
-
-		/// <summary>
-		/// Returns a list of members represented in the member string
-		/// </summary>
-		/// <param name="memberPath"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// http://www.java2s.com/Code/CSharp/Reflection/GetPropertyfromPropertypath.htm
-		/// </remarks>
-		public IEnumerable<MemberInfo> MemberInfos
-		{
-			get
-			{
-				return GetMemberInfos(DataType.InnerType, Member);
-			}
-		}
-
-		public MemberInfo FinalMemberInfo
-		{
-			get
-			{
-				return MemberInfos.Last();
-			}
-		}
-
-		//methods
-
-		public IEnumerable<object> GetValues(object obj)
-		{
-			object result = obj;
-
-			foreach (MemberInfo memberInfo in MemberInfos)
-			{
-				if (result != null)
-				{
-					result = GetValue(memberInfo, result);
-				}
-
-				yield return result;
-			}
-		}
-
-		public object GetValue(object obj)
-		{
-			return GetValues(obj).Last();
-		}
-
-		public void SetValue(object obj, object value)
-		{
-			var allMembers = MemberInfos.ToList();
-			var allValues = GetValues(obj).ToList();
-
-			//ensure all nested members are not null, except the lastone, that can be null
-			for(int i= 0; i < allValues.Count - 1; i++)
-			{
-				object val = allValues[i];
-				MemberInfo member = allMembers[i];
-				
-				if (val == null)
-				{
-					object container = (i == 0)? obj : allValues[i -1];
-					object newValue = Activator.CreateInstance(GetReturnType(member));
-					allValues[i] = newValue;
-
-					SetValue(member, container, newValue);
-				}
-			}
-
-			object finalContainer = (allValues.Count > 1) ? allValues[allValues.Count - 2] : obj;
-			SetValue(FinalMemberInfo, finalContainer, value);
-		}
-
 		public object GetValueForColumn(object obj)
 		{
-			object value = GetValue(obj);
+			object value = Member.GetValue(obj);
 
 			if (Converter != null)
 			{
@@ -169,19 +85,19 @@ namespace OKHOSTING.Sql.ORM
 				value = Converter.ColumnToMember(value);
 			}
 
-			SetValue(obj, value);
+			Member.SetValue(obj, value);
 		}
 
 		public void CreateColumn()
 		{
-			var finalMember = FinalMemberInfo;
+			var finalMember = Member.FinalMemberInfo;
 
 			Column = new Schema.Column()
 			{
 				Table = DataType.Table,
-				Name = Member.Replace('.', '_'),
-				DbType = Sql.DataBase.Parse(GetReturnType(finalMember)),
-				IsNullable = !ORM.Validators.RequiredValidator.IsRequired(finalMember),
+				Name = Member.Expression.Replace('.', '_'),
+				DbType = Sql.DataBase.Parse(MemberExpression.GetReturnType(finalMember)),
+				IsNullable = !Core.Data.Validation.RequiredValidator.IsRequired(finalMember),
 				IsPrimaryKey = IsPrimaryKey(finalMember),
 			};
 
@@ -189,7 +105,7 @@ namespace OKHOSTING.Sql.ORM
 
 			if (Column.IsString)
 			{
-				Column.Length = ORM.Validators.StringLengthValidator.GetMaxLenght(finalMember);
+				Column.Length = Core.Data.Validation.StringLengthValidator.GetMaxLenght(finalMember);
 			}
 
 			DataType.Table.Columns.Add(Column);
@@ -197,194 +113,60 @@ namespace OKHOSTING.Sql.ORM
 
 		public override string ToString()
 		{
-			return Member;
-		}
-
-		#region Static
-
-		public static Type GetReturnType(MemberInfo memberInfo)
-		{
-			if (memberInfo is FieldInfo)
-			{
-				return ((FieldInfo)memberInfo).FieldType;
-			}
-			else
-			{
-				return ((PropertyInfo)memberInfo).PropertyType;
-			}
-		}
-
-		/// <summary>
-		/// Returns the value of this DataMember
-		/// </summary>
-		/// <param name="obj">
-		/// Object that will be examined
-		/// </param>
-		/// <returns>
-		/// The value of the current DataMember in the specified DataObject
-		/// </returns>
-		public static object GetValue(MemberInfo memberInfo, object obj)
-		{
-			if (memberInfo is FieldInfo)
-			{
-				return ((FieldInfo) memberInfo).GetValue(obj);
-			}
-			else
-			{
-				return ((PropertyInfo) memberInfo).GetValue(obj);
-			}
-		}
-
-		/// <summary>
-		/// Sets the value for this DataValue
-		/// </summary>
-		/// <param name="obj">
-		/// Object that will be changed
-		/// </param>
-		/// <param name="value">
-		/// The value that will be set to the DataMember
-		/// </param>
-		public static void SetValue(MemberInfo memberInfo, object obj, object value)
-		{
-			value = OKHOSTING.Core.Data.TypeConverter.ChangeType(value, GetReturnType(memberInfo));
-
-			if (memberInfo is FieldInfo)
-			{
-				((FieldInfo) memberInfo).SetValue(obj, value);
-			}
-			else
-			{
-				((PropertyInfo) memberInfo).SetValue(obj, value);
-			}
-		}
-
-		public static void SetValue(string memberExpression, object obj, object value)
-		{
-			Type type = obj.GetType();
-			var allMembers = GetMemberInfos(type, memberExpression).ToList();
-			var allValues = new List<object>();
-			object result = obj;
-
-			foreach (MemberInfo memberInfo in allMembers)
-			{
-				if (result != null)
-				{
-					result = GetValue(memberInfo, result);
-				}
-
-				allValues.Add(result);
-			}
-
-			//ensure all nested members are not null, except the lastone, that can be null
-			for (int i = 0; i < allValues.Count - 1; i++)
-			{
-				object val = allValues[i];
-				MemberInfo member = allMembers[i];
-
-				if (val == null)
-				{
-					object container = (i == 0) ? obj : allValues[i - 1];
-					object newValue = Activator.CreateInstance(GetReturnType(member));
-					allValues[i] = newValue;
-
-					SetValue(member, container, newValue);
-				}
-			}
-
-			object finalContainer = (allValues.Count > 1) ? allValues[allValues.Count - 2] : obj;
-			SetValue(allMembers.Last(), finalContainer, value);
+			return Member.Expression;
 		}
 
 		public static bool IsPrimaryKey(System.Reflection.MemberInfo memberInfo)
 		{
 			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
 		}
-
-		public static bool IsReadOnly(System.Reflection.MemberInfo memberInfo)
-		{
-			//ignore readonly properties
-			if (memberInfo is System.Reflection.PropertyInfo && ((System.Reflection.PropertyInfo)memberInfo).SetMethod == null)
-			{
-				return true;
-			}
-
-			//ignore readonly fields
-			if (memberInfo is System.Reflection.FieldInfo && ((System.Reflection.FieldInfo)memberInfo).IsInitOnly)
-			{
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Returns an enumeration of MemberInfos that are interpreted from a string
-		/// </summary>
-		/// <param name="type">Type declaring the member expression</param>
-		/// <param name="memberExpression">A member expression, pe: Address.Country.Name</param>
-		public static IEnumerable<System.Reflection.MemberInfo> GetMemberInfos(Type type, string memberExpression)
-		{
-			string[] splittedMembers = memberExpression.Split(new[] { '.' }, StringSplitOptions.None);
-
-			Type memberType = type;
-
-			for (int x = 0; x < splittedMembers.Length; x++)
-			{
-				MemberInfo memberInfo = memberType.GetProperty(splittedMembers[x].Trim());
-
-				if (memberInfo == null)
-				{
-					memberInfo = memberType.GetField(splittedMembers[x].Trim());
-
-					if (memberInfo == null)
-					{
-						throw new ArgumentOutOfRangeException("Members", splittedMembers[x], "Type " + memberType + " does not contain a member with that name");
-					}
-				}
-
-				memberType = GetReturnType(memberInfo);
-
-				yield return memberInfo;
-			}
-		}
-		
-		#endregion
 	}
 
 	public class DataMember<T> : DataMember
 	{
-		protected DataMember(string member): base(typeof(T), member)
+		public DataMember(): base()
+		{
+			DataType = typeof(T);
+		}
+
+		public DataMember(string member): base(typeof(T), member)
 		{
 		}
 
-		protected DataMember(string member, Schema.Column column): base(typeof(T), member, column)
+		public DataMember(string member, Schema.Column column): base(typeof(T), member, column)
 		{
 		}
 
-		protected DataMember(Expression<Func<T, object>> memberExpression): base(typeof(T), GetMemberString(memberExpression))
+		public DataMember(System.Linq.Expressions.Expression<Func<T, object>> memberExpression): base(typeof(T), MemberExpression<T>.GetMemberString(memberExpression))
 		{
 		}
 
-		protected DataMember(Expression<Func<T, object>> memberExpression, Schema.Column column): base(typeof(T), GetMemberString(memberExpression), column)
+		public DataMember(System.Linq.Expressions.Expression<Func<T, object>> memberExpression, Schema.Column column): base(typeof(T), MemberExpression<T>.GetMemberString(memberExpression), column)
 		{
 		}
 
-		#region Static
-
-		public static string GetMemberString(Expression<Func<T, object>> member)
+		public static DataMember<T> ToGeneric(DataMember memberExpression)
 		{
-			string code = Mono.Linq.Expressions.CSharp.ToCSharpCode(member);
-			
-			//get the middle line only
-			code = code.Split('\n')[2];
+			if (memberExpression is DataMember<T>)
+			{
+				return (DataMember<T>) memberExpression;
+			}
 
-			//remove the prefix, until the first dot
-			code = code.Substring(code.IndexOf('.') + 1);
-			code = code.Trim().TrimEnd(';');
+			Type genericDataTypeType = typeof(DataMember<>).MakeGenericType(memberExpression.DataType.InnerType);
 
-			return code;
+			ConstructorInfo constructor = genericDataTypeType.GetConstructor
+			(
+				System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.CreateInstance | System.Reflection.BindingFlags.Instance,
+				null,
+				null,
+				null
+			);
+
+			DataMember<T> genericMember = (DataMember<T>) constructor.Invoke(null);
+			genericMember.Column = memberExpression.Column;
+			genericMember.Converter = memberExpression.Converter;
+
+			return genericMember;
 		}
-
-		#endregion
 	}
 }

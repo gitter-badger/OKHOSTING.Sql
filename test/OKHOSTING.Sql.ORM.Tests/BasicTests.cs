@@ -218,15 +218,17 @@ namespace OKHOSTING.Sql.ORM.Tests
 		[Test]
 		public void ManualMap()
 		{
-			DataType<Person> dtype = DataType<Person>.Map();
-			dtype.Map(m => m.Id);
-			dtype.Map(m => m.Firstname);
-
-			DataType<CustomerContact> dtype2 = DataType<CustomerContact>.Map();
-			dtype2.Map(m => m.Id);
-			dtype2.Map(m => m.Customer.Id);
-			dtype2.Map(m => m.Customer.LegalName);
-			dtype2.Map(m => m.Customer.Phone);
+			DataType<Person> dtype = new DataType<Person>();
+			DataType.DataTypes.Add(dtype);
+			dtype.AddMember(m => m.Id);
+			dtype.AddMember(m => m.Firstname);
+			
+			DataType<CustomerContact> dtype2 = new DataType<CustomerContact>();
+			DataType.DataTypes.Add(dtype2);
+			dtype2.AddMember(m => m.Id);
+			dtype2.AddMember(m => m.Customer.Id);
+			dtype2.AddMember(m => m.Customer.LegalName);
+			dtype2.AddMember(m => m.Customer.Phone);
 			DataBase.Create<CustomerContact>();
 
 			for(int i = 0; i < 30; i++)
