@@ -1202,13 +1202,17 @@ namespace OKHOSTING.Sql
 		/// <example>
 		/// if lenght is cero, "TEXT" is returned, is lengh is 20, CHAR(20) is returned
 		/// </example>
-		protected virtual string FormatStringType(int lenght)
+		protected virtual string FormatStringType(uint? lenght)
 		{
 			//Validating the lenght of the string 
-			if (lenght == 0)
+			if (!lenght.HasValue || lenght == 0)
+			{
 				return "TEXT";
+			}
 			else
-				return Format(DbType.String) + " (" + lenght + ")";
+			{
+				return Format(DbType.StringFixedLength) + " (" + lenght + ")";
+			}
 		}
 
 		/// <summary>

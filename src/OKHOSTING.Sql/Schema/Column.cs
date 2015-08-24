@@ -82,9 +82,9 @@ namespace OKHOSTING.Sql.Schema
 		public string ComputedDefinition { get; set; }
 		
 		/// <summary>
-		/// Gets or sets the length if this is string (VARCHAR) or character (CHAR) type data. In SQLServer, a length of -1 indicates VARCHAR(MAX).
+		/// Gets or sets the length if this is string (VARCHAR) or character (CHAR) type data. In SQLServer, a length of 0 or null indicates VARCHAR(MAX).
 		/// </summary>
-		public int? Length { get; set; }
+		public uint? Length { get; set; }
 		
 		/// <summary>
 		/// Gets or sets the ordinal (the order that the columns were defined in the database).

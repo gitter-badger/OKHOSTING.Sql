@@ -146,13 +146,17 @@ namespace OKHOSTING.Sql.OleDb
 		/// <example>
 		/// if lenght is cero, "TEXT" is returned, is lengh is 20, CHAR(20) is returned
 		/// </example>
-		protected override string FormatStringType(int lenght)
+		protected override string FormatStringType(uint? lenght)
 		{
 			//Validating the lenght of the string 
-			if (lenght == 0)
+			if (!lenght.HasValue || lenght == 0)
+			{
 				return "MEMO";
+			}
 			else
-				return this.Format(DbType.StringFixedLength) + " (" + lenght.ToString() + ")";
+			{
+				return this.Format(DbType.StringFixedLength) + " (" + lenght + ")";
+			}
 		}
 
 		#endregion

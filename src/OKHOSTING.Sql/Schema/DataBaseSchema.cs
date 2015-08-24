@@ -113,7 +113,7 @@ namespace OKHOSTING.Sql.Schema
 						ComputedDefinition = dbc.ComputedDefinition,
 						DefaultValue = dbc.DefaultValue,
 						IsPrimaryKey = dbc.IsPrimaryKey,
-						Length = dbc.Length,
+						Length = (uint) dbc.Length,
 						Ordinal = dbc.Ordinal,
 						Precision = dbc.Precision,
 						Scale = dbc.Scale,
