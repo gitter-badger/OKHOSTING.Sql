@@ -1211,7 +1211,7 @@ namespace OKHOSTING.Sql
 			}
 			else
 			{
-				return Format(DbType.StringFixedLength) + " (" + lenght + ")";
+				return Format(DbType.String) + " (" + lenght + ")";
 			}
 		}
 

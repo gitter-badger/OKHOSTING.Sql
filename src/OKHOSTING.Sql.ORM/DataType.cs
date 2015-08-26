@@ -289,7 +289,14 @@ namespace OKHOSTING.Sql.ORM
 		/// </summary>
 		public bool IsForeignKeyMapped(System.Reflection.MemberInfo member)
 		{
-			DataType dtype = MemberExpression.GetReturnType(member);
+			System.Type type = MemberExpression.GetReturnType(member);
+			
+			if (!DataType.IsMapped(type))
+			{
+				return false;
+			}
+
+			DataType dtype = type;
 
 			foreach (var pk in dtype.PrimaryKey)
 			{
