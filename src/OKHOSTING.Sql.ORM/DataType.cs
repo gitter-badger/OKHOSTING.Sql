@@ -24,6 +24,8 @@ namespace OKHOSTING.Sql.ORM
 				throw new ArgumentNullException("innerType");
 			}
 
+			InnerType = innerType;
+
 			if (table == null)
 			{
 				CreateTable();
@@ -32,8 +34,6 @@ namespace OKHOSTING.Sql.ORM
 			{
 				Table = table;
 			}
-
-			InnerType = innerType;
 		}
 
 		public DataType(Type innerType): this(innerType, null)
@@ -451,8 +451,26 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Creates a new DataType based on an existing Table, matching only members that have a column with the same name
 		/// </summary>
+		public static DataType DefaultMap(Type type)
+		{
+			return DefaultMap(new Type[] { type }).First();
+		}
+
+		/// <summary>
+		/// Creates a new DataType based on an existing Table, matching only members that have a column with the same name
+		/// </summary>
 		public static DataType DefaultMap(Type type, Schema.Table table)
 		{
+			if (type == null)
+			{
+				throw new ArgumentNullException("type");
+			}
+			
+			if (table == null)
+			{
+				throw new ArgumentNullException("table");
+			}
+
 			if (IsMapped(type))
 			{
 				throw new ArgumentOutOfRangeException("type", "This Types is already mapped");
@@ -462,9 +480,9 @@ namespace OKHOSTING.Sql.ORM
 
 			foreach (var memberInfo in GetMapableMembers(type))
 			{
-				if (table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
+				if (dtype.Table.Columns.Where(c => c.Name == memberInfo.Name).Count() > 0)
 				{
-					dtype.AddMember(memberInfo.Name, table[memberInfo.Name]);
+					dtype.AddMember(memberInfo.Name, dtype.Table[memberInfo.Name]);
 				}
 			}
 
@@ -609,14 +627,6 @@ namespace OKHOSTING.Sql.ORM
 
 				yield return dtype;
 			}
-		}
-
-		/// <summary>
-		/// Creates a list of new DataTypes, creating as well a list of new Tables with all members of type as columns
-		/// </summary>
-		public static IEnumerable<DataType> DefaultMap(params Type[] types)
-		{
-			return DefaultMap((IEnumerable<Type>) types);
 		}
 
 		/// <summary>
