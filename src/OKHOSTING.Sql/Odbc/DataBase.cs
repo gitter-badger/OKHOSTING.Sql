@@ -74,7 +74,7 @@ namespace OKHOSTING.Sql.Odbc
 			throw new NotSupportedException("OdbcExecuter is not compatible with the method BaseExecuter.IndexExists()");
 		}
 
-		private static Dictionary<DbType, OdbcType> DbTypeMap;
+		private new static Dictionary<DbType, OdbcType> DbTypeMap;
 
 		static DataBase()
 		{

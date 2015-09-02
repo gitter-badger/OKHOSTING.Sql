@@ -222,7 +222,7 @@ namespace OKHOSTING.Sql.MySql
 			return exists;
 		}
 
-		private static Dictionary<DbType, MySqlDbType> DbTypeMap;
+		private static new Dictionary<DbType, MySqlDbType> DbTypeMap;
 
 		static DataBase()
 		{

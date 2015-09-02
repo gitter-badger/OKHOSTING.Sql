@@ -78,9 +78,6 @@ namespace OKHOSTING.Sql.OleDb
 		/// </example>
 		protected override string Format(DbType type)
 		{
-			//Validating that the type Argument is not null
-			if (type == null) throw new ArgumentNullException("type");
-
 			//Getting the type name in Database
 			switch (type)
 			{

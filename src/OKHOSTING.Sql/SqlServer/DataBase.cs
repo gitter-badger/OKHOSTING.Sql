@@ -205,7 +205,7 @@ namespace OKHOSTING.Sql.SqlServer
 			return existsIndex;
 		}
 
-		private static Dictionary<DbType, SqlDbType> DbTypeMap;
+		private new static Dictionary<DbType, SqlDbType> DbTypeMap;
 
 		static DataBase()
 		{
