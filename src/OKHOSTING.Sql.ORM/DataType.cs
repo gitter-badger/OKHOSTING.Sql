@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data;
 using OKHOSTING.Core.Data.Validation;
 
@@ -42,7 +40,7 @@ namespace OKHOSTING.Sql.ORM
 
 		#region Properties
 
-		public readonly List<DataMember> Members = new List<DataMember>();
+		public readonly List<DataMember> DataMembers = new List<DataMember>();
 
 		public readonly List<ValidatorBase> Validators = new List<ValidatorBase>();
 
@@ -85,7 +83,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				return AllMembers.Where(m => m.Member.Expression == name).Single();
+				return AllDataMembers.Where(m => m.Member.Expression == name).Single();
 			}
 		}
 
@@ -95,13 +93,13 @@ namespace OKHOSTING.Sql.ORM
 		/// <remarks>
 		/// Does not duplicate the primary key by omitting base classes primary keys
 		/// </remarks>
-		public IEnumerable<DataMember> AllMembers
+		public IEnumerable<DataMember> AllDataMembers
 		{
 			get
 			{
-				foreach (DataType parent in GetBaseDataTypes())
+				foreach (DataType parent in BaseDataTypes)
 				{
-					foreach (DataMember dmember in parent.Members)
+					foreach (DataMember dmember in parent.DataMembers)
 					{
 						//Do not duplicate the primary key by omitting base classes primary keys
 						if (parent != this && dmember.Column.IsPrimaryKey)
@@ -119,15 +117,161 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				return from m in Members where m.Column.IsPrimaryKey select m;
+				return from m in DataMembers where m.Column.IsPrimaryKey select m;
 			}
 		}
 
-		public IEnumerable<DataMember> RegularValues
+		/// <summary>
+		/// Returns the list of immediate members that are mapped to the database, including foreign keys.
+		/// This does not contains inherited members except for the primary key
+		/// </summary>
+		public IEnumerable<System.Reflection.MemberInfo> MemberInfos
 		{
 			get
 			{
-				return from m in Members where !m.Column.IsPrimaryKey select m;
+				foreach (var member in GetMapableMembers(InnerType))
+				{
+					if (this.IsMapped(member.Name))
+					{
+						yield return member;
+					}
+					else if (IsMapped(MemberExpression.GetReturnType(member)) && IsForeignKey(member))
+					{
+						yield return member;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns the list of immediate members that are mapped to the database, including foreign keys.
+		/// This do contains all inherited members 
+		/// </summary>
+		public IEnumerable<System.Reflection.MemberInfo> AllMemberInfos
+		{
+			get
+			{
+				foreach (DataType parent in BaseDataTypes)
+				{
+					foreach (var member in parent.MemberInfos)
+					{
+						//Do not duplicate the primary key by omitting base classes primary keys
+						if (parent != this && !DataMember.IsPrimaryKey(member))
+						{
+							continue;
+						}
+
+						yield return member;
+					}
+				}
+			}
+		}
+		
+		/// <summary>
+		/// Returns all parent Types ordered from child to base
+		/// </summary>
+		public IEnumerable<DataType> BaseDataTypes
+		{
+			get
+			{
+				Type current;
+
+				//Get all types in ascendent order (from base to child)
+				current = this.InnerType;
+
+				while (current != null)
+				{
+					//see if this type is mapped
+					if (IsMapped(current))
+					{
+						yield return current;
+					}
+
+					//Getting the parent of the current object
+					current = current.BaseType;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Searches for all TypeMaps inherited from this TypeMap 
+		/// </summary>
+		/// <returns>
+		/// All TypeMap that directly inherit from the current TypeMap
+		/// </returns>
+		public IEnumerable<DataType> SubDataTypes
+		{
+			get
+			{
+				//Crossing all loaded DataTypes
+				foreach (DataType dt in AllDataTypes)
+				{
+					//Validating if the dataType has a Base Class
+					if (dt.BaseDataType != null)
+					{
+						//Validating if the base class of the TypeMap<T>
+						//is this TypeMap<T>
+						if (dt.BaseDataType.Equals(this))
+						{
+							yield return dt;
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Searches for all DataTypes inherited from this TypeMap in a recursive way
+		/// </summary>
+		/// <returns>
+		/// All DataTypes that directly and indirectly inherit from the current TypeMap. 
+		/// Returns the hole tree of subclasses.
+		/// </returns>
+		public IEnumerable<DataType> SubDataTypesRecursive
+		{
+			get
+			{
+				//Crossing all loaded DataTypes
+				foreach (DataType tm in AllDataTypes)
+				{
+					//Validating if the dataType has a Base Class
+					if (tm.BaseDataType != null)
+					{
+						//Validating if the base class of the TypeMap<T>
+						//is this TypeMap<T>
+						if (tm.BaseDataType.Equals(this))
+						{
+							yield return tm;
+
+							foreach (var tm2 in tm.SubDataTypesRecursive)
+							{
+								yield return tm2;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Returns a list of members that are foreign keys of this datatype, across all DataTypes registered
+		/// </summary>
+		/// <returns></returns>
+		public IEnumerable<System.Reflection.MemberInfo> InboundForeingKeys
+		{
+			get
+			{
+				foreach (DataType dtype in AllDataTypes)
+				{
+					foreach (System.Reflection.MemberInfo member in dtype.MemberInfos)
+					{
+						//Validating if the dataType has a Base Class
+						if (MemberExpression.GetReturnType(member).Equals(InnerType) && dtype.IsForeignKey(member))
+						{
+							yield return member;
+						}
+					}
+				}
 			}
 		}
 
@@ -137,7 +281,7 @@ namespace OKHOSTING.Sql.ORM
 
 		public bool IsMapped(string member)
 		{
-			return Members.Where(m => m.Member.Expression == member).Count() > 0;
+			return DataMembers.Where(m => m.Member.Expression == member).Count() > 0;
 		}
 
 		public DataMember AddMember(string member)
@@ -158,7 +302,7 @@ namespace OKHOSTING.Sql.ORM
 
 			DataMember genericDataMember = (DataMember) constructor.Invoke(new object[] { member, column });
 
-			Members.Add(genericDataMember);
+			DataMembers.Add(genericDataMember);
 
 			return genericDataMember;
 		}
@@ -172,122 +316,9 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		/// <summary>
-		/// Returns all parent Types ordered from child to base
-		/// </summary>
-		public IEnumerable<DataType> GetBaseDataTypes()
-		{
-			Type current;
-
-			//Get all types in ascendent order (from base to child)
-			current = this.InnerType;
-
-			while (current != null)
-			{
-				//see if this type is mapped
-				if (IsMapped(current))
-				{
-					yield return current;
-				}
-
-				//Getting the parent of the current object
-				current = current.BaseType;
-			}
-		}
-
-		/// <summary>
-		/// Searches for all TypeMaps inherited from this TypeMap 
-		/// </summary>
-		/// <returns>
-		/// All TypeMap that directly inherit from the current TypeMap
-		/// </returns>
-		public IEnumerable<DataType> GetSubDataTypes()
-		{
-			//Crossing all loaded DataTypes
-			foreach (DataType dt in DataTypes)
-			{
-				//Validating if the dataType has a Base Class
-				if (dt.BaseDataType != null)
-				{
-					//Validating if the base class of the TypeMap<T>
-					//is this TypeMap<T>
-					if (dt.BaseDataType.Equals(this))
-					{
-						yield return dt;
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Searches for all DataTypes inherited from this TypeMap in a recursive way
-		/// </summary>
-		/// <returns>
-		/// All DataTypes that directly and indirectly inherit from the current TypeMap. 
-		/// Returns the hole tree of subclasses.
-		/// </returns>
-		public IEnumerable<DataType> GetSubDataTypesRecursive()
-		{
-			//Crossing all loaded DataTypes
-			foreach (DataType tm in DataTypes)
-			{
-				//Validating if the dataType has a Base Class
-				if (tm.BaseDataType != null)
-				{
-					//Validating if the base class of the TypeMap<T>
-					//is this TypeMap<T>
-					if (tm.BaseDataType.Equals(this))
-					{
-						yield return tm;
-
-						foreach (var tm2 in tm.GetSubDataTypesRecursive())
-						{
-							yield return tm2;
-						}
-					}
-				}
-			}
-		}
-
-		/// <summary>
-		/// Returns a list of members that are actually of a type mapped as a datatype, and therefore are stored in their own table,
-		/// creating a foreing key from the current table
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerable<System.Reflection.MemberInfo> GetOutboundForeingKeys()
-		{
-			foreach (System.Reflection.MemberInfo member in GetMapableMembers(InnerType))
-			{
-				//Validating if the dataType has a Base Class
-				if (IsMapped(MemberExpression.GetReturnType(member)) && IsForeignKeyMapped(member))
-				{
-					yield return member;
-				}
-			}
-		}
-
-		/// <summary>
-		/// Returns a list of members that are foreign keys of this datatype, across all DataTypes registered
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerable<System.Reflection.MemberInfo> GetInboundForeingKeys()
-		{
-			foreach (DataType dtype in DataTypes)
-			{
-				foreach (System.Reflection.MemberInfo member in GetMapableMembers(dtype.InnerType))
-				{
-					//Validating if the dataType has a Base Class
-					if (MemberExpression.GetReturnType(member).Equals(InnerType) && dtype.IsForeignKeyMapped(member))
-					{
-						yield return member;
-					}
-				}
-			}
-		}
-
-		/// <summary>
 		/// Returns true if a member is properly mapped to be stored as a foreign key, with the primary key fully mapped
 		/// </summary>
-		public bool IsForeignKeyMapped(System.Reflection.MemberInfo member)
+		public bool IsForeignKey(System.Reflection.MemberInfo member)
 		{
 			System.Type type = MemberExpression.GetReturnType(member);
 			
@@ -316,7 +347,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			Table = new Schema.Table(InnerType.Name);
 
-			foreach (DataMember dm in Members)
+			foreach (DataMember dm in DataMembers)
 			{
 				if (dm.Column == null)
 				{
@@ -419,7 +450,7 @@ namespace OKHOSTING.Sql.ORM
 		
 		#region Static
 
-		public static readonly List<DataType> DataTypes = new List<DataType>();
+		public static readonly List<DataType> AllDataTypes = new List<DataType>();
 
 		/// <summary>
 		/// List of available type mappings, system-wide
@@ -431,12 +462,12 @@ namespace OKHOSTING.Sql.ORM
 
 		public static bool IsMapped(Type type)
 		{
-			return DataTypes.Where(m => m.InnerType.Equals(type)).Count() > 0;
+			return AllDataTypes.Where(m => m.InnerType.Equals(type)).Count() > 0;
 		}
 
 		public static DataType GetMap(Type type)
 		{
-			return DataTypes.Where(m => m.InnerType.Equals(type)).Single();
+			return AllDataTypes.Where(m => m.InnerType.Equals(type)).Single();
 		}
 
 		public static IEnumerable<DataType> DefaultMap(params Tuple<Type, Schema.Table>[] types)
@@ -516,7 +547,7 @@ namespace OKHOSTING.Sql.ORM
 
 				Schema.Table table = new Schema.Table(type.Name);
 				DataType dtype = new DataType(type, table);
-				DataTypes.Add(dtype);
+				AllDataTypes.Add(dtype);
 
 				foreach (var memberInfo in pk)
 				{
@@ -571,7 +602,7 @@ namespace OKHOSTING.Sql.ORM
 							column.Name = memberInfo.Name + "_" + pk.Member.Expression.Replace('.', '_');
 							column.Table = dtype.Table;
 							column.IsPrimaryKey = false;
-							column.IsNullable = !Core.Data.Validation.RequiredValidator.IsRequired(memberInfo);
+							column.IsNullable = !Core.Data.Validation.Required.IsRequired(memberInfo);
 							column.DbType = Sql.DataBase.Parse(pk.Member.ReturnType);
 
 							if (column.IsString)
@@ -594,7 +625,7 @@ namespace OKHOSTING.Sql.ORM
 						Schema.Column column = new Schema.Column();
 						column.Name = memberInfo.Name;
 						column.Table = dtype.Table;
-						column.IsNullable = !Core.Data.Validation.RequiredValidator.IsRequired(memberInfo);
+						column.IsNullable = !Core.Data.Validation.Required.IsRequired(memberInfo);
 						column.IsPrimaryKey = false;
 
 						//create datamember
@@ -613,7 +644,7 @@ namespace OKHOSTING.Sql.ORM
 						else
 						{
 							column.DbType = DbType.String;
-							dmember.Converter = new Converters.Json<object>();
+							dmember.Converter = new Conversions.Json<object>();
 						}
 
 						if (column.IsString)
@@ -679,7 +710,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			get
 			{
-				foreach (DataMember dmember in base.Members)
+				foreach (DataMember dmember in base.DataMembers)
 				{
 					yield return (DataMember<T>) dmember;
 				}
@@ -748,15 +779,15 @@ namespace OKHOSTING.Sql.ORM
 
 			DataType genericDataType = (DataType) constructor.Invoke(new object[] { dtype.Table });
 
-			foreach (var member in dtype.Members)
+			foreach (var member in dtype.DataMembers)
 			{
 				if (member is DataMember<T>)
 				{
-					genericDataType.Members.Add(member);
+					genericDataType.DataMembers.Add(member);
 				}
 				else
 				{
-					genericDataType.Members.Add(DataMember<T>.ToGeneric(member));
+					genericDataType.DataMembers.Add(DataMember<T>.ToGeneric(member));
 				}
 			}
 
@@ -766,12 +797,12 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			//replace in DataTypes
-			var dtypeMapped = DataTypes.Where(dt => dt.InnerType == dtype.InnerType).SingleOrDefault();
+			var dtypeMapped = AllDataTypes.Where(dt => dt.InnerType == dtype.InnerType).SingleOrDefault();
 			
 			if (dtypeMapped != null)
 			{
-				DataTypes.Remove(dtypeMapped);
-				DataTypes.Add(genericDataType);
+				AllDataTypes.Remove(dtypeMapped);
+				AllDataTypes.Add(genericDataType);
 			}
 
 			return (DataType<T>) genericDataType;

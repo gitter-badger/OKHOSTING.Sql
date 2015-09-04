@@ -120,7 +120,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 			Select<TType> select = new Select<TType>();
 			DataType dtype = DataType;
-			select.AddMembers(dtype.Members.ToArray());
+			select.AddMembers(dtype.DataMembers.ToArray());
 
 			return select;
 		}

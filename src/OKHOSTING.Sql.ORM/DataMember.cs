@@ -64,7 +64,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <summary>
 		/// Conversions to apply when writing yo or reading from the database
 		/// </summary>
-		public Converters.ConverterBase Converter { get; set; }
+		public Conversions.ConverterBase Converter { get; set; }
 
 		public object GetValueForColumn(object obj)
 		{

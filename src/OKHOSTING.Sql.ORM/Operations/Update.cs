@@ -13,12 +13,25 @@ namespace OKHOSTING.Sql.ORM.Operations
 		}
 
 		public DataType From { get; set; }
-		public readonly List<MemberValue> Set = new List<MemberValue>();
+		public object Instance { get; set; }
+		public readonly List<DataMember> Set = new List<DataMember>();
 		public readonly List<Filters.FilterBase> Where = new List<Filters.FilterBase>();
 	}
 
 	public class Update<T> : Update
 	{
+		public new T Instance
+		{
+			get
+			{
+				return (T) base.Instance;
+			}
+			set
+			{
+				base.Instance = value;
+			}
+		}
+
 		public Update()
 		{
 			From = typeof(T);

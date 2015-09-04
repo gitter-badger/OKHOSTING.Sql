@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="DatabaseSchemaReader, Version=1.4.2.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\DatabaseSchemaReader.1.4.2.2\lib\net40\DatabaseSchemaReader.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -104,10 +108,9 @@
       <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\dbschemareader\DatabaseSchemaReader\DatabaseSchemaReader.csproj">
-      <Project>{aa652f8e-0b96-484c-a146-c4183e4a0a25}</Project>
-      <Name>DatabaseSchemaReader</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />

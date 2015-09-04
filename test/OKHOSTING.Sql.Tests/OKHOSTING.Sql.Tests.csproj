@@ -52,10 +52,6 @@
       <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\dbschemareader\DatabaseSchemaReader\DatabaseSchemaReader.csproj">
-      <Project>{aa652f8e-0b96-484c-a146-c4183e4a0a25}</Project>
-      <Name>DatabaseSchemaReader</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\OKHOSTING.Sql.MySql\OKHOSTING.Sql.MySql.csproj">
       <Project>{0a304a16-0f65-4ce6-a878-41263293021c}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>

@@ -1,21 +1,15 @@
 using OKHOSTING.Core.Data;
 using OKHOSTING.Core.Extensions;
-using OKHOSTING.Sql.ORM.Operations;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.IO;
-using System.Reflection;
 using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
 
 namespace OKHOSTING.Sql.ORM
 {
 	/// <summary>
-	/// Defines methods for converting objects from one Type to another,
-	/// as well as serialization and deserialization methods
+	/// Defines methods for serialization and deserialization of datatypes, datamembers and instances
 	/// </summary>
 	public static class Converter
 	{
@@ -34,45 +28,7 @@ namespace OKHOSTING.Sql.ORM
 			if (string.IsNullOrWhiteSpace(value)) return null;
 
 			//try to unparse as xml
-			return (DataType) ToIStringSerializable(value, typeof(DataType));
-		}
-
-		/// <summary>
-		/// Returns a DataType created by deserializing an xml element
-		/// </summary>
-		/// <param name="xml">
-		/// XmlElement containing a serialized DataType
-		/// </param>
-		/// <returns>
-		/// A deserialized DataType
-		/// </returns>
-		public static DataType ToDataType(XmlElement xml)
-		{
-			DataType dtype;
-
-			//Validating if the argumetn is null
-			if (xml == null) return null;
-			if (string.IsNullOrWhiteSpace(xml.InnerXml)) return null;
-
-			//retrieve DataType
-			dtype = System.Type.GetType(xml.GetAttribute("InnerType"));
-
-			//deserialize
-			return dtype;
-		}
-
-		/// <summary>
-		/// Returns a DataType created by deserializing an XElement
-		/// </summary>
-		/// <param name="xml">
-		/// XElement containing a serialized DataType
-		/// </param>
-		/// <returns>
-		/// A deserialized DataType
-		/// </returns>
-		public static DataType ToDataType(XElement xml)
-		{
-			return ToDataType(xml.ToXmlElement());
+			return Type.GetType(value, true, false);
 		}
 
 		/// <summary>
@@ -91,48 +47,6 @@ namespace OKHOSTING.Sql.ORM
 
 			//try to unparse as xml
 			return (DataMember) ToIStringSerializable(value, typeof(DataMember));
-		}
-		
-		/// <summary>
-		/// Returns a DataMember created by deserializing an xml element
-		/// </summary>
-		/// <param name="xml">
-		/// XmlElement containing a serialized DataMember
-		/// </param>
-		/// <returns>
-		/// A deserialized DataMember
-		/// </returns>
-		public static DataMember ToDataMember(XmlElement xml)
-		{
-			DataType dtype;
-			string name;
-
-			//Validating if the argumetn is null
-			if (xml == null) return null;
-			if (string.IsNullOrWhiteSpace(xml.InnerXml)) return null;
-
-			//retrieve DataType
-			dtype = DataType.Parse(xml.GetAttribute("DataType"));
-
-			//retrieve DataMemeber's name
-			name = xml.GetAttribute("Name");
-
-			//return DataMember
-			return dtype[name];
-		}
-
-		/// <summary>
-		/// Returns a DataMember created by deserializing an XElement
-		/// </summary>
-		/// <param name="xml">
-		/// XElement containing a serialized DataMember
-		/// </param>
-		/// <returns>
-		/// A deserialized DataMember
-		/// </returns>
-		public static DataMember ToDataMember(XElement xml)
-		{
-			return ToDataMember(xml.ToXmlElement());
 		}
 		
 		/// <summary>
@@ -165,44 +79,6 @@ namespace OKHOSTING.Sql.ORM
 		}
 
 		/// <summary>
-		/// Returns a object populated by deserializing an xml element
-		/// </summary>
-		/// <param name="xml">
-		/// XmlElement containing a serialized object
-		/// </param>
-		/// <returns>
-		/// A populated object
-		/// </returns>
-		public static object ToObject(XmlElement xml)
-		{
-			DataType dtype;
-
-			//Validating if the argumetn is null
-			if (xml == null) return null;
-			if (string.IsNullOrWhiteSpace(xml.InnerXml)) return null;
-
-			//retrieve DataType
-			dtype = DataType.Parse(xml.GetAttribute("DataType"));
-
-			//deserialize
-			return (object) ToIXmlSerializable(xml.OuterXml, dtype.InnerType);
-		}
-
-		/// <summary>
-		/// Returns a object populated by deserializing an XElement
-		/// </summary>
-		/// <param name="xml">
-		/// XElement containing a serialized object
-		/// </param>
-		/// <returns>
-		/// A populated object
-		/// </returns>
-		public static object ToObject(XElement xml)
-		{
-			return ToObject(xml.ToXmlElement());
-		}
-
-		/// <summary>
 		/// Returns a object with all the DataValues
 		/// whose values exists in the values collection
 		/// </summary>
@@ -226,6 +102,45 @@ namespace OKHOSTING.Sql.ORM
 			return ToObject(SerializeToString(values));
 		}
 
+
+		/// <summary>
+		/// Converts a object to it's string representantion
+		/// </summary>
+		/// <param name="value">
+		/// object to be converted to string
+		/// </param>
+		/// <returns>
+		/// A string representation of object
+		/// </returns>
+		public static string ToString(object value)
+		{
+			if (value == null)
+				return null;
+
+			else if (value is DataType)
+			{
+				return ToString((DataType)value);
+			}
+			else if (value is DataMember)
+			{
+				return ToString((DataMember)value);
+			}
+			else if (DataType.IsMapped(value.GetType()))
+			{
+				DataType dtype = value.GetType();
+				string result = string.Empty;
+
+				foreach (DataMember member in dtype.AllDataMembers)
+				{
+					
+				}
+			}
+			else
+			{
+				return Core.Data.Converter.ToString(value);
+			}
+		}
+
 		/// <summary>
 		/// Converts a DataType to it's string representantion
 		/// </summary>
@@ -240,7 +155,7 @@ namespace OKHOSTING.Sql.ORM
 			//null values
 			if (value == null) return null;
 
-			return ((OKHOSTING.Core.Data.IStringSerializable) value).SerializeToString();
+			return value.InnerType.FullName;
 		}
 
 		/// <summary>
@@ -257,24 +172,7 @@ namespace OKHOSTING.Sql.ORM
 			//null values
 			if (value == null) return null;
 
-			return ((IStringSerializable)value).SerializeToString();
-		}
-
-		/// <summary>
-		/// Converts a object to it's string representantion
-		/// </summary>
-		/// <param name="value">
-		/// object to be converted to string
-		/// </param>
-		/// <returns>
-		/// A string representation of object
-		/// </returns>
-		public static string ToString(object value)
-		{
-			//null values
-			if (value == null) return null;
-
-			return ((IStringSerializable)value).SerializeToString();
+			return "DataType=" + ToString(value.DataType) + "&DataMember=" + value.Member.Expression;
 		}
 
 		/// <summary>
@@ -282,13 +180,16 @@ namespace OKHOSTING.Sql.ORM
 		/// </summary>
 		/// <param name="dataValuesInstances">List that will be parsed as a string</param>
 		/// <returns>String containing all values in dataValuesInstances</returns>
-		public static string ToString(List<MemberValue> value)
+		public static string ToString(List<DataMember> value)
 		{
-			//First, convert to NameValueCollection
-			NameValueCollection nameValues = ToNameValues(value);
+			string result = string.Empty;
 
-			//Now convert to string
-			return SerializeToString(nameValues);
+			foreach (var member in value)
+			{
+				result += ToString(member) + '&';
+			}
+
+			return result.TrimEnd('&');
 		}
 
 		/// <summary>
@@ -321,7 +222,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// NameValueCollection filed with the atomized values of the List
 		/// </returns>
-		public static NameValueCollection ToNameValues(List<MemberValue> values)
+		public static NameValueCollection ToNameValues(List<DataMember> values, object instance)
 		{
 			//Validating if the dataProperties argument is null
 			if (values == null) return null;
@@ -330,13 +231,14 @@ namespace OKHOSTING.Sql.ORM
 			NameValueCollection result = new NameValueCollection();
 
 			//Crossing the DataValues candidates to load
-			foreach (MemberValue dvi in values)
+			foreach (DataMember member in values)
 			{
+				object val = member.Member.GetValue(instance);
+
 				//Validating if the value was specified on dicResult collection
-				if (Core.Data.Validation.RequiredValidator.HasValue((dvi.Value)))
+				if (Core.Data.Validation.RequiredValidator.HasValue(val))
 				{
-					//Adding the value to the collection
-					result.Add(dvi.DataMember.Member.Expression, Converter.SerializeToString(dvi.Value));
+					result.Add(member.Member.Expression, Converter.ToString(val));
 				}
 			}
 
@@ -353,7 +255,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <param name="instances">
 		/// Collection that will be populated from queryString
 		/// </param>
-		public static void ToDataValueInstances(string queryString, List<MemberValue> instances)
+		public static void ToDataValueInstances(string queryString, List<DataMemberValue> instances)
 		{
 			//Validating if the dataProperties argument is null
 			if (string.IsNullOrWhiteSpace(queryString)) return;
@@ -374,14 +276,14 @@ namespace OKHOSTING.Sql.ORM
 		/// <param name="instances">
 		/// Collection that will be populated from values
 		/// </param>
-		public static void ToDataValueInstances(NameValueCollection values, List<MemberValue> instances)
+		public static void ToDataValueInstances(NameValueCollection values, List<DataMemberValue> instances)
 		{
 			//Validating if the dataProperties argument is null
 			if (values == null) return;
 			if (instances == null) throw new ArgumentNullException("instances");
 
 			//copy values from values to atomized
-			foreach (MemberValue dvi in instances)
+			foreach (DataMemberValue dvi in instances)
 			{
 				//Validating if the value was specified on dicResult collection
 				if (Core.Data.Validation.RequiredValidator.HasValue(values[dvi.DataMember.Member.Expression]))

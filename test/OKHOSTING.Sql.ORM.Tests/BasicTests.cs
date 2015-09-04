@@ -191,7 +191,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 
 			Operations.Select<CustomerContact> select = new Operations.Select<CustomerContact>();
 			
-			foreach (var member in select.From.Members)
+			foreach (var member in select.From.DataMembers)
 			{
 				select.Members.Add(new Operations.SelectMember(member));
 			}
@@ -202,7 +202,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 			join.On.Add(new Filters.MemberCompareFilter(){ Member = select.From["Customer.Id"], MemberToCompare = join.Type["id"], Operator = Core.Data.CompareOperator.Equal });
 			select.Joins.Add(join);
 
-			foreach (var member in join.Type.Members.Where(m=> !m.Column.IsPrimaryKey))
+			foreach (var member in join.Type.DataMembers.Where(m=> !m.Column.IsPrimaryKey))
 			{
 				select.Members.Add(new Operations.SelectMember(member));
 			}
@@ -219,12 +219,12 @@ namespace OKHOSTING.Sql.ORM.Tests
 		public void ManualMap()
 		{
 			DataType<Person> dtype = new DataType<Person>();
-			DataType.DataTypes.Add(dtype);
+			DataType.AllDataTypes.Add(dtype);
 			dtype.AddMember(m => m.Id);
 			dtype.AddMember(m => m.Firstname);
 			
 			DataType<CustomerContact> dtype2 = new DataType<CustomerContact>();
-			DataType.DataTypes.Add(dtype2);
+			DataType.AllDataTypes.Add(dtype2);
 			dtype2.AddMember(m => m.Id);
 			dtype2.AddMember(m => m.Customer.Id);
 			dtype2.AddMember(m => m.Customer.LegalName);

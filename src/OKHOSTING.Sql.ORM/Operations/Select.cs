@@ -35,7 +35,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 			}
 
 			//see if this is a dataMember from a base type
-			foreach (DataType parent in From.GetBaseDataTypes().Skip(1))
+			foreach (DataType parent in From.BaseDataTypes.Skip(1))
 			{
 				if (!parent.IsMapped(memberExpression))
 				{
@@ -102,7 +102,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 				currentExpression = currentExpression.Trim('.');
 
 				//if this is a dataMember from a base type, create join for that relationship
-				foreach (DataType parent in From.GetBaseDataTypes())
+				foreach (DataType parent in From.BaseDataTypes)
 				{
 					DataType referencingDataType = isTheFirstOne ? parent : MemberExpression.GetReturnType(nestedMemberInfos[i - 1]);
 
@@ -114,7 +114,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 						foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 						{
-							DataMember localKey = referencingDataType.Members.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
+							DataMember localKey = referencingDataType.DataMembers.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
 
 							if (localKey == null)
 							{
@@ -151,7 +151,7 @@ namespace OKHOSTING.Sql.ORM.Operations
 
 								foreach (DataMember foreignKey in foreignDataType.PrimaryKey)
 								{
-									DataMember localKey = referencingDataType.Members.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
+									DataMember localKey = referencingDataType.DataMembers.Where(m => m.Member.Expression == memberInfo.Name + "." + foreignKey.Member).SingleOrDefault();
 
 									var filter = new Filters.MemberCompareFilter()
 									{

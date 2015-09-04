@@ -9,11 +9,24 @@ namespace OKHOSTING.Sql.ORM.Operations
 	public class Insert
 	{
 		public DataType Into { get; set; }
-		public readonly List<MemberValue> Values = new List<MemberValue>();
+		public object Instance { get; set; }
+		public readonly List<DataMember> Values = new List<DataMember>();
 	}
 
 	public class Insert<T> : Insert
 	{
+		public new T Instance
+		{
+			get
+			{
+				return (T) base.Instance;
+			}
+			set
+			{
+				base.Instance = value;
+			}
+		}
+
 		public Insert()
 		{
 			Into = typeof(T);

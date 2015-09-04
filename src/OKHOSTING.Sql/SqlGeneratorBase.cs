@@ -864,7 +864,7 @@ namespace OKHOSTING.Sql
 			//Creating indexes
 			//foreach (Index index in table.InnerType.GetCustomAttributes(typeof(Index), false))
 			//{
-			//    sql += GetIndexDefinition(table, index) + ", ";
+			//	sql += GetIndexDefinition(table, index) + ", ";
 			//}
 
 			//Removing the last ", "
