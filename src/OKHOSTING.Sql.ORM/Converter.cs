@@ -1,10 +1,7 @@
-using OKHOSTING.Core.Data;
-using OKHOSTING.Core.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Xml;
-using System.Xml.Linq;
+using CoreConverter = OKHOSTING.Core.Data.Converter;
 
 namespace OKHOSTING.Sql.ORM
 {
@@ -13,100 +10,12 @@ namespace OKHOSTING.Sql.ORM
 	/// </summary>
 	public static class Converter
 	{
-		/// <summary>
-		/// Converts a DataType string representantion into an actual DataType instance
-		/// </summary>
-		/// <param name="value">
-		/// Value to be converted to DataType
-		/// </param>
-		/// <returns>
-		/// A DataType object deserialized from the string
-		/// </returns>
-		public static DataType ToDataType(string value)
-		{
-			//validate arguments
-			if (string.IsNullOrWhiteSpace(value)) return null;
-
-			//try to unparse as xml
-			return Type.GetType(value, true, false);
-		}
-
-		/// <summary>
-		/// Converts a DataMember string representantion into an actual DataMember instance
-		/// </summary>
-		/// <param name="value">
-		/// Value to be converted to DataMember
-		/// </param>
-		/// <returns>
-		/// A DataMember object deserialized from the string
-		/// </returns>
-		public static DataMember ToDataMember(string value)
-		{
-			//validate arguments
-			if (string.IsNullOrWhiteSpace(value)) return null;
-
-			//try to unparse as xml
-			return (DataMember) ToIStringSerializable(value, typeof(DataMember));
-		}
+		#region From object to string
 		
-		/// <summary>
-		/// Creates and populates a object based on a query string values
-		/// </summary>
-		/// <param name="value">
-		/// Query string containing a serialized object
-		/// </param>
-		/// <returns>
-		/// A populated object
-		/// </returns>
-		public static object ToObject(string value)
-		{
-			object dobj;
-			DataType dtype;
-
-			//Validating if the sting is null
-			if (string.IsNullOrWhiteSpace(value)) return null;
-
-			//deserialize datatype
-			dtype = ToDataType(GetValueFromQueryString(value, "DataType"));
-
-			//create new object
-			dobj = object.From(dtype);
-
-			//deserialize values
-			((IStringSerializable)dobj).DeserializeFromString(value);
-
-			return dobj;
-		}
-
-		/// <summary>
-		/// Returns a object with all the DataValues
-		/// whose values exists in the values collection
-		/// </summary>
-		/// <param name="dtype">
-		/// DataType of the object whose DataValues will be loaded
-		/// </param>
-		/// <param name="valuesString">
-		/// NameValueCollection with the next structure:
-		/// 
-		///		- Name: Name of the DataValue referenced by the item
-		///		- Value: String representation of the value of referenced DataValue
-		///		
-		/// </param>
-		/// <returns>
-		/// object with all the DataValues
-		/// of the specified DataType whose values exists in the values
-		/// collection
-		/// </returns>
-		public static object ToObject(NameValueCollection values)
-		{
-			return ToObject(SerializeToString(values));
-		}
-
-
 		/// <summary>
 		/// Converts a object to it's string representantion
 		/// </summary>
-		/// <param name="value">
+		/// <param name="instance">
 		/// object to be converted to string
 		/// </param>
 		/// <returns>
@@ -119,26 +28,55 @@ namespace OKHOSTING.Sql.ORM
 
 			else if (value is DataType)
 			{
-				return ToString((DataType)value);
+				return ToString((DataType) value);
 			}
 			else if (value is DataMember)
 			{
-				return ToString((DataMember)value);
+				return ToString((DataMember) value);
 			}
 			else if (DataType.IsMapped(value.GetType()))
 			{
 				DataType dtype = value.GetType();
-				string result = string.Empty;
-
-				foreach (DataMember member in dtype.AllDataMembers)
-				{
-					
-				}
+				return ToString(value, dtype.AllDataMembers);
 			}
 			else
 			{
-				return Core.Data.Converter.ToString(value);
+				return CoreConverter.ToString(value);
 			}
+		}
+
+		/// <summary>
+		/// Converts an instance to it's string representantion
+		/// </summary>
+		/// <param name="instance">
+		/// Instance to be converted to string
+		/// </param>
+		/// <param name="dmembers">
+		/// Members that will be serialized
+		/// </param>
+		/// <returns>
+		/// A string representation of instance
+		/// </returns>
+		public static string ToString(object instance, IEnumerable<DataMember> dmembers)
+		{
+			if (instance == null)
+				return null;
+
+			if (!DataType.IsMapped(instance.GetType()))
+			{
+				throw new ArgumentOutOfRangeException("instance", "Instance's Type is not mapped as a DataType");
+			}
+
+			DataType dtype = instance.GetType();
+			string result = "DataType=" + ToString(dtype) + '&';
+
+			foreach (DataMember dmember in dmembers)
+			{
+				var memberValue = dmember.Member.GetValue(instance);
+				result += dmember.Member.Expression + '=' + ToString(memberValue);
+			}
+
+			return result.TrimEnd('&');
 		}
 
 		/// <summary>
@@ -175,123 +113,106 @@ namespace OKHOSTING.Sql.ORM
 			return "DataType=" + ToString(value.DataType) + "&DataMember=" + value.Member.Expression;
 		}
 
+		#endregion
+
+		#region From string to object
+
 		/// <summary>
-		/// Creates a string representation of a List
+		/// Converts a DataType string representantion into an actual DataType instance
 		/// </summary>
-		/// <param name="dataValuesInstances">List that will be parsed as a string</param>
-		/// <returns>String containing all values in dataValuesInstances</returns>
-		public static string ToString(List<DataMember> value)
+		/// <param name="value">
+		/// Value to be converted to DataType
+		/// </param>
+		/// <returns>
+		/// A DataType object deserialized from the string
+		/// </returns>
+		public static DataType ToDataType(string value)
 		{
-			string result = string.Empty;
+			//validate arguments
+			if (string.IsNullOrWhiteSpace(value)) return null;
 
-			foreach (var member in value)
-			{
-				result += ToString(member) + '&';
-			}
-
-			return result.TrimEnd('&');
+			//try to unparse as xml
+			return Type.GetType(value, true, false);
 		}
 
 		/// <summary>
-		/// Creates a NameValueCollection filed with the atomized values of the object
+		/// Converts a DataMember string representantion into an actual DataMember instance
 		/// </summary>
-		/// <param name="dobj">
-		/// object which will be atomized and represented in the NameValueCollection
+		/// <param name="value">
+		/// Value to be converted to DataMember
 		/// </param>
 		/// <returns>
-		/// NameValueCollection filed with the atomized values of the List
+		/// A DataMember object deserialized from the string
 		/// </returns>
-		public static NameValueCollection ToNameValues(object value)
+		public static DataMember ToDataMember(string value)
 		{
-			if (value == null) return null;
+			//validate arguments
+			if (string.IsNullOrWhiteSpace(value)) return null;
 
-			NameValueCollection values = new NameValueCollection();
+			DataType dtype = Type.GetType(CoreConverter.GetValueFromQueryString(value, "DataType"));
+			DataMember dmember = dtype[CoreConverter.GetValueFromQueryString(value, "DataMember")];
 
-			values.Add("DataType", ((IStringSerializable)value.DataType).SerializeToString());
-			values.Add(ToNameValues(value.PrimaryKey));
-
-			return values;
+			return dmember;
 		}
 
 		/// <summary>
-		/// Creates a NameValueCollection filed with the atomized values of the List
+		/// Creates and populates a persistent object based on a query string values
 		/// </summary>
-		/// <param name="dataValuesInstances">
-		/// List which will be atomized and represented in the NameValueCollection
+		/// <param name="value">
+		/// Query string containing a serialized object
 		/// </param>
 		/// <returns>
-		/// NameValueCollection filed with the atomized values of the List
+		/// A populated object
 		/// </returns>
-		public static NameValueCollection ToNameValues(List<DataMember> values, object instance)
+		public static object ToInstance(string value)
 		{
-			//Validating if the dataProperties argument is null
-			if (values == null) return null;
+			return ToInstance(value, null);
+		}
 
-			//Creating the result
-			NameValueCollection result = new NameValueCollection();
+		/// <summary>
+		/// Creates and populates a persistent object based on a query string values
+		/// </summary>
+		/// <param name="value">
+		/// Query string containing a serialized object
+		/// </param>
+		/// <returns>
+		/// A populated object
+		/// </returns>
+		public static object ToInstance(string value, IEnumerable<DataMember> dmembers)
+		{
+			DataType dtype;
+			object dobj;
 
-			//Crossing the DataValues candidates to load
-			foreach (DataMember member in values)
+			//Validating if the sting is null
+			if (string.IsNullOrWhiteSpace(value)) return null;
+
+			//deserialize datatype
+			dtype = ToDataType(CoreConverter.GetValueFromQueryString(value, "DataType"));
+
+			//create new object
+			dobj = Activator.CreateInstance(dtype.InnerType);
+
+			//use all datamembers if no list is passed
+			if (dmembers == null)
 			{
-				object val = member.Member.GetValue(instance);
+				dmembers = dtype.AllDataMembers;
+            }
+
+			//deserialize values
+			foreach (DataMember dmember in dmembers)
+			{
+				string dmemberValue = CoreConverter.GetValueFromQueryString(value, dmember.Member.Expression);
 
 				//Validating if the value was specified on dicResult collection
-				if (Core.Data.Validation.RequiredValidator.HasValue(val))
+				if (!string.IsNullOrWhiteSpace(dmemberValue))
 				{
-					result.Add(member.Member.Expression, Converter.ToString(val));
+					dmember.Member.SetValue(dobj, CoreConverter.ChangeType(dmemberValue, dmember.Member.ReturnType));
 				}
 			}
 
-			//Returning the NameValueCollection
-			return result;
+			return dobj;
 		}
 
-		/// <summary>
-		/// Populates a List&lt;MemberValue&gt; with the atomized fields in queryString
-		/// </summary>
-		/// <param name="queryString">
-		/// QueryString that contains atomized names and values of DataValues
-		/// </param>
-		/// <param name="instances">
-		/// Collection that will be populated from queryString
-		/// </param>
-		public static void ToDataValueInstances(string queryString, List<DataMemberValue> instances)
-		{
-			//Validating if the dataProperties argument is null
-			if (string.IsNullOrWhiteSpace(queryString)) return;
-			if (instances == null) throw new ArgumentNullException("instances");
-
-			NameValueCollection nameValues = ToNameValues(queryString);
-
-			//populating instances
-			ToDataValueInstances(nameValues, instances);
-		}
-
-		/// <summary>
-		/// Populates a List&lt;MemberValue&gt; with the atomized fields in values
-		/// </summary>
-		/// <param name="values">
-		/// Collection that contains atomazed names and values of DataValues
-		/// </param>
-		/// <param name="instances">
-		/// Collection that will be populated from values
-		/// </param>
-		public static void ToDataValueInstances(NameValueCollection values, List<DataMemberValue> instances)
-		{
-			//Validating if the dataProperties argument is null
-			if (values == null) return;
-			if (instances == null) throw new ArgumentNullException("instances");
-
-			//copy values from values to atomized
-			foreach (DataMemberValue dvi in instances)
-			{
-				//Validating if the value was specified on dicResult collection
-				if (Core.Data.Validation.RequiredValidator.HasValue(values[dvi.DataMember.Member.Expression]))
-				{
-					//Adding the value to the collection
-					dvi.Value = Converter.ChangeType(values[dvi.DataMember.Member.Expression], dvi.DataMember.Member.ReturnType);
-				}
-			}
-		}
+		#endregion
 	}
 }

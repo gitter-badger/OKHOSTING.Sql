@@ -602,12 +602,12 @@ namespace OKHOSTING.Sql.ORM
 							column.Name = memberInfo.Name + "_" + pk.Member.Expression.Replace('.', '_');
 							column.Table = dtype.Table;
 							column.IsPrimaryKey = false;
-							column.IsNullable = !Core.Data.Validation.Required.IsRequired(memberInfo);
+							column.IsNullable = !RequiredValidator.IsRequired(memberInfo);
 							column.DbType = Sql.DataBase.Parse(pk.Member.ReturnType);
 
 							if (column.IsString)
 							{
-								column.Length = Core.Data.Validation.StringLengthValidator.GetMaxLenght(pk.Member.FinalMemberInfo);
+								column.Length = StringLengthValidator.GetMaxLenght(pk.Member.FinalMemberInfo);
 							}
 
 							dtype.Table.Columns.Add(column);
@@ -625,7 +625,7 @@ namespace OKHOSTING.Sql.ORM
 						Schema.Column column = new Schema.Column();
 						column.Name = memberInfo.Name;
 						column.Table = dtype.Table;
-						column.IsNullable = !Core.Data.Validation.Required.IsRequired(memberInfo);
+						column.IsNullable = !Core.Data.Validation.RequiredValidator.IsRequired(memberInfo);
 						column.IsPrimaryKey = false;
 
 						//create datamember
