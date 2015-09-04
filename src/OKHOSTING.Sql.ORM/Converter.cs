@@ -21,23 +21,23 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// A string representation of object
 		/// </returns>
-		public static string ToString(object value)
+		public static string Serialize(object value)
 		{
 			if (value == null)
 				return null;
 
 			else if (value is DataType)
 			{
-				return ToString((DataType) value);
+				return Serialize((DataType) value);
 			}
 			else if (value is DataMember)
 			{
-				return ToString((DataMember) value);
+				return Serialize((DataMember) value);
 			}
 			else if (DataType.IsMapped(value.GetType()))
 			{
 				DataType dtype = value.GetType();
-				return ToString(value, dtype.AllDataMembers);
+				return Serialize(value, dtype.AllDataMembers);
 			}
 			else
 			{
@@ -57,7 +57,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// A string representation of instance
 		/// </returns>
-		public static string ToString(object instance, IEnumerable<DataMember> dmembers)
+		public static string Serialize(object instance, IEnumerable<DataMember> dmembers)
 		{
 			if (instance == null)
 				return null;
@@ -68,12 +68,12 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			DataType dtype = instance.GetType();
-			string result = "DataType=" + ToString(dtype) + '&';
+			string result = "DataType=" + Serialize(dtype) + '&';
 
 			foreach (DataMember dmember in dmembers)
 			{
 				var memberValue = dmember.Member.GetValue(instance);
-				result += dmember.Member.Expression + '=' + ToString(memberValue);
+				result += dmember.Member.Expression + '=' + Serialize(memberValue);
 			}
 
 			return result.TrimEnd('&');
@@ -88,7 +88,7 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// A string representation of DataType
 		/// </returns>
-		public static string ToString(DataType value)
+		public static string Serialize(DataType value)
 		{
 			//null values
 			if (value == null) return null;
@@ -105,12 +105,12 @@ namespace OKHOSTING.Sql.ORM
 		/// <returns>
 		/// A string representation of DataMember
 		/// </returns>
-		public static string ToString(DataMember value)
+		public static string Serialize(DataMember value)
 		{
 			//null values
 			if (value == null) return null;
 
-			return "DataType=" + ToString(value.DataType) + "&DataMember=" + value.Member.Expression;
+			return "DataType=" + Serialize(value.DataType) + "&DataMember=" + value.Member.Expression;
 		}
 
 		#endregion

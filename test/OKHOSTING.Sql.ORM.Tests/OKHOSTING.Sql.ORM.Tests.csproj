@@ -66,6 +66,10 @@
       <Project>{0a304a16-0f65-4ce6-a878-41263293021c}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\OKHOSTING.Sql.ORM.UI.Web.Forms\OKHOSTING.Sql.ORM.UI.Web.Forms.csproj">
+      <Project>{dfd3ea16-146c-41d5-80e0-17cb81ada125}</Project>
+      <Name>OKHOSTING.Sql.ORM.UI.Web.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\src\OKHOSTING.Sql.ORM\OKHOSTING.Sql.ORM.csproj">
       <Project>{de7ef600-96a1-468d-93c4-5bc815e62390}</Project>
       <Name>OKHOSTING.Sql.ORM</Name>

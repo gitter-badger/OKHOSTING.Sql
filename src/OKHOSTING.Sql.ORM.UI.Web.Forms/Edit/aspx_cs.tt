@@ -1,11 +1,8 @@
 ﻿<#@ template language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(ProjectDir)/bin/debug/OKHOSTING.Core.dll" #>
 <#@ assembly name="$(ProjectDir)/bin/debug/OKHOSTING.Sql.ORM.dll" #>
 <#@ import namespace="System" #>
 <#@ import namespace="OKHOSTING.Sql.ORM" #>
-<#@ import namespace="OKHOSTING.Core.Data" #>
-<#@ import namespace="OKHOSTING.Core.Data.Validation" #>
 <#@ parameter name="dtype" type="OKHOSTING.Sql.ORM.DataType" #> 
 using System;
 using OKHOSTING.Sql.ORM;
@@ -13,139 +10,15 @@ using <#= dtype.InnerType.Namespace #>;
 
 namespace <#= dtype.InnerType.Namespace #>.UI.WebForms.<#= dtype.InnerType.Name #>
 {
-	protected <#= dtype.InnerType.Name #> Instance;
-
-	public partial class Edit : System.Web.UI.Page
+	public partial class List : System.Web.UI.Page
 	{
-		
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			Instance = new <#= dtype.InnerType.Name #>();
+			var dtype = DataType<<#= dtype.InnerType.Name #>>.GetMap();
 			
-			<#
-			foreach(var dmember in dtype.PrimaryKey)
-			{
-			#>
-				Instance.<#= dmember.Member.Expression #> = (<#= dmember.Member.ReturnType.FullName #>) Core.Data.Converter.ChangeType(Request.QueryString["<#= dmember.Member.Expression #>"], typeof(<#= dmember.Member.ReturnType.FullName #>));
-			<#
-			}
-			#>
-
 			//load data from database
-			DataBase.Default.Select(Instance);
-
-			if(IsPostBack)
-			{
-				return;
-			}
-
-			//set control values on the first load
-			<#
-			foreach (System.Reflection.MemberInfo member in dtype.AllMemberInfos)
-			{
-				Type returnType = MemberExpression.GetReturnType(member);
-
-				if (dtype.IsForeignKey(member))
-				{
-				#>
-					ctr<#= member.Name #>.DataSource = DataBase.Default.Select<<#= returnType.Name #>>();
-					ctr<#= member.Name #>.DataBind();
-				<#
-				}
-				else if (returnType.IsEnum)
-				{
-				#>
-					foreach (string name Enum.GetNames(returnType))
-					{
-						ctr<#= member.Name #>.Items.Add(name);
-					}
-				<#
-				}
-				else if (returnType == typeof(bool))
-				{
-				#>
-					ctr<#= member.Name  #>.Checked = Instance.<#= member.Name #>;
-				<#
-				}
-				else if (returnType == typeof(DateTime))
-				{
-				#>
-					ctr<#= member.Name  #>.Text = Instance.<#= member.Name #>.ToString("dd-MM-yyyy hh:mm");
-				<#
-				}
-				else if (OKHOSTING.Core.Extensions.TypeExtensions.IsNumeric(returnType))
-				{
-				#>
-					ctr<#= member.Name  #>.Text = Instance.<#= member.Name #>.ToString();
-				<#
-				}
-				else if (returnType == typeof(string))
-				{
-				#>
-					ctr<#= member.Name  #>.Text = Instance.<#= member.Name #>;
-				<#
-				}
-				else
-				{
-				#>
-					<asp:TextBox runat="server" ID="ctr<#= member.Name  #>"></asp:TextBox>
-				<#
-				}
-			}
-			#>
-		}
-
-		protected void cmdSave_Click(object sender, EventArgs e)
-		{
-			<# 
-			foreach (System.Reflection.MemberInfo member in dtype.AllMemberInfos)
-			{
-				Type returnType = MemberExpression.GetReturnType(member);
-
-				if(dtype.IsForeignKey(member))
-				{
-				#>
-					<asp:DropDownList runat="server" id="ctr<#= member.Name  #>"></asp:DropDownList>
-				<#
-				}
-				else if(returnType.IsEnum)
-				{
-				#>
-					<asp:DropDownList runat="server" id="ctr<#= member.Name  #>"></asp:DropDownList>
-				<#
-				}
-				else if(returnType == typeof(bool))
-				{
-				#>
-					Instance.<#= member.Name #> = ctr<#= member.Name  #>.Checked;
-				<#
-				}
-				else if(returnType == typeof(DateTime))
-				{
-				#>
-					<asp:TextBox TextMode="DateTime" runat="server" ID="ctr<#= member.Name  #>"></asp:TextBox>
-				<#
-				}
-				else if(OKHOSTING.Core.Extensions.TypeExtensions.IsNumeric(returnType))
-				{
-				#>
-					<asp:TextBox TextMode="Number" runat="server" ID="ctr<#= member.Name  #>"></asp:TextBox>
-				<#
-				}
-				else if(returnType == typeof(string))
-				{
-				#>
-					Instance.<#= member.Name #> = ctr<#= member.Name  #>.Text;
-				<#
-				}
-				else
-				{
-				#>
-					Instance.<#= member.Name #> = ctr<#= member.Name  #>.Text;
-				<#
-				}
-			}
-			#>
+			grdList.DataSource = DataBase.Default.Select(dtype);
+			grdList.DatBind();
 		}
 	}
 }
