@@ -27,7 +27,7 @@ namespace <#= dtype.InnerType.Namespace #>.UI.WebForms.<#= dtype.InnerType.Name 
 			foreach(var dmember in dtype.PrimaryKey)
 			{
 			#>
-				Instance.<#= dmember.Member.Expression #> = (<#= dmember.Member.ReturnType.FullName #>) Core.Data.Converter.ChangeType(Request.QueryString["<#= dmember.Member.Expression #>"], typeof(<#= dmember.Member.ReturnType.FullName #>));
+				Instance.<#= dmember.Member.Expression #> = (<#= dmember.Member.ReturnType.FullName #>) Core.Data.Converter.ChangeType<<#= dmember.Member.ReturnType.FullName #>>(Request.QueryString["<#= dmember.Member.Expression #>"]);
 			<#
 			}
 			#>

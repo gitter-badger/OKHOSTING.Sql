@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OKHOSTING.Sql.ORM.UI.Web.Forms</RootNamespace>
     <AssemblyName>OKHOSTING.Sql.ORM.UI.Web.Forms</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,6 +36,31 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CodeGenerator.cs" />
+    <Compile Include="General\master.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>master.tt</DependentUpon>
+    </Compile>
+    <Compile Include="General\master_cs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>master_cs.tt</DependentUpon>
+    </Compile>
+    <Compile Include="General\master_designer_cs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>master_designer_cs.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Global\asax.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>asax.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Global\asax_cs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>asax_cs.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -87,6 +113,26 @@
     <Content Include="Edit\aspx_designer_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
+    </Content>
+    <Content Include="General\master.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>master.cs</LastGenOutput>
+    </Content>
+    <Content Include="General\master_cs.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>master_cs.cs</LastGenOutput>
+    </Content>
+    <Content Include="General\master_designer_cs.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>master_designer_cs.cs</LastGenOutput>
+    </Content>
+    <Content Include="Global\asax.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>asax.cs</LastGenOutput>
+    </Content>
+    <Content Include="Global\asax_cs.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>asax_cs.cs</LastGenOutput>
     </Content>
     <Content Include="List\aspx.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>

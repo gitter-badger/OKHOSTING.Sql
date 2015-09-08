@@ -7,19 +7,20 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Edit
+namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Global
 {
+    using System.Linq;
+    using System.Text;
+    using System.Collections.Generic;
     using System;
-    using OKHOSTING.Sql.ORM;
-    using OKHOSTING.Core.Data.Validation;
     
     /// <summary>
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
+    #line 1 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Global\asax_cs.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
-    public partial class aspx : aspxBase
+    public partial class asax_cs : asax_csBase
     {
 #line hidden
         /// <summary>
@@ -27,272 +28,8 @@ namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Edit
         /// </summary>
         public virtual string TransformText()
         {
-            this.Write(" \r\n<%@ Page Title=\"\" Language=\"C#\" MasterPageFile=\"~/General.Master\" AutoEventWir" +
-                    "eup=\"true\" CodeBehind=\"Edit.aspx.cs\" Inherits=\"");
-            
-            #line 9 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Namespace));
-            
-            #line default
-            #line hidden
-            this.Write(".UI.WebForms.");
-            
-            #line 9 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
-            
-            #line default
-            #line hidden
-            this.Write(".Edit\" %>\r\n<asp:Content ID=\"Content1\" ContentPlaceHolderID=\"head\" runat=\"server\">" +
-                    "\r\n</asp:Content>\r\n<asp:Content ID=\"Content2\" ContentPlaceHolderID=\"ContentPlaceH" +
-                    "older1\" runat=\"server\">\r\n\t\r\n\t<h1>Edit ");
-            
-            #line 14 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
-            
-            #line default
-            #line hidden
-            this.Write("</h1>\r\n\r\n\t<table>\r\n\t\t");
-            
-            #line 17 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
- 
-		foreach (System.Reflection.MemberInfo member in dtype.AllMemberInfos)
-		{
-		
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t<tr>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t");
-            
-            #line 23 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(RequiredValidator.IsRequired(member)? "<b>" + member.Name + "</b>" : member.Name));
-            
-            #line default
-            #line hidden
-            this.Write(":\r\n\t\t\t\t</td>\r\n\t\t\t\t<td>\r\n\t\t\t\t\t");
-            
-            #line 26 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
- 
-					Type returnType = MemberExpression.GetReturnType(member);
-
-					if (dtype.IsForeignKey(member))
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:DropDownList runat=\"server\" id=\"ctr");
-            
-            #line 32 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:DropDownList>\r\n\t\t\t\t\t");
-            
-            #line 33 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else if(returnType.IsEnum)
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:DropDownList runat=\"server\" id=\"ctr");
-            
-            #line 38 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:DropDownList>\r\n\t\t\t\t\t");
-            
-            #line 39 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else if (returnType == typeof(bool))
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:CheckBox runat=\"server\" id=\"ctr");
-            
-            #line 44 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:CheckBox>\r\n\t\t\t\t\t");
-            
-            #line 45 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else if(returnType == typeof(DateTime))
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:TextBox TextMode=\"DateTime\" runat=\"server\" ID=\"ctr");
-            
-            #line 50 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:TextBox>\r\n\t\t\t\t\t");
-            
-            #line 51 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else if(OKHOSTING.Core.Extensions.TypeExtensions.IsNumeric(returnType))
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:TextBox TextMode=\"Number\" runat=\"server\" ID=\"ctr");
-            
-            #line 56 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:TextBox>\r\n\t\t\t\t\t");
-            
-            #line 57 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else if(returnType == typeof(string))
-					{
-						uint? maxLenght = StringLengthValidator.GetMaxLenght(member);
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:TextBox runat=\"server\" ID=\"ctr");
-            
-            #line 63 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\" ");
-            
-            #line 63 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(maxLenght.HasValue? "MaxLenght=" + maxLenght : string.Empty));
-            
-            #line default
-            #line hidden
-            this.Write("></asp:TextBox>\r\n\t\t\t\t\t");
-            
-            #line 64 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-					else
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:TextBox runat=\"server\" ID=\"ctr");
-            
-            #line 69 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\"></asp:TextBox>\r\n\t\t\t\t\t");
-            
-            #line 70 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-					}
-
-					if(RequiredValidator.IsRequired(member))
-					{
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t\t\t<asp:RequiredFieldValidator runat=\"server\" ControlToValidate=\"ctr");
-            
-            #line 76 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
-            
-            #line default
-            #line hidden
-            this.Write("\" Display=\"Static\" Text=\"Required\" />\r\n\t\t\t\t\t");
-            
-            #line 77 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
- 
-					}
-					
-            
-            #line default
-            #line hidden
-            this.Write("\t\t\t\t</td>\r\n\t\t\t</tr>\r\n\t\t");
-            
-            #line 82 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-		} 
-		
-            
-            #line default
-            #line hidden
-            this.Write("\t\t<tr>\r\n\t\t\t<td colspan=\"2\">\r\n\t\t\t\t<asp:Button runat=\"server\" ID=\"cmdSave\" Text=\"Sa" +
-                    "ve\" OnClick=\"cmdSave_Click\" />\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t\t<tr>\r\n\t\t\t<td colspan=\"2\">\r\n" +
-                    "\t\t\t\t<a href=\"List.aspx\">Cancel</a>\r\n\t\t\t</td>\r\n\t\t</tr>\r\n\t</table>\r\n</asp:Content>" +
-                    "\r\n");
             return this.GenerationEnvironment.ToString();
         }
-        
-        #line 1 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx.tt"
-
-private global::OKHOSTING.Sql.ORM.DataType _dtypeField;
-
-/// <summary>
-/// Access the dtype parameter of the template.
-/// </summary>
-private global::OKHOSTING.Sql.ORM.DataType dtype
-{
-    get
-    {
-        return this._dtypeField;
-    }
-}
-
-
-/// <summary>
-/// Initialize the template
-/// </summary>
-public virtual void Initialize()
-{
-    if ((this.Errors.HasErrors == false))
-    {
-bool dtypeValueAcquired = false;
-if (this.Session.ContainsKey("dtype"))
-{
-    this._dtypeField = ((global::OKHOSTING.Sql.ORM.DataType)(this.Session["dtype"]));
-    dtypeValueAcquired = true;
-}
-if ((dtypeValueAcquired == false))
-{
-    object data = global::System.Runtime.Remoting.Messaging.CallContext.LogicalGetData("dtype");
-    if ((data != null))
-    {
-        this._dtypeField = ((global::OKHOSTING.Sql.ORM.DataType)(data));
-    }
-}
-
-
-    }
-}
-
-
-        
-        #line default
-        #line hidden
     }
     
     #line default
@@ -302,7 +39,7 @@ if ((dtypeValueAcquired == false))
     /// Base class for this transformation
     /// </summary>
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "14.0.0.0")]
-    public class aspxBase
+    public class asax_csBase
     {
         #region Fields
         private global::System.Text.StringBuilder generationEnvironmentField;

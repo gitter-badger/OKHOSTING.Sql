@@ -156,7 +156,7 @@ namespace OKHOSTING.Sql.ORM
 					foreach (var member in parent.MemberInfos)
 					{
 						//Do not duplicate the primary key by omitting base classes primary keys
-						if (parent != this && !DataMember.IsPrimaryKey(member))
+						if (DataMember.IsPrimaryKey(member) && parent != this)
 						{
 							continue;
 						}

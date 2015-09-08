@@ -9,7 +9,7 @@
 namespace <#= dtype.InnerType.Namespace #>.UI.WebForms.<#= dtype.InnerType.Name #>
 	
 	
-	public partial class Delete {
+	public partial class Edit {
 		
 		/// <summary>
 		/// cmdDelete control.

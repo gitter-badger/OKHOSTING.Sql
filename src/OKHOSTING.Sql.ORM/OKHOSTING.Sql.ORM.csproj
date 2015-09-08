@@ -57,7 +57,7 @@
     <Compile Include="Conversions\Lowercase.cs" />
     <Compile Include="Conversions\Trim.cs" />
     <Compile Include="Conversions\EncryptString.cs" />
-    <Compile Include="Converter.cs" />
+    <Compile Include="Serializer.cs" />
     <Compile Include="DataBase.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -11,6 +11,8 @@ namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Edit
 {
     using System;
     using OKHOSTING.Sql.ORM;
+    using OKHOSTING.Core.Data;
+    using OKHOSTING.Core.Data.Validation;
     
     /// <summary>
     /// Class to produce the template output
@@ -26,37 +28,464 @@ namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Edit
         /// </summary>
         public virtual string TransformText()
         {
+            this.Write("﻿");
             this.Write(" \r\nusing System;\r\nusing OKHOSTING.Sql.ORM;\r\nusing ");
             
-            #line 9 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            #line 12 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Namespace));
             
             #line default
             #line hidden
             this.Write(";\r\n\r\nnamespace ");
             
-            #line 11 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            #line 14 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Namespace));
             
             #line default
             #line hidden
             this.Write(".UI.WebForms.");
             
-            #line 11 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            #line 14 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
             
             #line default
             #line hidden
-            this.Write("\r\n{\r\n\tpublic partial class List : System.Web.UI.Page\r\n\t{\r\n\t\tprotected void Page_L" +
-                    "oad(object sender, EventArgs e)\r\n\t\t{\r\n\t\t\tvar dtype = DataType<");
+            this.Write("\r\n{\r\n\tprotected ");
             
-            #line 17 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            #line 16 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
             
             #line default
             #line hidden
-            this.Write(">.GetMap();\r\n\t\t\t\r\n\t\t\t//load data from database\r\n\t\t\tgrdList.DataSource = DataBase." +
-                    "Default.Select(dtype);\r\n\t\t\tgrdList.DatBind();\r\n\t\t}\r\n\t}\r\n}");
+            this.Write(" Instance;\r\n\r\n\tpublic partial class Edit : System.Web.UI.Page\r\n\t{\r\n\t\t\r\n\t\tprotecte" +
+                    "d void Page_Load(object sender, EventArgs e)\r\n\t\t{\r\n\t\t\tInstance = new ");
+            
+            #line 23 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
+            
+            #line default
+            #line hidden
+            this.Write("();\r\n\t\t\tvar dtype = DataType<");
+            
+            #line 24 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dtype.InnerType.Name));
+            
+            #line default
+            #line hidden
+            this.Write(">.GetMap();\r\n\t\t\t\r\n\t\t\t");
+            
+            #line 26 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+			foreach(var dmember in dtype.PrimaryKey)
+			{
+			
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\tInstance.");
+            
+            #line 30 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dmember.Member.Expression));
+            
+            #line default
+            #line hidden
+            this.Write(" = (");
+            
+            #line 30 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dmember.Member.ReturnType.FullName));
+            
+            #line default
+            #line hidden
+            this.Write(") Core.Data.Converter.ChangeType<");
+            
+            #line 30 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dmember.Member.ReturnType.FullName));
+            
+            #line default
+            #line hidden
+            this.Write(">(Request.QueryString[\"");
+            
+            #line 30 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(dmember.Member.Expression));
+            
+            #line default
+            #line hidden
+            this.Write("\"]);\r\n\t\t\t");
+            
+            #line 31 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+			}
+			
+            
+            #line default
+            #line hidden
+            this.Write("\r\n\t\t\t//load data from database\r\n\t\t\tDataBase.Default.Select(Instance);\r\n\r\n\t\t\tif(Is" +
+                    "PostBack)\r\n\t\t\t{\r\n\t\t\t\treturn;\r\n\t\t\t}\r\n\r\n\t\t\t//set control values on the first load\r" +
+                    "\n\t\t\t");
+            
+            #line 44 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+			foreach (System.Reflection.MemberInfo member in dtype.AllMemberInfos)
+			{
+				Type returnType = MemberExpression.GetReturnType(member);
+
+				if (dtype.IsForeignKey(member))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tstring current");
+            
+            #line 52 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("String = Serializer.ToString(Instance);\r\n\t\t\t\t\tforeach (var obj in DataBase.Defaul" +
+                    "t.Select<");
+            
+            #line 53 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(returnType.Name));
+            
+            #line default
+            #line hidden
+            this.Write(">())\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tvar item = new ListItem(obj.ToString(), Serializer.ToString(o" +
+                    "bj));\r\n\t\t\t\t\t\t\r\n\t\t\t\t\t\tif (item.Value == current");
+            
+            #line 57 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("String)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\titem.Selected = true;\r\n\t\t\t\t\t\t}\r\n\r\n\t\t\t\t\t\tctr");
+            
+            #line 62 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Items.Add(item)\r\n\t\t\t\t\t}\r\n\r\n\t\t\t\t\tctr");
+            
+            #line 65 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".DataBind();\r\n\t\t\t\t");
+            
+            #line 66 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if (returnType.IsEnum)
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tforeach (string name Enum.GetNames(returnType))\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tctr");
+            
+            #line 73 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Items.Add(name);\r\n\t\t\t\t\t}\r\n\t\t\t\t");
+            
+            #line 75 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if (returnType == typeof(bool))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tctr");
+            
+            #line 80 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Checked = Instance.");
+            
+            #line 80 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n\t\t\t\t");
+            
+            #line 81 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if (returnType == typeof(DateTime))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tctr");
+            
+            #line 86 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Text = Instance.");
+            
+            #line 86 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".ToString(\"dd-MM-yyyy hh:mm\");\r\n\t\t\t\t");
+            
+            #line 87 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if (OKHOSTING.Core.Extensions.TypeExtensions.IsNumeric(returnType))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tctr");
+            
+            #line 92 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Text = Instance.");
+            
+            #line 92 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".ToString();\r\n\t\t\t\t");
+            
+            #line 93 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if (returnType == typeof(string))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tctr");
+            
+            #line 98 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Text = Instance.");
+            
+            #line 98 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(";\r\n\t\t\t\t");
+            
+            #line 99 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\t<asp:TextBox runat=\"server\" ID=\"ctr");
+            
+            #line 104 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\"></asp:TextBox>\r\n\t\t\t\t");
+            
+            #line 105 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+			}
+			
+            
+            #line default
+            #line hidden
+            this.Write("\t\t}\r\n\r\n\t\tprotected void cmdSave_Click(object sender, EventArgs e)\r\n\t\t{\r\n\t\t\t");
+            
+            #line 113 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+ 
+			foreach (System.Reflection.MemberInfo member in dtype.AllMemberInfos)
+			{
+				Type returnType = MemberExpression.GetReturnType(member);
+
+				if(dtype.IsForeignKey(member))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tInstance.");
+            
+            #line 121 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" = Serializer.ToInstance(");
+            
+            #line 121 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".SelectedValue);\r\n\t\t\t\t");
+            
+            #line 122 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if(returnType.IsEnum)
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\t<asp:DropDownList runat=\"server\" id=\"ctr");
+            
+            #line 127 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\"></asp:DropDownList>\r\n\t\t\t\t");
+            
+            #line 128 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if(returnType == typeof(bool))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tInstance.");
+            
+            #line 133 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" = ctr");
+            
+            #line 133 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Checked;\r\n\t\t\t\t");
+            
+            #line 134 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if(returnType == typeof(DateTime))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\t<asp:TextBox TextMode=\"DateTime\" runat=\"server\" ID=\"ctr");
+            
+            #line 139 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\"></asp:TextBox>\r\n\t\t\t\t");
+            
+            #line 140 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if(OKHOSTING.Core.Extensions.TypeExtensions.IsNumeric(returnType))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\t<asp:TextBox TextMode=\"Number\" runat=\"server\" ID=\"ctr");
+            
+            #line 145 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write("\"></asp:TextBox>\r\n\t\t\t\t");
+            
+            #line 146 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else if(returnType == typeof(string))
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tInstance.");
+            
+            #line 151 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" = ctr");
+            
+            #line 151 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Text;\r\n\t\t\t\t");
+            
+            #line 152 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+				else
+				{
+				
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\t\tInstance.");
+            
+            #line 157 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(" = ctr");
+            
+            #line 157 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+            this.Write(this.ToStringHelper.ToStringWithCulture(member.Name));
+            
+            #line default
+            #line hidden
+            this.Write(".Text;\r\n\t\t\t\t");
+            
+            #line 158 "C:\Desarrollo\OKHOSTING.Sql\src\OKHOSTING.Sql.ORM.UI.Web.Forms\Edit\aspx_cs.tt"
+
+				}
+			}
+			
+            
+            #line default
+            #line hidden
+            this.Write("\t\t\t\r\n\t\t\tDataBase.Default.Update(Instance);\r\n\t\t}\r\n\t}\r\n}");
             return this.GenerationEnvironment.ToString();
         }
         
