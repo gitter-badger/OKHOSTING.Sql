@@ -120,6 +120,22 @@ namespace OKHOSTING.Sql.ORM
 		{
 			return memberInfo.Name.ToString().ToLower() == "id" || memberInfo.GetCustomAttributes(typeof(System.ComponentModel.DataAnnotations.KeyAttribute), false).Length > 0;
 		}
+
+		/// <summary>
+		/// Sets the converter to all DataMembers that have this returnType
+		/// </summary>
+		/// <param name="converter">Converter to use</param>
+		/// <param name="returnType">Return type of the members that will have the converter set</param>
+		public static void SetConverter(Conversions.ConverterBase converter, Type returnType)
+		{
+			foreach (DataType dtype in DataType.AllDataTypes)
+			{
+				foreach (DataMember dmember in dtype.DataMembers.Where(dm => dm.Member.ReturnType.Equals(returnType)))
+				{
+					dmember.Converter = converter;
+				}
+			}
+		}
 	}
 
 	public class DataMember<T> : DataMember

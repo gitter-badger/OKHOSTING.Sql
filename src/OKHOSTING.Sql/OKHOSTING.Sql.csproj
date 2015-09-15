@@ -104,7 +104,7 @@
     <Folder Include="obj\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core\OKHOSTING.Core.csproj">
       <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>

@@ -706,7 +706,7 @@ namespace OKHOSTING.Sql.ORM
 		{
 		}
 
-		public new IEnumerable<DataMember<T>> Members
+		public IEnumerable<DataMember<T>> Members
 		{
 			get
 			{

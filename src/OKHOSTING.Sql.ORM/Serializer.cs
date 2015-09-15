@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using CoreConverter = OKHOSTING.Core.Data.Converter;
+using CoreConverter = OKHOSTING.Core.Data.Convert;
 
 namespace OKHOSTING.Sql.ORM
 {

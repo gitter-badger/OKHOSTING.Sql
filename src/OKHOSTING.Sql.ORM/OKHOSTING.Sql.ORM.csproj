@@ -48,11 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Conversions\ConverterBase.cs" />
+    <Compile Include="Conversions\DataMemberConverter.cs" />
     <Compile Include="Conversions\EncryptBinary.cs" />
     <Compile Include="Conversions\Json.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Conversions\TypeStringConverter.cs" />
+    <Compile Include="Conversions\DataTypeConverter.cs" />
+    <Compile Include="Conversions\ListConverter.cs" />
+    <Compile Include="Conversions\TypeConverter.cs" />
     <Compile Include="Conversions\Uppercase.cs" />
     <Compile Include="Conversions\Lowercase.cs" />
     <Compile Include="Conversions\Trim.cs" />
@@ -102,11 +105,11 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core.Cryptography\OKHOSTING.Core.Cryptography.csproj">
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core.Cryptography\OKHOSTING.Core.Cryptography.csproj">
       <Project>{88fa702f-1354-4abc-abc3-540cd659bd57}</Project>
       <Name>OKHOSTING.Core.Cryptography</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core\OKHOSTING.Core.csproj">
       <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>

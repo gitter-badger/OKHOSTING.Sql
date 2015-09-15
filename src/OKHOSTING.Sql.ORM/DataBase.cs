@@ -531,7 +531,7 @@ namespace OKHOSTING.Sql.ORM
 			}
 
 			//get list of objects
-			var result = DataBase.Default.SearchInherited(select).ToList();
+			var result = SearchInherited(select).ToList();
 
 			//if the list is an array, try to "set"
 			if (memberReturnType.IsArray)

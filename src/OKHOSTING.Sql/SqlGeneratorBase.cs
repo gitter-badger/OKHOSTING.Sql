@@ -116,7 +116,7 @@ namespace OKHOSTING.Sql
 				{
 					try
 					{
-						intValue = (Int64)Convert.ChangeType(cv.Value, typeof(Int64));
+						intValue = (Int64)System.Convert.ChangeType(cv.Value, typeof(Int64));
 					}
 					catch { }
 				}

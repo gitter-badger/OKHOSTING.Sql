@@ -59,17 +59,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\OKHOSTING.Core\OKHOSTING.Core.csproj">
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core\OKHOSTING.Core.csproj">
       <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\OKHOSTING.Sql.MySql\OKHOSTING.Sql.MySql.csproj">
       <Project>{0a304a16-0f65-4ce6-a878-41263293021c}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\OKHOSTING.Sql.ORM.UI.Web.Forms\OKHOSTING.Sql.ORM.UI.Web.Forms.csproj">
-      <Project>{dfd3ea16-146c-41d5-80e0-17cb81ada125}</Project>
-      <Name>OKHOSTING.Sql.ORM.UI.Web.Forms</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\OKHOSTING.Sql.ORM\OKHOSTING.Sql.ORM.csproj">
       <Project>{de7ef600-96a1-468d-93c4-5bc815e62390}</Project>

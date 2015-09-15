@@ -1,0 +1,10 @@
+{
+  "AppSettings": {
+    "SiteTitle": "OKHOSTING.Sql.ORM.UI.Web.MVC"
+  },
+  "Data": {
+    "DefaultConnection": {
+      "ConnectionString": "Server=(localdb)\\mssqllocaldb;Database=aspnet5-OKHOSTING.Sql.ORM.UI.Web.MVC-333db4c4-e01d-4039-9437-7dffd3cb2df8;Trusted_Connection=True;MultipleActiveResultSets=true"
+    }
+  }
+}

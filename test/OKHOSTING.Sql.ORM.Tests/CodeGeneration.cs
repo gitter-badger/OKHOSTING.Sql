@@ -12,7 +12,7 @@ namespace OKHOSTING.Sql.ORM.Tests
 			Type[] types = new Type[] { typeof(Person), typeof(Employee), typeof(Customer), typeof(CustomerContact), typeof(Address), typeof(Country) };
 
 			var dtypes = DataType.DefaultMap(types);
-			OKHOSTING.Sql.ORM.UI.Web.Forms.CodeGenerator.Generate(dtypes, @"C:\Pruebas\Test1");
+			//OKHOSTING.Sql.ORM.UI.Web.Forms.CodeGenerator.Generate(dtypes, @"C:\Pruebas\Test1");
 		}
 	}
 }
