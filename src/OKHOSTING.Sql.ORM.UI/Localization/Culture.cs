@@ -122,7 +122,10 @@ namespace OKHOSTING.Sql.ORM.UI.Localization
 		/// <summary>
 		/// Default application culture
 		/// </summary>
-		public static Culture Default;
+		public static Culture Default
+		{
+			get; set;
+		}
 
 		/// <summary>
 		/// Initializes static DefaultCulture property

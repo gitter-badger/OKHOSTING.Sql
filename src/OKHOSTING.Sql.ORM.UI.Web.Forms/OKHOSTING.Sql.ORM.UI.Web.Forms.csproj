@@ -42,7 +42,20 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="CodeGenerator.cs" />
+    <Compile Include="Private\Logout.ashx.cs">
+      <DependentUpon>Logout.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Private\UserControls\ForeignKeyPickerAutoComplete.ashx.cs">
+      <DependentUpon>ForeignKeyPickerAutoComplete.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Private\UserControls\Navigation.ascx.cs">
+      <DependentUpon>Navigation.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Private\UserControls\Navigation.ascx.designer.cs">
+      <DependentUpon>Navigation.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\CodeGenerator.cs" />
     <Compile Include="ForgotPassword.aspx.cs">
       <DependentUpon>ForgotPassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -74,6 +87,21 @@
     <Compile Include="Private\PrivateGeneral.master.designer.cs">
       <DependentUpon>PrivateGeneral.master</DependentUpon>
     </Compile>
+    <Compile Include="Templates\Execute\aspx.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>aspx.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Execute\aspx_cs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>aspx_cs.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Execute\aspx_designer_cs.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>aspx_designer_cs.tt</DependentUpon>
+    </Compile>
     <Compile Include="Private\User\ChangePassword.aspx.cs">
       <DependentUpon>ChangePassword.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -82,117 +110,146 @@
       <DependentUpon>ChangePassword.aspx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Private\UserControls\ForeignKeyPicker.ascx.cs">
+      <DependentUpon>ForeignKeyPicker.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Private\UserControls\ForeignKeyPicker.ascx.designer.cs">
+      <DependentUpon>ForeignKeyPicker.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\Navigation.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Navigation.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Private\UserControls\Navigation.ascx" />
+    <Content Include="Resources\css\custom.css" />
+    <Content Include="Resources\css\bootstrap-theme.css" />
+    <Content Include="Resources\css\bootstrap.css" />
+    <Content Include="Resources\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="ForgotPassword.aspx" />
     <Content Include="Login.aspx" />
-    <Content Include="Private\Templates\Delete\aspx.tt">
+    <Content Include="Templates\Delete\aspx.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Delete\aspx_cs.tt">
+    <Content Include="Templates\Delete\aspx_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Delete\aspx_designer_cs.tt">
+    <Content Include="Templates\Delete\aspx_designer_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Detail\aspx.tt">
+    <Content Include="Templates\Detail\aspx.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Detail\aspx_cs.tt">
+    <Content Include="Templates\Detail\aspx_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Detail\aspx_designer_cs.tt">
+    <Content Include="Templates\Detail\aspx_designer_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Edit\aspx.tt">
+    <Content Include="Templates\Edit\aspx.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Edit\aspx_cs.tt">
+    <Content Include="Templates\Edit\aspx_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\Edit\aspx_designer_cs.tt">
+    <Content Include="Templates\Edit\aspx_designer_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
     </Content>
     <Content Include="Global.asax" />
-    <Content Include="Private\Templates\List\aspx.tt">
+    <Content Include="Templates\Execute\aspx.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\List\aspx_cs.tt">
+    <Content Include="Templates\Execute\aspx_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_cs.cs</LastGenOutput>
     </Content>
-    <Content Include="Private\Templates\List\aspx_designer_cs.tt">
+    <Content Include="Templates\Execute\aspx_designer_cs.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\List\aspx.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>aspx.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\List\aspx_cs.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>aspx_cs.cs</LastGenOutput>
+    </Content>
+    <Content Include="Templates\List\aspx_designer_cs.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>aspx_designer_cs.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Private\Templates\Delete\aspx.cs">
+    <Compile Include="Templates\Delete\aspx.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>aspx.tt</DependentUpon>
     </Compile>
-    <Compile Include="Private\Templates\Delete\aspx_cs.cs">
+    <Compile Include="Templates\Delete\aspx_cs.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>aspx_cs.tt</DependentUpon>
     </Compile>
-    <Compile Include="Private\Templates\Delete\aspx_designer_cs.cs">
+    <Compile Include="Templates\Delete\aspx_designer_cs.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>aspx_designer_cs.tt</DependentUpon>
     </Compile>
-    <Compile Include="Private\Templates\Detail\aspx.cs">
+    <Compile Include="Templates\Detail\aspx.cs">
       <DependentUpon>aspx.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\Detail\aspx_cs.cs">
+    <Compile Include="Templates\Detail\aspx_cs.cs">
       <DependentUpon>aspx_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\Detail\aspx_designer_cs.cs">
+    <Compile Include="Templates\Detail\aspx_designer_cs.cs">
       <DependentUpon>aspx_designer_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\Edit\aspx.cs">
+    <Compile Include="Templates\Edit\aspx.cs">
       <DependentUpon>aspx.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\Edit\aspx_cs.cs">
+    <Compile Include="Templates\Edit\aspx_cs.cs">
       <DependentUpon>aspx_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\Edit\aspx_designer_cs.cs">
+    <Compile Include="Templates\Edit\aspx_designer_cs.cs">
       <DependentUpon>aspx_designer_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\List\aspx.cs">
+    <Compile Include="Templates\List\aspx.cs">
       <DependentUpon>aspx.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\List\aspx_cs.cs">
+    <Compile Include="Templates\List\aspx_cs.cs">
       <DependentUpon>aspx_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Private\Templates\List\aspx_designer_cs.cs">
+    <Compile Include="Templates\List\aspx_designer_cs.cs">
       <DependentUpon>aspx_designer_cs.tt</DependentUpon>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -221,11 +278,27 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Private\User\ChangePassword.aspx" />
+    <Content Include="Private\UserControls\ForeignKeyPicker.ascx" />
+    <Content Include="packages.config" />
+    <Content Include="Resources\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="Resources\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="Resources\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="Resources\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="Resources\img\favicon.ico" />
+    <Content Include="Resources\img\okhosting-logo.png" />
+    <Content Include="Resources\js\bootstrap.min.js" />
+    <Content Include="Resources\js\jquery-1.9.1.min.js" />
+    <Content Include="Templates\Navigation.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>Navigation.cs</LastGenOutput>
+    </Content>
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="General.Master" />
     <Content Include="Private\PrivateGeneral.master" />
+    <Content Include="Private\UserControls\ForeignKeyPickerAutoComplete.ashx" />
+    <Content Include="Private\Logout.ashx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -247,11 +320,7 @@
       <Name>OKHOSTING.Sql</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\css\" />
-    <Folder Include="Resources\img\" />
-    <Folder Include="Resources\js\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

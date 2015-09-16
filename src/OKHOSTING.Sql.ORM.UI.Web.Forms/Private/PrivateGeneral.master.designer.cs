@@ -13,6 +13,15 @@ namespace OKHOSTING.Sql.ORM.UI.Web.Forms.Private {
     public partial class PrivateGeneral {
         
         /// <summary>
+        /// Navigation control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::OKHOSTING.Sql.ORM.UI.Web.Forms.Private.UserControls.Navigation Navigation;
+        
+        /// <summary>
         /// content control.
         /// </summary>
         /// <remarks>
