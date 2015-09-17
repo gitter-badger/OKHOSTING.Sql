@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DatabaseSchemaReader, Version=1.4.2.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DatabaseSchemaReader.1.4.2.2\lib\net40\DatabaseSchemaReader.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,6 +37,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="DatabaseSchemaReader, Version=1.4.2.1, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\DatabaseSchemaReader.1.4.2.2\lib\net40\DatabaseSchemaReader.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Operations\SelectColumn.cs" />
@@ -104,12 +103,6 @@
     <Folder Include="obj\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core\OKHOSTING.Core.csproj">
-      <Project>{5f753619-fd61-4e33-b1d4-3e3e34879a0a}</Project>
-      <Name>OKHOSTING.Core</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -121,4 +114,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\Net4\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{5F753619-FD61-4E33-B1D4-3E3E34879A0A}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

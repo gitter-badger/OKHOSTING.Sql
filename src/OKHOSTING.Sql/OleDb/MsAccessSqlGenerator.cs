@@ -128,7 +128,7 @@ namespace OKHOSTING.Sql.OleDb
 
 			//If the flow reaches the next line, the type is not 
 			//recognized and then throw an exception
-			throw new NotImplementedException("MsAccessFormatProvider not support type '" + type + "'");
+			throw new ArgumentOutOfRangeException("type", "MsAccessFormatProvider not support type '" + type + "'");
 		}
 
 		/// <summary>

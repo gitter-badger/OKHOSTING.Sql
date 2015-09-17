@@ -139,7 +139,7 @@ namespace OKHOSTING.Sql.SqlServer
 
 			//If the flow reaches the next line, the type is not 
 			//recognized and then throw an exception
-			throw new NotImplementedException("SqlServerFormatProvider not support type '" + type + "'");
+			throw new ArgumentOutOfRangeException("type", "SqlServerFormatProvider not support type '" + type + "'");
 		}
 
 		/// <summary>

@@ -1187,7 +1187,7 @@ namespace OKHOSTING.Sql
 
 			//If the flow reaches the next line, the table is not 
 			//recognized and then throw an exception
-			throw new NotImplementedException("AnsiFormatProvider deoes not support type '" + type + "'");
+			throw new ArgumentOutOfRangeException("type", "AnsiFormatProvider deoes not support type '" + type + "'");
 		}
 
 		/// <summary>
