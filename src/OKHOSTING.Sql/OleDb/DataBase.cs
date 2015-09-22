@@ -4,7 +4,7 @@ using System.Data.OleDb;
 using System.Data.Common;
 using System.Data;
 using System.Text;
-using OKHOSTING.Core.Extensions;
+using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql.OleDb
 {

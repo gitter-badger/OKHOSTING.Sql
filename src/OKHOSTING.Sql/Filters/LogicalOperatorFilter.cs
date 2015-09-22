@@ -1,11 +1,5 @@
-﻿using OKHOSTING.Core.Data;
-using System;
+﻿using OKHOSTING.Data;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.Schema;
-using System.Xml.Serialization;
 
 namespace OKHOSTING.Sql.Filters
 {

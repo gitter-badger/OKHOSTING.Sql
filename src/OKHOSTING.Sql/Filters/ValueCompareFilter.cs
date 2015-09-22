@@ -4,7 +4,7 @@ using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
 using OKHOSTING.Sql.Schema;
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.Filters
 {

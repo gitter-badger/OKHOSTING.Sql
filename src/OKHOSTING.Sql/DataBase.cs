@@ -3,7 +3,7 @@ using System.Text;
 using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
-using OKHOSTING.Core.Extensions;
+using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql
 {

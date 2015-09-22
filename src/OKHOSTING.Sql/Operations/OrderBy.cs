@@ -1,4 +1,4 @@
-﻿using OKHOSTING.Core.Data;
+﻿using OKHOSTING.Data;
 using OKHOSTING.Sql.Schema;
 using System;
 using System.Xml.Serialization;

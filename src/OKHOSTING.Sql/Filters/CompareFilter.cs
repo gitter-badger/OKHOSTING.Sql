@@ -5,7 +5,7 @@ using System.Xml.Schema;
 using System.Xml;
 using System.Reflection;
 using OKHOSTING.Sql.Schema;
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.Filters
 {

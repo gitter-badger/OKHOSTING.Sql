@@ -1,4 +1,4 @@
-﻿using OKHOSTING.Core.Data;
+﻿using OKHOSTING.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

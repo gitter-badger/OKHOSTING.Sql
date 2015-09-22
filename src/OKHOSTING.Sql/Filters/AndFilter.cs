@@ -1,4 +1,4 @@
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 using System.Collections.Generic;
 namespace OKHOSTING.Sql.Filters
 {

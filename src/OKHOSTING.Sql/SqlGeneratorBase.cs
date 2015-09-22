@@ -1,4 +1,4 @@
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 using OKHOSTING.Sql.Filters;
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;

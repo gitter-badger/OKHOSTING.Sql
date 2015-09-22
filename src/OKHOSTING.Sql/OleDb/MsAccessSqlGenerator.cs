@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.OleDb
 {
