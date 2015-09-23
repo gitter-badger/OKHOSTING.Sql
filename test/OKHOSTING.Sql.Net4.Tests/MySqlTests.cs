@@ -27,7 +27,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 		public void CreateTable()
 		{
 			DataBase db = Connect();
-			MySql.SqlGenerator generator = new MySql.SqlGenerator();
+			var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
 
 			//define table schema
 			Table table = new Table("test1");

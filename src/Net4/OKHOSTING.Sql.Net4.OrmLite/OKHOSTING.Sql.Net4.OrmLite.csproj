@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}</ProjectGuid>
+    <ProjectGuid>{38640244-DB86-4E4F-8623-BA1F03A04537}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OKHOSTING.Sql.Net4</RootNamespace>
-    <AssemblyName>OKHOSTING.Sql.Net4</AssemblyName>
+    <RootNamespace>OKHOSTING.Sql.Net4.OrmLite</RootNamespace>
+    <AssemblyName>OKHOSTING.Sql.Net4.OrmLite</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -31,6 +31,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ServiceStack.Common, Version=4.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Common.4.0.40\lib\net40\ServiceStack.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces, Version=4.0.0.0, Culture=neutral, PublicKeyToken=e06fbc6124f57c43, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Interfaces.4.0.40\lib\portable-wp80+sl5+net40+win8+monotouch+monoandroid+xamarin.ios10\ServiceStack.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.OrmLite, Version=4.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.OrmLite.4.0.40\lib\net45\ServiceStack.OrmLite.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=4.0.40.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ServiceStack.Text.4.0.40\lib\net40\ServiceStack.Text.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -38,49 +54,35 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="DatabaseSchemaReader, Version=1.4.2.1, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DatabaseSchemaReader.1.4.2.2\lib\net40\DatabaseSchemaReader.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBase.cs" />
-    <Compile Include="SchemaLoader.cs" />
-    <Compile Include="Odbc\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OleDb\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OleDb\MsAccessSqlGenerator.cs" />
+    <Compile Include="Inheritance.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlException.cs" />
-    <Compile Include="SqlServer\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="SqlServer\SqlGenerator.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="obj\" />
+    <Compile Include="Table.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
       <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
       <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
       <Name>OKHOSTING.Data</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
+    <ProjectReference Include="..\..\PCL\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
       <Project>{afc2147b-ead8-439b-8ca6-d1bf308064b3}</Project>
       <Name>OKHOSTING.Sql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OKHOSTING.Sql.Net4\OKHOSTING.Sql.Net4.csproj">
+      <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
+      <Name>OKHOSTING.Sql.Net4</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

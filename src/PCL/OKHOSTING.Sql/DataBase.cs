@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Data;
-using System.Data.Common;
 using System.Collections.Generic;
-using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql.Net4
 {
@@ -11,40 +8,6 @@ namespace OKHOSTING.Sql.Net4
 	/// </summary>
 	public abstract class DataBase
 	{
-		#region Constructors and destructors
-
-		/// <summary>
-		/// Initializes a new instance of the OKHOSTING.Data.SqlBases.BaseExecuter class
-		/// </summary>
-		/// <param name="ConnectionString"> 
-		/// The connection string to use to connect to the DataBase
-		/// </param>
-		protected DataBase(DbProviderFactory providerFactory)
-		{
-			if (providerFactory == null)
-			{
-				throw new ArgumentNullException("providerFactory");
-			}
-
-			//Assigning the Connection String
-			ProviderFactory = providerFactory;
-			Connection = providerFactory.CreateConnection();
-		}
-
-		/// <summary>
-		/// Destroy the Executer
-		/// </summary>
-		~DataBase()
-		{
-			//Canceling current transaction 
-			if (Transaction != null) Transaction.Rollback();
-
-			//Cleaning the memory
-			Transaction = null;
-		}
-
-		#endregion
-
 		#region Fields and Properties
 
 		/// <summary>
@@ -52,39 +15,11 @@ namespace OKHOSTING.Sql.Net4
 		/// </summary>
 		private readonly object Locker = new object();
 
-		/// <summary>
-		/// Connection in which all the operations are performed
-		/// </summary>
-		protected readonly DbConnection Connection;
-
-		/// <summary>
-		/// Transaction in which all the operations are performed, after BeginTrans() is called
-		/// </summary>
-		protected DbTransaction Transaction;
-
-		/// <summary>
-		/// Used to create connections, commands and parameters for a specific database engine
-		/// </summary>
-		protected DbProviderFactory ProviderFactory;
-
-		protected OKHOSTING.Sql.Schema.DataBaseSchema _Schema;
-
 		public int Id { get; set; }
 
 		public string Name { get; set; }
 
-		public OKHOSTING.Sql.Schema.DataBaseSchema Schema
-		{
-			get
-			{
-				if (_Schema == null)
-				{
-					_Schema = SchemaLoader.Load(this, SchemaProvider);
-				}
-
-				return _Schema;
-			}
-		}
+		public Schema.DataBaseSchema Schema { get; set; }
 
 		string _ConnectionString;
 
@@ -97,11 +32,6 @@ namespace OKHOSTING.Sql.Net4
 			set
 			{
 				_ConnectionString = value;
-
-				if (Connection != null)
-				{
-					Connection.ConnectionString = value;
-				}
 			}
 		}
 

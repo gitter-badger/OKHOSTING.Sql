@@ -35,11 +35,11 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .NET Framework is automatically included -->
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
       <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
       <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
       <Name>OKHOSTING.Data</Name>
     </ProjectReference>

@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Data.Common;
 using System.Data;
-using System.Text;
-using OKHOSTING.Core.Extensions;
+using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql.Net4.MySql
 {
@@ -222,7 +221,7 @@ namespace OKHOSTING.Sql.Net4.MySql
 			return exists;
 		}
 
-		private static new Dictionary<DbType, MySqlDbType> DbTypeMap;
+		private static Dictionary<DbType, MySqlDbType> DbTypeMap;
 
 		static DataBase()
 		{

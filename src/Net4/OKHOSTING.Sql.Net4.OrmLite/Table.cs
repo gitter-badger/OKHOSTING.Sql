@@ -1,11 +1,8 @@
-﻿using OKHOSTING.Core.Data;
+﻿using OKHOSTING.Data;
 using ServiceStack;
 using ServiceStack.OrmLite;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql.Net4.OrmLite
 {

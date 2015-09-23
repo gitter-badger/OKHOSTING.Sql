@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,55 +33,38 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
-      <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="OKHOSTING.Core">
-      <HintPath>..\..\..\OKHOSTING.Files\src\References\OKHOSTING.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.SQLite, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.97.0\lib\net45\System.Data.SQLite.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.97.0\lib\net45\System.Data.SQLite.EF6.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.97.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.97.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="DataBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
+      <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
+      <Name>OKHOSTING.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PCL\OKHOSTING.Sql.SQLite\OKHOSTING.Sql.SQLite.csproj">
+      <Project>{d5974bb5-1ae1-4f93-aa78-8eb9ed83b83f}</Project>
+      <Name>OKHOSTING.Sql.SQLite</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PCL\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
+      <Project>{afc2147b-ead8-439b-8ca6-d1bf308064b3}</Project>
+      <Name>OKHOSTING.Sql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OKHOSTING.Sql.Net4\OKHOSTING.Sql.Net4.csproj">
       <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
       <Name>OKHOSTING.Sql.Net4</Name>
     </ProjectReference>
-    <ProjectReference Include="..\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
-      <Project>{afc2147b-ead8-439b-8ca6-d1bf308064b3}</Project>
-      <Name>OKHOSTING.Sql</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6\System.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.97.0\build\net45\System.Data.SQLite.Core.targets')" />

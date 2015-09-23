@@ -1,10 +1,8 @@
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;
 using System;
-using System.Data;
-using System.Data.Common;
 
-namespace OKHOSTING.Sql.Net4.MySql
+namespace OKHOSTING.Sql.MySql
 {
 
 	/// <summary>

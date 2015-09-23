@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ServiceStack;
 using ServiceStack.OrmLite;
-using OKHOSTING.Core.Extensions;
+using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql.Net4.OrmLite
 {

@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using System.Data.Entity;
-using OKHOSTING.Core.Data;
+using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.Net4.EF
 {
