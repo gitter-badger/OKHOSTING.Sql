@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
-using System.Reflection;
-using OKHOSTING.Sql.Schema;
 using OKHOSTING.Data;
 
 namespace OKHOSTING.Sql.Filters

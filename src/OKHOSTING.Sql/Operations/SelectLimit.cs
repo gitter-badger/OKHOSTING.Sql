@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace OKHOSTING.Sql.Operations
+﻿namespace OKHOSTING.Sql.Operations
 {
 	/// <summary>
 	/// Use to define paging in select operations, for example, if you only want to retrieve DataObjects from index 0 to 100, or 101 to 200

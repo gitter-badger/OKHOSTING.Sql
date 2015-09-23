@@ -3,10 +3,7 @@ using OKHOSTING.Sql.Filters;
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
 using System.Linq;
 
 namespace OKHOSTING.Sql
@@ -820,7 +817,7 @@ namespace OKHOSTING.Sql
 				string paramName = randomPrefix + "_" + i;
 
 				command.Script += paramName + ", ";
-				command.Parameters.Add(new CommandParameter() { Name = paramName, DbType = DataBase.Parse(item.GetType()), Value = item });
+				command.Parameters.Add(new CommandParameter() { Name = paramName, DbType = DbTypeMapper.Parse(item.GetType()), Value = item });
 			}
 
 			//Removing last ", "
@@ -1397,7 +1394,7 @@ namespace OKHOSTING.Sql
 
 		protected CommandParameter CreateCommandParameter(object value)
 		{
-			return CreateCommandParameter(value, DataBase.Parse(value.GetType()));
+			return CreateCommandParameter(value, DbTypeMapper.Parse(value.GetType()));
 		}
 
 		protected CommandParameter CreateCommandParameter(object value, DbType dbType)

@@ -1,13 +1,8 @@
 ﻿using OKHOSTING.Data;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql.Schema
 {
-	[System.ComponentModel.DefaultProperty("Name")]
 	public class Index
 	{
 		public int Id { get; set; }

@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql.Schema
 {
 	/// <summary>
 	/// Represents a foreign key in a database
 	/// </summary>
-	[System.ComponentModel.DefaultProperty("Name")]
 	public class ForeignKey
 	{
 		public int Id { get; set; }

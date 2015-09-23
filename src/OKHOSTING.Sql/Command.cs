@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql
 {
@@ -19,7 +16,7 @@ namespace OKHOSTING.Sql
 		public string Script { get; set; }
 
 		/// <summary>
-		/// Parameters for the script, will be passed on to the System.Data.ICommand cobject
+		/// Parameters for the script, will be passed on to the ICommand cobject
 		/// </summary>
 		public readonly List<CommandParameter> Parameters = new List<CommandParameter>();
 

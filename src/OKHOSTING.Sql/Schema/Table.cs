@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql.Schema
 {
 	/// <summary>
 	/// A table in a DataBase
 	/// </summary>
-	[System.ComponentModel.DefaultProperty("Name")]
 	public class Table
 	{
 		public Table()
@@ -85,9 +81,9 @@ namespace OKHOSTING.Sql.Schema
 				bool equals;
 				equals = ((Table) obj).Name == Name;
 
-				if (((Table)obj).DataBase != null && DataBase != null && ((Table)obj).DataBase.DataBase != null && DataBase.DataBase != null)
+				if (((Table)obj).DataBase != null && DataBase != null)
 				{
-					equals = equals && ((Table)obj).DataBase.DataBase.Name == DataBase.DataBase.Name;
+					equals = equals && ((Table)obj).DataBase == DataBase;
 				}
 			}
 

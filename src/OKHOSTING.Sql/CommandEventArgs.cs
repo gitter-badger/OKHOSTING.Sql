@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Text;
-
-namespace OKHOSTING.Sql
+﻿namespace OKHOSTING.Sql
 {
 	/// <summary>
 	/// Argument used for allow to the users of database executors 

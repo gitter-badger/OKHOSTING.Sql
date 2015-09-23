@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OKHOSTING.Sql.Schema
+﻿namespace OKHOSTING.Sql.Schema
 {
 	/// <summary>
 	/// A view in a DataBase
 	/// </summary>
-	[System.ComponentModel.DefaultProperty("Name")]
 	public class View
 	{
 		public int Id { get; set; }

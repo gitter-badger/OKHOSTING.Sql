@@ -1,12 +1,5 @@
 using System;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Collections;
 using System.Collections.Generic;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
-using OKHOSTING.Sql.Schema;
 
 namespace OKHOSTING.Sql.Filters
 {

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OKHOSTING.Sql
 {
@@ -35,15 +31,15 @@ namespace OKHOSTING.Sql
 
 			if (value != null)
 			{
-				DbType = DataBase.Parse(value.GetType());
+				DbType = DbTypeMapper.Parse(value.GetType());
 			}
 		}
 
-		public CommandParameter(object value, string name, System.Data.DbType dbType): this(value, name, dbType, 0)
+		public CommandParameter(object value, string name, DbType dbType): this(value, name, dbType, 0)
 		{
 		}
 
-		public CommandParameter(object value, string name, System.Data.DbType dbType, int size)
+		public CommandParameter(object value, string name, DbType dbType, int size)
 		{
 			Value = value;
 			DbType = dbType;
@@ -69,7 +65,7 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// DbType 
 		/// </summary>
-		public System.Data.DbType DbType { get; set; }
+		public DbType DbType { get; set; }
 
 		/// <summary>
 		/// Optional size, used for string max lenght
@@ -84,7 +80,7 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// Direction of the parameter
 		/// </summary>
-		public System.Data.ParameterDirection Direction { get; set; }
+		public ParameterDirection Direction { get; set; }
 
 		private static readonly Random Random = new Random();
 		

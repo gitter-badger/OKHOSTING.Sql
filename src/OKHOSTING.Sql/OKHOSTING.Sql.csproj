@@ -1,17 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}</ProjectGuid>
+    <ProjectGuid>{AFC2147B-EAD8-439B-8CA6-D1BF308064B3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OKHOSTING.Sql</RootNamespace>
     <AssemblyName>OKHOSTING.Sql</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>Profile259</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,24 +34,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="DatabaseSchemaReader, Version=1.4.2.1, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\DatabaseSchemaReader.1.4.2.2\lib\net40\DatabaseSchemaReader.dll</HintPath>
-    </Reference>
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
+      <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
+      <Name>OKHOSTING.Data</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Operations\SelectColumn.cs" />
-    <Compile Include="SqlGeneratorBase.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="CommandEventArgs.cs" />
     <Compile Include="CommandParameter.cs" />
-    <Compile Include="DataBase.cs" />
+    <Compile Include="DbTypeMapper.cs" />
     <Compile Include="Filters\AndFilter.cs" />
     <Compile Include="Filters\ColumnCompareFilter.cs" />
     <Compile Include="Filters\ColumnFilter.cs" />
@@ -62,13 +62,6 @@
     <Compile Include="Filters\RangeFilter.cs" />
     <Compile Include="Filters\ValueCompareFilter.cs" />
     <Compile Include="IOrmDataBase.cs" />
-    <Compile Include="Odbc\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OleDb\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="OleDb\MsAccessSqlGenerator.cs" />
     <Compile Include="Operations\ColumnValue.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />
@@ -77,16 +70,19 @@
     <Compile Include="Operations\SelectAggregate.cs" />
     <Compile Include="Operations\SelectAggregateColumn.cs" />
     <Compile Include="Operations\SelectAggregateFunction.cs" />
+    <Compile Include="Operations\SelectColumn.cs" />
     <Compile Include="Operations\SelectJoin.cs" />
     <Compile Include="Operations\SelectJoinType.cs" />
     <Compile Include="Operations\SelectLimit.cs" />
     <Compile Include="Operations\Update.cs" />
+    <Compile Include="ParameterDirection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Schema\CheckConstraint.cs" />
     <Compile Include="Schema\Column.cs" />
     <Compile Include="Schema\ConstraintAction.cs" />
     <Compile Include="Schema\DataBaseOperation.cs" />
     <Compile Include="Schema\DataBaseSchema.cs" />
+    <Compile Include="DbType.cs" />
     <Compile Include="Schema\ForeignKey.cs" />
     <Compile Include="Schema\Index.cs" />
     <Compile Include="Schema\Row.cs" />
@@ -94,30 +90,9 @@
     <Compile Include="Schema\Trigger.cs" />
     <Compile Include="Schema\User.cs" />
     <Compile Include="Schema\View.cs" />
-    <Compile Include="SqlException.cs" />
-    <Compile Include="SqlServer\DataBase.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="SqlServer\SqlGenerator.cs" />
+    <Compile Include="SqlGeneratorBase.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="obj\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
-      <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
-      <Name>OKHOSTING.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
-      <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
-      <Name>OKHOSTING.Data</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets" Condition="Exists('..\packages\AutoMapper.3.3.1\tools\AutoMapper.targets')" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

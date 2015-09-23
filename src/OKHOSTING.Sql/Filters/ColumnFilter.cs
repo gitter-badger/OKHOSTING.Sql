@@ -1,7 +1,3 @@
-using System;
-using System.Xml.Serialization;
-using System.Xml.Schema;
-using System.Xml;
 using OKHOSTING.Sql.Schema;
 
 namespace OKHOSTING.Sql.Filters
