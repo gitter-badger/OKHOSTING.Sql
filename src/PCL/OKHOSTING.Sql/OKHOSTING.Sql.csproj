@@ -61,7 +61,6 @@
     <Compile Include="Filters\OrFilter.cs" />
     <Compile Include="Filters\RangeFilter.cs" />
     <Compile Include="Filters\ValueCompareFilter.cs" />
-    <Compile Include="IOrmDataBase.cs" />
     <Compile Include="Operations\ColumnValue.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />

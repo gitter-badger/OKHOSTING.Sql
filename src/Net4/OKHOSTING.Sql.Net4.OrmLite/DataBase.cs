@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OKHOSTING.Data;
+using System;
 using System.Collections.Generic;
 
 namespace OKHOSTING.Sql.Net4.OrmLite
