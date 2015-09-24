@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace OKHOSTING.Sql.Net4
+namespace OKHOSTING.Sql
 {
 	/// <summary>
 	/// Implements methods for interact with database engines
@@ -10,29 +10,15 @@ namespace OKHOSTING.Sql.Net4
 	{
 		#region Fields and Properties
 
-		/// <summary>
-		/// Object used for lock operations
-		/// </summary>
-		private readonly object Locker = new object();
-
 		public int Id { get; set; }
 
 		public string Name { get; set; }
 
 		public Schema.DataBaseSchema Schema { get; set; }
 
-		string _ConnectionString;
-
 		public string ConnectionString
 		{
-			get
-			{
-				return _ConnectionString;
-			}
-			set
-			{
-				_ConnectionString = value;
-			}
+			get; set;
 		}
 
 		#endregion
@@ -62,70 +48,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public int Execute(List<Command> commands)
-		{
-			//Local Vars
-			int rowsAffected = 0;
-			Command current = new Command();
-
-			//Validating that exists at least one script
-			if (commands == null) throw new ArgumentNullException("commands");
-
-			lock (Locker)
-			{
-				try
-				{
-					//Initializing command and connection
-					DbCommand dbCommand = ProviderFactory.CreateCommand();
-					dbCommand.Connection = Connection;
-					dbCommand.Transaction = Transaction;
-					OpenConnection();
-
-					//Crossing the array of scripts
-					foreach (Command command in commands)
-					{
-						//raising events
-						CommandEventArgs e = new CommandEventArgs(command);
-						OnBeforeExecute(e);
-						current = command;
-
-						//Executing the code only if have authorization 
-						if (!e.Cancel)
-						{
-							//Setting the command text
-							dbCommand.CommandText = command.Script;
-
-							foreach (CommandParameter param in command.Parameters)
-							{
-								dbCommand.Parameters.Add(Parse(param));
-							}
-
-							//Executing command and getting the number of affected rows
-							rowsAffected = dbCommand.ExecuteNonQuery();
-						}
-
-						//clear parameters
-						dbCommand.Parameters.Clear();
-
-						//calling events
-						e.Result = rowsAffected;
-						OnAfterExecute(e);
-					}
-				}
-				catch (System.Exception ex)
-				{
-					//Re throwing exception to the caller
-					throw new SqlException(current, "Error on executing command against the database (" + ex.Message + ")", ex);
-				}
-				finally
-				{
-					//Closing the connection
-					CloseConnection();
-				}
-			}
-			//Returning value
-			return rowsAffected;
-		}
+		public abstract int Execute(List<Command> commands);
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
@@ -139,68 +62,9 @@ namespace OKHOSTING.Sql.Net4
 		/// Sql Sentence to exectute for retrieve data
 		/// </param>
 		/// <returns>
-		/// A System.Data.DbDataReader with all data obtained
+		/// A System.Data.IDataReader with all data obtained
 		/// </returns>
-		public DbDataReader GetDataReader(Command command)
-		{
-			//Local Vars
-			DbDataReader reader = null;
-
-			lock (Locker)
-			{
-				try
-				{
-					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
-					OnBeforeGetDataReader(e);
-
-					//running the script only if e.Cancel is false
-					if (!e.Cancel)
-					{
-						//Initializing command and connection
-						DbCommand dbCommand = ProviderFactory.CreateCommand();
-						dbCommand.Connection = Connection;
-						dbCommand.CommandText = command.Script;
-						dbCommand.Transaction = Transaction;
-
-						foreach (CommandParameter param in command.Parameters)
-						{
-							dbCommand.Parameters.Add(Parse(param));
-						}
-
-						OpenConnection();
-
-						//Validating if there is a current transaction
-						if (Transaction == null)
-						{
-							//Loading the data reader indicating that the close of the reader
-							//must close the connection too
-							reader = dbCommand.ExecuteReader(CommandBehavior.CloseConnection);
-						}
-						else
-						{
-							//Loading the data reader
-							reader = dbCommand.ExecuteReader();
-						}
-					}
-
-					//raising events
-					e.Result = reader;
-					OnAfterGetDataReader(e);
-				}
-				catch (System.Exception ex)
-				{
-					//Closing the reader if apply
-					CloseConnection();
-
-					//Re - throw the excepción to the caller
-					throw new SqlException(command, "Error on creating DataReader (" + ex.Message + ")", ex);
-				}
-			}
-
-			//Returning the DataReader
-			return reader;
-		}
+		public abstract IDataReader GetDataReader(Command command);
 
 		/// <summary>
 		/// Executes a scalar function SQL Script and retrieves a single value
@@ -214,62 +78,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Value returned in the first row and firstn collumn
 		/// </returns>
-		public object GetScalar(Command command)
-		{
-			//Local Vars
-			object value = null;
-
-			lock (Locker)
-			{
-				try
-				{
-					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
-					OnBeforeGetDataReader(e);
-
-					//running the script only if e.Cancel is false
-					if (!e.Cancel)
-					{
-						//Initializing command and connection
-						DbCommand dbCommand = ProviderFactory.CreateCommand();
-
-						dbCommand.Connection = Connection;
-						dbCommand.CommandText = command.Script;
-						dbCommand.Transaction = Transaction;
-
-						foreach (CommandParameter param in command.Parameters)
-						{
-							dbCommand.Parameters.Add(Parse(param));
-						}
-
-						OpenConnection();
-
-						//Loading the data reader 
-						value = dbCommand.ExecuteScalar();
-					}
-
-					//raising events
-					e.Result = value;
-					OnAfterGetDataReader(e);
-				}
-				catch (System.Exception ex)
-				{
-					//Closing the reader if apply
-					CloseConnection();
-
-					//Re - throw the excepción to the caller
-					throw new SqlException(command, "Error on creating DataReader (" + ex.Message + ")", ex);
-				}
-				finally
-				{
-					//Closing the connection
-					CloseConnection();
-				}
-			}
-
-			//Returning the DataReader
-			return value;
-		}
+		public abstract object GetScalar(Command command);
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
@@ -278,66 +87,9 @@ namespace OKHOSTING.Sql.Net4
 		/// Sql Sentence to execute for retrieve data
 		/// </param>
 		/// <returns>
-		/// A System.Data.DataTable with all data obtained
+		/// A System.Data.IDataTable with all data obtained
 		/// </returns>
-		public DataTable GetDataTable(Command command)
-		{
-			//Local Vars
-			DataTable tableToReturn = null;
-			DbDataAdapter adapter;
-
-			lock (Locker)
-			{
-				try
-				{
-					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
-					OnBeforeGetDataTable(e);
-
-					//running the script only if e.Cancel is false
-					if (!e.Cancel)
-					{
-						//Initializing command and connection
-						DbCommand dbCommand = ProviderFactory.CreateCommand();
-						dbCommand.Connection = Connection;
-						dbCommand.CommandText = command.Script;
-						dbCommand.Transaction = Transaction;
-
-						foreach (CommandParameter param in command.Parameters)
-						{
-							dbCommand.Parameters.Add(Parse(param));
-						}
-
-						OpenConnection();
-
-						//Configuring the adapter
-						adapter = ProviderFactory.CreateDataAdapter();
-						adapter.SelectCommand = dbCommand;
-
-						//Loading the data
-						tableToReturn = new DataTable();
-						adapter.Fill(tableToReturn);
-					}
-
-					//raising events
-					e.Result = tableToReturn;
-					OnAfterGetDataTable(e);
-
-					//Returning the data to the caller
-					return tableToReturn;
-				}
-				catch (System.Exception ex)
-				{
-					//Re - throwing the exception to the caller
-					throw new SqlException(command, "Error on creating DataTable (" + ex.Message + ")", ex);
-				}
-				finally
-				{
-					//Closing the connection
-					CloseConnection();
-				}
-			}
-		}
+		public abstract IDataTable GetDataTable(Command command);
 
 		#endregion
 
@@ -346,76 +98,24 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Starts a transaction for all the querys executed throught the Executer
 		/// </summary>
-		public void BeginTransaction()
-		{
-			//Validating if dont exists currently a transaction 
-			if (this.Transaction != null)
-				throw new InvalidOperationException("Can't start a transaction because a transaction already exists in this executer");
-
-			//Getting the default connection
-			try
-			{
-				//Starting the transaction 
-				OpenConnection();
-				Transaction = Connection.BeginTransaction();
-			}
-			catch
-			{
-				//Cleaning the memory
-				Transaction = null;
-
-				//Throwing the exception
-				throw;
-			}
-		}
+		public abstract void BeginTransaction();
 
 		/// <summary> 
 		/// Accepts the current transaction 
 		/// </summary>
-		public void CommitTransaction()
-		{
-			//Validating if exists currently a transaction 
-			if (this.Transaction == null)
-				throw new InvalidOperationException("Can't start a transaction because a transaction already exists in this executer");
-
-			//Acceptig the transaction
-			this.Transaction.Commit();
-
-			//Closing the connection
-			this.Connection.Close();
-
-			//Cleaning the memory
-			this.Transaction = null;
-		}
+		public abstract void CommitTransaction();
 
 		/// <summary> 
 		/// Cancels the current transaction
 		/// </summary>		
-		public void RollBackTransaction()
-		{
-			//Validating if exists currently a transaction 
-			if (this.Transaction == null)
-				throw new InvalidOperationException("A transaction has not being initialized and therefore can't be rolled back");
-
-			//Canceling the transaction
-			this.Transaction.Rollback();
-
-			//Closing the connection
-			this.Connection.Close();
-
-			//Cleaning the memory
-			this.Transaction = null;
-		}
+		public abstract void RollBackTransaction();
 
 		/// <summary>
 		/// Gets a value indicating if a transaction is currently active
 		/// </summary>
-		public bool IsTransactionActive
+		public abstract bool IsTransactionActive
 		{
-			get
-			{
-				return Transaction != null;
-			}
+			get;
 		}
 
 		#endregion
@@ -425,47 +125,12 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Opens the current connection, only if it is not already openned
 		/// </summary>
-		protected void OpenConnection()
-		{
-			if (Connection.State != ConnectionState.Open)
-			{
-				Connection.Open();
-			}
-		}
+		protected abstract void OpenConnection();
 
 		/// <summary>
 		/// Opens the current connection, only if it is not already openned
 		/// </summary>
-		protected void CloseConnection()
-		{
-			if (Connection.State != ConnectionState.Closed && !IsTransactionActive) Connection.Close();
-		}
-
-		/// <summary>
-		/// Returns a native Command corresponding to the database engine associated
-		/// </summary>
-		protected virtual DbParameter Parse(CommandParameter param)
-		{
-			DbParameter dbParam = ProviderFactory.CreateParameter();
-
-			dbParam.Value = param.Value;
-			dbParam.DbType = Parse(param.DbType);
-			dbParam.Direction = Parse(param.Direction);
-			dbParam.Size = param.Size;
-			dbParam.ParameterName = param.Name;
-
-			return dbParam;
-		}
-
-		protected virtual System.Data.ParameterDirection Parse(ParameterDirection direction)
-		{
-			return (System.Data.ParameterDirection) Enum.Parse(typeof(System.Data.ParameterDirection), direction.ToString());
-		}
-
-		protected virtual System.Data.DbType Parse(DbType dbType)
-		{
-			return (System.Data.DbType) Enum.Parse(typeof(System.Data.DbType), dbType.ToString());
-		}
+		protected abstract void CloseConnection();
 
 		/// <summary>
 		/// Returns a boolean value that indicates if the 
@@ -478,58 +143,7 @@ namespace OKHOSTING.Sql.Net4
 		/// Boolean value that indicates if the 
 		/// SQL Sentence return data
 		/// </returns>
-		public bool ExistsData(Command command)
-		{
-			//Local Vars
-			bool result = false;
-
-			//Creating DataReader
-			DbDataReader reader = null;
-
-			//Trying to read the data
-			try
-			{
-				//Query the Database
-				reader = GetDataReader(command);
-
-				//Validating if exists data
-				result = (reader.Read());
-			}
-			catch
-			{
-				throw;
-			}
-			finally
-			{
-				if (reader != null && !reader.IsClosed) reader.Close();
-			}
-
-			//Returning value
-			return result;
-		}
-
-		/// <summary>
-		/// Returns a value that indicates how many records returns
-		/// the query specified
-		/// </summary>
-		/// <param name="SQLSentence">
-		/// Sql Sentence for query
-		/// </param>
-		/// <returns>
-		/// Number of Records that returns the query
-		/// </returns>
-		public int NumberOfRecords(string sqlSentence)
-		{
-			//Local Vars
-			int result = 0;
-
-			//Geting data requested and number of rows affected 
-			DataTable tblData = this.GetDataTable(sqlSentence);
-			result = tblData.Rows.Count;
-
-			//Returning value
-			return result;
-		}
+		public abstract bool ExistsData(Command command);
 
 		/// <summary>
 		/// Returns a boolean value that indicates if is possible to connect
@@ -538,12 +152,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public bool CanConnect()
-		{
-			//Calling to the corresponding overload
-			Exception ExceptionOccured;
-			return CanConnect(out ExceptionOccured);
-		}
+		public abstract bool CanConnect();
 
 		/// <summary>
 		/// Returns a boolean value that indicates if is possible to connect
@@ -556,40 +165,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public bool CanConnect(out Exception exceptionOccured)
-		{
-			//Local vars
-			bool success;
-
-			//Initializing the out parameters
-			exceptionOccured = null;
-
-			try
-			{
-				//Trying to connect to database
-				OpenConnection();
-
-				//Establishing that the connection was successfully
-				success = true;
-			}
-			catch (System.Exception ex)
-			{
-				//Establishing exception to return 
-				exceptionOccured = ex;
-
-				//Establishing that the connection was failed
-				success = false;
-			}
-
-			finally
-			{
-				//Closing the conection (if apply)
-				CloseConnection();
-			}
-
-			//Returning the value
-			return success;
-		}
+		public abstract bool CanConnect(out Exception exceptionOccured);
 
 		/// <summary>
 		/// Verify if exists the specified table on the database
@@ -604,7 +180,7 @@ namespace OKHOSTING.Sql.Net4
 		{
 			//Local vars
 			bool existsTable = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
@@ -639,15 +215,6 @@ namespace OKHOSTING.Sql.Net4
 
 			//Setting the return value
 			return existsTable;
-		}
-
-		#endregion
-
-		#region Abstract functionality (for implementation on child classes)
-
-		protected abstract string SchemaProvider
-		{
-			get;
 		}
 
 		/// <summary>
@@ -690,7 +257,7 @@ namespace OKHOSTING.Sql.Net4
 		/// the specified index on the Database
 		/// </returns>
 		public abstract bool ExistsIndex(string Name);
-
+		
 		#endregion
 
 		#region Events
@@ -777,10 +344,6 @@ namespace OKHOSTING.Sql.Net4
 		{
 			if (AfterGetDataReader != null) AfterGetDataReader(this, e);
 		}
-
-		#endregion
-
-		#region Static
 
 		#endregion
 	}

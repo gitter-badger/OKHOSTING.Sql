@@ -48,6 +48,7 @@
     <Compile Include="Command.cs" />
     <Compile Include="CommandEventArgs.cs" />
     <Compile Include="CommandParameter.cs" />
+    <Compile Include="DataBase.cs" />
     <Compile Include="DbTypeMapper.cs" />
     <Compile Include="Filters\AndFilter.cs" />
     <Compile Include="Filters\ColumnCompareFilter.cs" />
@@ -61,6 +62,10 @@
     <Compile Include="Filters\OrFilter.cs" />
     <Compile Include="Filters\RangeFilter.cs" />
     <Compile Include="Filters\ValueCompareFilter.cs" />
+    <Compile Include="IDataReader.cs" />
+    <Compile Include="IDataResult.cs" />
+    <Compile Include="IDataRow.cs" />
+    <Compile Include="IDataTable.cs" />
     <Compile Include="Operations\ColumnValue.cs" />
     <Compile Include="Operations\Delete.cs" />
     <Compile Include="Operations\Insert.cs" />
@@ -84,7 +89,6 @@
     <Compile Include="DbType.cs" />
     <Compile Include="Schema\ForeignKey.cs" />
     <Compile Include="Schema\Index.cs" />
-    <Compile Include="Schema\Row.cs" />
     <Compile Include="Schema\Table.cs" />
     <Compile Include="Schema\Trigger.cs" />
     <Compile Include="Schema\User.cs" />
