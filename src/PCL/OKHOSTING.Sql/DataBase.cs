@@ -10,13 +10,13 @@ namespace OKHOSTING.Sql
 	{
 		#region Fields and Properties
 
-		public int Id { get; set; }
+		public virtual int Id { get; set; }
 
-		public string Name { get; set; }
+		public virtual string Name { get; set; }
 
-		public Schema.DataBaseSchema Schema { get; set; }
+		public virtual Schema.DataBaseSchema Schema { get; set; }
 
-		public string ConnectionString
+		public virtual string ConnectionString
 		{
 			get; set;
 		}
@@ -34,7 +34,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public int Execute(Command command)
+		public virtual int Execute(Command command)
 		{
 			return Execute(new List<Command>() { command });
 		}

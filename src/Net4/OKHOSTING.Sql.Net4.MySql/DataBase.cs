@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
-using System.Data.Common;
-using System.Data;
 using OKHOSTING.Core;
 
 namespace OKHOSTING.Sql.Net4.MySql
@@ -32,14 +30,14 @@ namespace OKHOSTING.Sql.Net4.MySql
 		{
 			//Local vars
 			DateTime currentDate = DateTime.MinValue;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
 				//Loading DataReader and getting the date and time
-				reader = this.GetDataReader("select SYSDATE() AS CurrentDate");
+				reader = this.GetDataReader("SELECT SYSDATE() AS CurrentDate");
 				reader.Read();
-				currentDate = reader.GetDateTime(0);
+				currentDate = reader.GetFieldValue<DateTime>(0);
 			}
 			catch
 			{
@@ -72,9 +70,9 @@ namespace OKHOSTING.Sql.Net4.MySql
 			string uniqueIdentifier = string.Empty;
 
 			//Creating DataTable
-			DataTable tblData = this.GetDataTable("select UUID()");
+			IDataTable tblData = this.GetDataTable("select UUID()");
 			//Reading the ID
-			uniqueIdentifier = tblData.Rows[0][0].ToString();
+			uniqueIdentifier = tblData[0][0].ToString();
 
 			//Returning the GUID
 			return uniqueIdentifier;
@@ -96,7 +94,7 @@ namespace OKHOSTING.Sql.Net4.MySql
 			//Local vars
 			bool exists = false;
 			string table, constraint;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			//Validating if the name is correctly specified
 			if (name.IndexOf(".") == -1)
@@ -142,12 +140,12 @@ namespace OKHOSTING.Sql.Net4.MySql
 		{
 			//Local vars
 			bool existsTable = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
 				//Loading data reader
-				reader = this.GetDataReader("select * from `" + name + "` limit 1");
+				reader = this.GetDataReader("SELECT * FROM `" + name + "` LIMIT 1");
 
 				//If the previous query executes it successfully, 
 				//then the table exists
@@ -187,7 +185,7 @@ namespace OKHOSTING.Sql.Net4.MySql
 			//Local vars
 			bool exists = false;
 			string table, index;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			//Validating if the name is correctly specified
 			if (name.IndexOf(".") == -1)

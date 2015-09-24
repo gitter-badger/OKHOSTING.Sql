@@ -44,6 +44,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataBase.cs" />
+    <Compile Include="DataReader.cs" />
+    <Compile Include="DataTableRow.cs" />
+    <Compile Include="DataTable.cs" />
     <Compile Include="SchemaLoader.cs" />
     <Compile Include="Odbc\DataBase.cs">
       <SubType>Code</SubType>

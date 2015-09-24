@@ -33,7 +33,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			//Local vars
 			DateTime currentDate = DateTime.MinValue;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
@@ -41,7 +41,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 				reader = this.GetDataReader("select CurrentDate = GETDATE()");
 
 				reader.Read();
-				currentDate = reader.GetDateTime(0);
+				currentDate =  reader.GetFieldValue<DateTime>(0);
 
 				//Closing the DataReader and it underlying connection
 				reader.Close();
@@ -72,10 +72,10 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 			string uniqueIdentifier = string.Empty;
 
 			//Creating DataTable
-			DataTable tblData = this.GetDataTable("select NEWID()");
+			IDataTable tblData = this.GetDataTable("SELECT NEWID()");
 
 			//Reading the ID
-			uniqueIdentifier = tblData.Rows[0][0].ToString();
+			uniqueIdentifier = tblData[0][0].ToString();
 
 			//Returning the GUID
 			return uniqueIdentifier;
@@ -96,7 +96,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			//Local vars
 			bool existsConstraint = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
@@ -141,7 +141,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			//Local vars
 			bool existsTable = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
@@ -183,12 +183,12 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			//Local vars
 			bool existsIndex = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
 				//Creating the reader and searching for the index
-				reader = this.GetDataReader("select * from sysindexes where name = '" + Name + "'");
+				reader = this.GetDataReader("SELECT * FROM sysindexes WHERE name = '" + Name + "'");
 				existsIndex = (reader.Read());
 			}
 			catch

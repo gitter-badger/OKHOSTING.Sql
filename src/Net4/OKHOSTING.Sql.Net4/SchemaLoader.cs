@@ -14,12 +14,12 @@ namespace OKHOSTING.Sql.Net4
 		/// <remarks>
 		/// It's very slow for large databases
 		/// </remarks>
-		public static DataBaseSchema Load(DataBase nativeDatabase, string schemaProvider)
+		public static DataBaseSchema Load(DataBase database, string schemaProvider)
 		{
 			DataBaseSchema schema = new DataBaseSchema();
 			DatabaseSchema schemaReader;
 
-			using (var dbReader = new DatabaseSchemaReader.DatabaseReader(nativeDatabase.ConnectionString, schemaProvider))
+			using (var dbReader = new DatabaseSchemaReader.DatabaseReader(database.ConnectionString, schemaProvider))
 			{
 				dbReader.AllTables();
 				dbReader.AllViews();
@@ -63,7 +63,7 @@ namespace OKHOSTING.Sql.Net4
 					table.Columns.Add(new Column()
 					{
 						Name = dbc.Name,
-						//DbType = DataBase.Parse(dbc.DataType.GetNetType()),
+						DbType = DbTypeMapper.Parse(dbc.DataType.GetNetType()),
 						Table = table,
 						Description = dbc.Description,
 						IsNullable = dbc.Nullable,

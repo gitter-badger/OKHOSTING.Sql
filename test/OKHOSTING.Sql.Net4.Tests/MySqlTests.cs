@@ -66,7 +66,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 
 			sql = generator.Select(select);
 			var result = db.GetDataTable(sql);
-			Assert.AreEqual(result.Rows.Count, 1);
+			Assert.AreEqual(result.Count, 1);
 
 			//delete
 			Delete delete = new Delete();

@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.Net4
 	/// <summary>
 	/// Implements methods for interact with database engines
 	/// </summary>
-	public abstract class DataBase
+	public abstract class DataBase: Sql.DataBase
 	{
 		#region Constructors and destructors
 
@@ -68,34 +68,15 @@ namespace OKHOSTING.Sql.Net4
 
 		protected OKHOSTING.Sql.Schema.DataBaseSchema _Schema;
 
-		public int Id { get; set; }
-
-		public string Name { get; set; }
-
-		public OKHOSTING.Sql.Schema.DataBaseSchema Schema
+		public override string ConnectionString
 		{
 			get
 			{
-				if (_Schema == null)
-				{
-					_Schema = SchemaLoader.Load(this, SchemaProvider);
-				}
-
-				return _Schema;
-			}
-		}
-
-		string _ConnectionString;
-
-		public string ConnectionString
-		{
-			get
-			{
-				return _ConnectionString;
+				return base.ConnectionString;
 			}
 			set
 			{
-				_ConnectionString = value;
+				base.ConnectionString = value;
 
 				if (Connection != null)
 				{
@@ -112,26 +93,12 @@ namespace OKHOSTING.Sql.Net4
 		/// Executes a SQL Script that doesn't retun rows
 		/// </summary>
 		/// <param name="command">
-		/// The SQL script to be executed
-		/// </param>
-		/// <returns>
-		/// An int indicating the number of affected rows
-		/// </returns>
-		public int Execute(Command command)
-		{
-			return Execute(new List<Command>() { command });
-		}
-
-		/// <summary>
-		/// Executes a SQL Script that doesn't retun rows
-		/// </summary>
-		/// <param name="command">
 		/// A list of SQL scripts to be executed
 		/// </param>
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public int Execute(List<Command> commands)
+		public override int Execute(List<Command> commands)
 		{
 			//Local Vars
 			int rowsAffected = 0;
@@ -210,7 +177,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// A System.Data.DbDataReader with all data obtained
 		/// </returns>
-		public DbDataReader GetDataReader(Command command)
+		public override IDataReader GetDataReader(Command command)
 		{
 			//Local Vars
 			DbDataReader reader = null;
@@ -268,7 +235,7 @@ namespace OKHOSTING.Sql.Net4
 			}
 
 			//Returning the DataReader
-			return reader;
+			return new DataReader(this, reader);
 		}
 
 		/// <summary>
@@ -283,7 +250,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Value returned in the first row and firstn collumn
 		/// </returns>
-		public object GetScalar(Command command)
+		public override object GetScalar(Command command)
 		{
 			//Local Vars
 			object value = null;
@@ -349,10 +316,10 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// A System.Data.DataTable with all data obtained
 		/// </returns>
-		public DataTable GetDataTable(Command command)
+		public override IDataTable GetDataTable(Command command)
 		{
 			//Local Vars
-			DataTable tableToReturn = null;
+			System.Data.DataTable tableToReturn = null;
 			DbDataAdapter adapter;
 
 			lock (Locker)
@@ -384,7 +351,7 @@ namespace OKHOSTING.Sql.Net4
 						adapter.SelectCommand = dbCommand;
 
 						//Loading the data
-						tableToReturn = new DataTable();
+						tableToReturn = new System.Data.DataTable();
 						adapter.Fill(tableToReturn);
 					}
 
@@ -393,7 +360,7 @@ namespace OKHOSTING.Sql.Net4
 					OnAfterGetDataTable(e);
 
 					//Returning the data to the caller
-					return tableToReturn;
+					return new DataTable(this, tableToReturn);
 				}
 				catch (System.Exception ex)
 				{
@@ -415,7 +382,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Starts a transaction for all the querys executed throught the Executer
 		/// </summary>
-		public void BeginTransaction()
+		public override void BeginTransaction()
 		{
 			//Validating if dont exists currently a transaction 
 			if (this.Transaction != null)
@@ -441,7 +408,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary> 
 		/// Accepts the current transaction 
 		/// </summary>
-		public void CommitTransaction()
+		public override void CommitTransaction()
 		{
 			//Validating if exists currently a transaction 
 			if (this.Transaction == null)
@@ -460,7 +427,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary> 
 		/// Cancels the current transaction
 		/// </summary>		
-		public void RollBackTransaction()
+		public override void RollBackTransaction()
 		{
 			//Validating if exists currently a transaction 
 			if (this.Transaction == null)
@@ -479,7 +446,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Gets a value indicating if a transaction is currently active
 		/// </summary>
-		public bool IsTransactionActive
+		public override bool IsTransactionActive
 		{
 			get
 			{
@@ -494,7 +461,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Opens the current connection, only if it is not already openned
 		/// </summary>
-		protected void OpenConnection()
+		protected override void OpenConnection()
 		{
 			if (Connection.State != ConnectionState.Open)
 			{
@@ -505,7 +472,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <summary>
 		/// Opens the current connection, only if it is not already openned
 		/// </summary>
-		protected void CloseConnection()
+		protected override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed && !IsTransactionActive) Connection.Close();
 		}
@@ -547,13 +514,13 @@ namespace OKHOSTING.Sql.Net4
 		/// Boolean value that indicates if the 
 		/// SQL Sentence return data
 		/// </returns>
-		public bool ExistsData(Command command)
+		public override bool ExistsData(Command command)
 		{
 			//Local Vars
 			bool result = false;
 
 			//Creating DataReader
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			//Trying to read the data
 			try
@@ -562,7 +529,7 @@ namespace OKHOSTING.Sql.Net4
 				reader = GetDataReader(command);
 
 				//Validating if exists data
-				result = (reader.Read());
+				result = reader.Read();
 			}
 			catch
 			{
@@ -570,31 +537,12 @@ namespace OKHOSTING.Sql.Net4
 			}
 			finally
 			{
-				if (reader != null && !reader.IsClosed) reader.Close();
+				if (reader != null && !reader.IsClosed)
+				{
+					reader.Close();
+					reader.Dispose();
+                }
 			}
-
-			//Returning value
-			return result;
-		}
-
-		/// <summary>
-		/// Returns a value that indicates how many records returns
-		/// the query specified
-		/// </summary>
-		/// <param name="SQLSentence">
-		/// Sql Sentence for query
-		/// </param>
-		/// <returns>
-		/// Number of Records that returns the query
-		/// </returns>
-		public int NumberOfRecords(string sqlSentence)
-		{
-			//Local Vars
-			int result = 0;
-
-			//Geting data requested and number of rows affected 
-			DataTable tblData = this.GetDataTable(sqlSentence);
-			result = tblData.Rows.Count;
 
 			//Returning value
 			return result;
@@ -607,7 +555,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public bool CanConnect()
+		public override bool CanConnect()
 		{
 			//Calling to the corresponding overload
 			Exception ExceptionOccured;
@@ -625,7 +573,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public bool CanConnect(out Exception exceptionOccured)
+		public override bool CanConnect(out Exception exceptionOccured)
 		{
 			//Local vars
 			bool success;
@@ -669,11 +617,11 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// Boolean value that indicates if the table exists
 		/// </returns>
-		public virtual bool ExistsTable(string name)
+		public override bool ExistsTable(string name)
 		{
 			//Local vars
 			bool existsTable = false;
-			DbDataReader reader = null;
+			IDataReader reader = null;
 
 			try
 			{
@@ -703,7 +651,11 @@ namespace OKHOSTING.Sql.Net4
 			finally
 			{
 				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed) reader.Close();
+				if (reader != null && !reader.IsClosed)
+				{
+					reader.Close();
+					reader.Dispose();
+				}
 			}
 
 			//Setting the return value
@@ -718,138 +670,6 @@ namespace OKHOSTING.Sql.Net4
 		{
 			get;
 		}
-
-		/// <summary>
-		/// Returns the Date and Hour from the database Server
-		/// </summary>
-		/// <returns>
-		/// Date and Hour from the database Server
-		/// </returns>
-		public abstract DateTime DateTimeOnDBServer();
-
-		/// <summary>
-		/// Returns a Global Unique Identifier from the Database
-		/// </summary>
-		/// <returns>
-		/// Global Unique Identifier 
-		/// </returns>
-		public abstract string GetUniqueIdentifier();
-
-		/// <summary>
-		/// Returns a value that indicates if the Constrainst 
-		/// exists in the Underlying Database 
-		/// </summary>
-		/// <param name="Name">
-		/// Name of the constraint to validate
-		/// </param>
-		/// <returns>
-		/// Value that indicates if the Constrainst 
-		/// exists in the Underlying Database 
-		/// </returns>
-		public abstract bool ExistsConstraint(string Name);
-
-		/// <summary>
-		/// Verify if exists the specified index on the Database
-		/// </summary>
-		/// <param name="Name">
-		/// Name of the index
-		/// </param>
-		/// <returns>
-		/// Boolean value that indicates if exists 
-		/// the specified index on the Database
-		/// </returns>
-		public abstract bool ExistsIndex(string Name);
-
-		#endregion
-
-		#region Events
-
-		/// <summary>
-		/// Delegate for the database interaction events
-		/// </summary>
-		public delegate void DataBaseOperationEventHandler(DataBase sender, CommandEventArgs DatabaseInteractionArgs);
-
-		/// <summary>
-		/// Event thrown before of execute sentences against the database
-		/// </summary>
-		public event DataBaseOperationEventHandler BeforeExecute;
-
-		/// <summary>
-		/// Event thrown after of execute sentences against the database
-		/// </summary>
-		public event DataBaseOperationEventHandler AfterExecute;
-
-		/// <summary>
-		/// Event thrown before get a data table
-		/// </summary>
-		public event DataBaseOperationEventHandler BeforeGetDataTable;
-
-		/// <summary>
-		/// Event thrown after get a data table
-		/// </summary>
-		public event DataBaseOperationEventHandler AfterGetDataTable;
-
-		/// <summary>
-		/// Event thrown before get a data reader
-		/// </summary>
-		public event DataBaseOperationEventHandler BeforeGetDataReader;
-
-		/// <summary>
-		/// Event thrown after get a data reader
-		/// </summary>
-		public event DataBaseOperationEventHandler AfterGetDataReader;
-
-		/// <summary>
-		/// Raises the BeforeExecute event
-		/// </summary>
-		public virtual void OnBeforeExecute(CommandEventArgs e)
-		{
-			if (BeforeExecute != null) BeforeExecute(this, e);
-		}
-
-		/// <summary>
-		/// Raises the AfterExecute event
-		/// </summary>
-		public virtual void OnAfterExecute(CommandEventArgs e)
-		{
-			if (AfterExecute != null) AfterExecute(this, e);
-		}
-
-		/// <summary>
-		/// Raises the BeforeGetDataTable event
-		/// </summary>
-		public virtual void OnBeforeGetDataTable(CommandEventArgs e)
-		{
-			if (BeforeGetDataTable != null) BeforeGetDataTable(this, e);
-		}
-
-		/// <summary>
-		/// Raises the AfterGetDataTable event
-		/// </summary>
-		public virtual void OnAfterGetDataTable(CommandEventArgs e)
-		{
-			if (AfterGetDataTable != null) AfterGetDataTable(this, e);
-		}
-
-		/// <summary>
-		/// Raises the BeforeGetDataReader event
-		/// </summary>
-		public virtual void OnBeforeGetDataReader(CommandEventArgs e)
-		{
-			if (BeforeGetDataReader != null) BeforeGetDataReader(this, e);
-		}
-
-		/// <summary>
-		/// Raises the AfterGetDataReader event
-		/// </summary>
-		public virtual void OnAfterGetDataReader(CommandEventArgs e)
-		{
-			if (AfterGetDataReader != null) AfterGetDataReader(this, e);
-		}
-
-		#endregion
-
-		#region Static
 
 		#endregion
 	}

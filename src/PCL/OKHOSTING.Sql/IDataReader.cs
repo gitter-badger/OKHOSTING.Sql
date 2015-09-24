@@ -6,19 +6,14 @@ namespace OKHOSTING.Sql
 	/// <summary>
 	/// Represents a collection of rows that are accesed one at a time, and must finally be closed, since its "conected" to the data source
 	/// </summary>
-	public interface IDataReader: IDataResult, IDataRow
+	public interface IDataReader: IDataRow
 	{
-		bool IsClosed { get; }
+		/// <summary>
+		/// Returns the list of columns that define this data result
+		/// </summary>
+		IEnumerable<DataColumn> Schema { get; }
 
-		//
-		// Summary:
-		//     Obtiene un valor que indica si este objeto System.Data.Common.DbDataReader contiene
-		//     una o varias filas.
-		//
-		// Returns:
-		//     true si System.Data.Common.DbDataReader contiene una o varias filas; en caso
-		//     contrario, false.
-		bool HasRows { get; }
+		bool IsClosed { get; }
 
 		//
 		// Summary:
@@ -36,8 +31,10 @@ namespace OKHOSTING.Sql
 		// Exceptions:
 		//   T:System.InvalidCastException:
 		//     La conversión especificada no es válida.
-		DbType GetDataTypeName(int ordinal);
-		
+		string GetDataTypeName(int ordinal);
+
+		Type GetType(int ordinal);
+
 		//
 		// Summary:
 		//     Obtiene el nombre de la columna a partir del índice de columna de base cero.

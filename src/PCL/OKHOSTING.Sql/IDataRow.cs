@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 
 namespace OKHOSTING.Sql
 {
 	/// <summary>
 	/// Represents a row of data, with multiple columns
 	/// </summary>
-	public interface IDataRow: IEnumerator<object>, IDisposable
+	public interface IDataRow: IEnumerable, IDisposable
 	{
-		/// <summary>
-		/// The IDataTable or IDataReader that contains this row
-		/// </summary>
-		IDataResult Container { get; }
-
 		//
 		// Summary:
 		//     Obtiene el valor de la columna especificada como una instancia de System.Object.
