@@ -93,6 +93,7 @@
     <Compile Include="Schema\Trigger.cs" />
     <Compile Include="Schema\User.cs" />
     <Compile Include="Schema\View.cs" />
+    <Compile Include="SqlException.cs" />
     <Compile Include="SqlGeneratorBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

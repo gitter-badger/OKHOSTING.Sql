@@ -56,7 +56,6 @@
     </Compile>
     <Compile Include="OleDb\MsAccessSqlGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SqlException.cs" />
     <Compile Include="SqlServer\DataBase.cs">
       <SubType>Code</SubType>
     </Compile>

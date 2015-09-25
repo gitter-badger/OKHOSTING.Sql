@@ -1,6 +1,6 @@
 using System;
 
-namespace OKHOSTING.Sql.Net4
+namespace OKHOSTING.Sql
 {
 	/// <summary>
 	/// The exception that is thrown when a bad-formed 
