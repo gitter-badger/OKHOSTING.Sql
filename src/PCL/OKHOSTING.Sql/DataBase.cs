@@ -133,26 +133,18 @@ namespace OKHOSTING.Sql
 		protected abstract void CloseConnection();
 
 		/// <summary>
-		/// Returns a boolean value that indicates if the 
-		/// SQL Sentence return data
-		/// </summary>
-		/// <param name="command">
-		/// Sentence to verify
-		/// </param>
-		/// <returns>
-		/// Boolean value that indicates if the 
-		/// SQL Sentence return data
-		/// </returns>
-		public abstract bool ExistsData(Command command);
-
-		/// <summary>
 		/// Returns a boolean value that indicates if is possible to connect
 		/// to database defined at the connection string of the executor
 		/// </summary>
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public abstract bool CanConnect();
+		public virtual bool CanConnect()
+		{
+			//Calling to the corresponding overload
+			Exception ExceptionOccured;
+			return CanConnect(out ExceptionOccured);
+		}
 
 		/// <summary>
 		/// Returns a boolean value that indicates if is possible to connect
@@ -165,7 +157,40 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// Boolean value that indicates the successfully or failed connection
 		/// </returns>
-		public abstract bool CanConnect(out Exception exceptionOccured);
+		public virtual bool CanConnect(out Exception exceptionOccured)
+		{
+			//Local vars
+			bool success;
+
+			//Initializing the out parameters
+			exceptionOccured = null;
+
+			try
+			{
+				//Trying to connect to database
+				OpenConnection();
+
+				//Establishing that the connection was successfully
+				success = true;
+			}
+			catch (System.Exception ex)
+			{
+				//Establishing exception to return 
+				exceptionOccured = ex;
+
+				//Establishing that the connection was failed
+				success = false;
+			}
+
+			finally
+			{
+				//Closing the conection (if apply)
+				CloseConnection();
+			}
+
+			//Returning the value
+			return success;
+		}
 
 		/// <summary>
 		/// Verify if exists the specified table on the database
@@ -185,7 +210,7 @@ namespace OKHOSTING.Sql
 			try
 			{
 				//Loading data reader
-				reader = GetDataReader("select * from " + name);
+				reader = GetDataReader("SELECT * FROM " + name);
 
 				//Validating if was possible to load the reader
 				if (reader != null)
@@ -210,11 +235,60 @@ namespace OKHOSTING.Sql
 			finally
 			{
 				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed) reader.Close();
+				if (reader != null && !reader.IsClosed) 
+				{
+					reader.Close ();
+					reader.Dispose ();
+				}
 			}
 
 			//Setting the return value
 			return existsTable;
+		}
+
+		/// <summary>
+		/// Returns a boolean value that indicates if the 
+		/// SQL Sentence return data
+		/// </summary>
+		/// <param name="command">
+		/// Sentence to verify
+		/// </param>
+		/// <returns>
+		/// Boolean value that indicates if the 
+		/// SQL Sentence return data
+		/// </returns>
+		public virtual bool ExistsData(Command command)
+		{
+			//Local Vars
+			bool result = false;
+
+			//Creating DataReader
+			IDataReader reader = null;
+
+			//Trying to read the data
+			try
+			{
+				//Query the Database
+				reader = GetDataReader(command);
+
+				//Validating if exists data
+				result = reader.Read();
+			}
+			catch
+			{
+				throw;
+			}
+			finally
+			{
+				if (reader != null && !reader.IsClosed)
+				{
+					reader.Close();
+					reader.Dispose();
+				}
+			}
+
+			//Returning value
+			return result;
 		}
 
 		/// <summary>

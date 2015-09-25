@@ -12,12 +12,12 @@ namespace OKHOSTING.Sql.Net4
 		{
 			if (container == null)
 			{
-				throw new ArgumentNullException(nameof(container));
+				throw new ArgumentNullException("container");
 			}
 
 			if (nativeRow == null)
 			{
-				throw new ArgumentNullException(nameof(nativeRow));
+				throw new ArgumentNullException("nativeRow");
 			}
 
 			Container = container;

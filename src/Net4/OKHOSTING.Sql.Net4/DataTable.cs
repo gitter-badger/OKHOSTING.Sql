@@ -14,12 +14,12 @@ namespace OKHOSTING.Sql.Net4
 		{
 			if (dataBase == null)
 			{
-				throw new ArgumentNullException(nameof(dataBase));
+				throw new ArgumentNullException("dataBase");
 			}
 
 			if (nativeTable == null)
 			{
-				throw new ArgumentNullException(nameof(nativeTable));
+				throw new ArgumentNullException("nativeTable");
 			}
 
 			DataBase = dataBase;

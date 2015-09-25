@@ -11,12 +11,12 @@ namespace OKHOSTING.Sql
 		{
 			if (name == null)
 			{
-				throw new ArgumentNullException(nameof(name));
+				throw new ArgumentNullException("name");
 			}
 
 			if (columnType == null)
 			{
-				throw new ArgumentNullException(nameof(columnType));
+				throw new ArgumentNullException("columnType");
 			}
 
 			Name = name;

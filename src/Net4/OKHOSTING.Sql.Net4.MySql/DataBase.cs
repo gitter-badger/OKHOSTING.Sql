@@ -128,49 +128,6 @@ namespace OKHOSTING.Sql.Net4.MySql
 		}
 
 		/// <summary>
-		/// Verify if exists the specified table on the database
-		/// </summary>
-		/// <param name="name">
-		/// Table to search
-		/// </param>
-		/// <returns>
-		/// Boolean value that indicates if the table exists
-		/// </returns>
-		public override bool ExistsTable(string name)
-		{
-			//Local vars
-			bool existsTable = false;
-			IDataReader reader = null;
-
-			try
-			{
-				//Loading data reader
-				reader = this.GetDataReader("SELECT * FROM `" + name + "` LIMIT 1");
-
-				//If the previous query executes it successfully, 
-				//then the table exists
-				existsTable = true;
-			}
-			catch (System.Exception)
-			{
-				//The query fails; the table dont exists
-				existsTable = false;
-			}
-			finally
-			{
-				//Closing the reader if apply
-				if (reader != null && !reader.IsClosed)
-				{
-					reader.Close();
-					reader.Dispose();
-				}
-			}
-
-			//Setting the return value
-			return existsTable;
-		}
-
-		/// <summary>
 		/// Verify if exists the specified index on the Database
 		/// </summary>
 		/// <param name="Name">

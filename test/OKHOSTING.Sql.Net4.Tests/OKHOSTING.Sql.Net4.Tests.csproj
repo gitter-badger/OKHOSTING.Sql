@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -31,10 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\..\src\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -43,6 +39,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77">
+      <HintPath>..\..\src\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MySqlTests.cs" />
@@ -57,27 +56,27 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
-      <Project>{3f4502fa-51ea-4cb9-8e50-46f828d240a1}</Project>
+      <Project>{3F4502FA-51EA-4CB9-8E50-46F828D240A1}</Project>
       <Name>OKHOSTING.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
-      <Project>{5ba0cbac-63e5-4e01-aeca-67ae3b63503b}</Project>
+      <Project>{5BA0CBAC-63E5-4E01-AECA-67AE3B63503B}</Project>
       <Name>OKHOSTING.Data</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Net4\OKHOSTING.Sql.Net4.MySql\OKHOSTING.Sql.Net4.MySql.csproj">
-      <Project>{0a304a16-0f65-4ce6-a878-41263293021c}</Project>
+      <Project>{0A304A16-0F65-4CE6-A878-41263293021C}</Project>
       <Name>OKHOSTING.Sql.Net4.MySql</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Net4\OKHOSTING.Sql.Net4\OKHOSTING.Sql.Net4.csproj">
-      <Project>{dcead90d-4031-4c10-983e-b6e71f4a8b2f}</Project>
+      <Project>{DCEAD90D-4031-4C10-983E-B6E71F4A8B2F}</Project>
       <Name>OKHOSTING.Sql.Net4</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\PCL\OKHOSTING.Sql.MySql\OKHOSTING.Sql.MySql.csproj">
-      <Project>{35ed0ac8-2240-4095-b7cb-60622e515a9c}</Project>
+      <Project>{35ED0AC8-2240-4095-B7CB-60622E515A9C}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\PCL\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
-      <Project>{afc2147b-ead8-439b-8ca6-d1bf308064b3}</Project>
+      <Project>{AFC2147B-EAD8-439B-8CA6-D1BF308064B3}</Project>
       <Name>OKHOSTING.Sql</Name>
     </ProjectReference>
   </ItemGroup>
