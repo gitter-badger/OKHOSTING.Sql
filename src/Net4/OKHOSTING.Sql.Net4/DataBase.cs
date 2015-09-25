@@ -98,7 +98,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public override int Execute(List<Command> commands)
+		public override int Execute(IEnumerable<Command> commands)
 		{
 			//Local Vars
 			int rowsAffected = 0;

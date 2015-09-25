@@ -48,7 +48,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public abstract int Execute(List<Command> commands);
+		public abstract int Execute(IEnumerable<Command> commands);
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
