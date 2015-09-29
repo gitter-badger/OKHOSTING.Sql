@@ -146,7 +146,7 @@ namespace OKHOSTING.Sql
 
 			//Creating Insert Sentence and return it
 			command.Script =
-				"INSERT INTO " + EncloseName(insert.Into.Name) + " " +
+				"INSERT INTO " + EncloseName(insert.Table.Name) + " " +
 				EncloseOnParenthesis(columnsList) +
 				" VALUES " +
 				EncloseOnParenthesis(valuesList);
@@ -199,7 +199,7 @@ namespace OKHOSTING.Sql
 			}
 
 			//Creating Update sentence begin
-			Command command = "UPDATE " + EncloseName(update.From.Name) + " SET ";
+			Command command = "UPDATE " + EncloseName(update.Table.Name) + " SET ";
 
 			//Crossing DataValues that aren't primary key
 			foreach (var value in update.Set)
@@ -249,7 +249,7 @@ namespace OKHOSTING.Sql
 				throw new ArgumentNullException("delete");
 			}
 
-			Command command = "DELETE " + EncloseName(delete.From.Name);
+			Command command = "DELETE " + EncloseName(delete.Table.Name);
 
 			command += WhereClause(delete.Where);
 			command.Script += ScriptSeparator;
@@ -289,7 +289,7 @@ namespace OKHOSTING.Sql
 			foreach (ColumnFilter filter in select.Where.Where(f => f is ColumnFilter))
 			{
 				//this filter is using a join table's column, so we need to the join's table alias
-				if (filter.Column.Table != select.From)
+				if (filter.Column.Table != select.Table)
 				{
 					foreach (SelectJoin join in select.Joins)
 					{
@@ -386,7 +386,7 @@ namespace OKHOSTING.Sql
 			//use all columns if none is defined
 			if (select.Columns.Count == 0)
 			{
-				foreach (Column c in select.From.Columns)
+				foreach (Column c in select.Table.Columns)
 				{
 					select.Columns.Add(c);
 				}
@@ -396,7 +396,7 @@ namespace OKHOSTING.Sql
 			string sql = "SELECT ";
 
 			//Getting the Table DB table name
-			string tableName = EncloseName(select.From.Name);
+			string tableName = EncloseName(select.Table.Name);
 
 			//Crossing all the loaded members
 			foreach (var c in select.Columns)
@@ -684,7 +684,7 @@ namespace OKHOSTING.Sql
 			if (select == null) throw new ArgumentNullException("select");
 
 			//Creating the From Clause
-			Command command = " From " + EncloseName(select.From.Name);
+			Command command = " From " + EncloseName(select.Table.Name);
 
 			//resolve joins 
 			foreach (SelectJoin join in select.Joins)
