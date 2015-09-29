@@ -331,15 +331,15 @@ namespace OKHOSTING.Sql
 		/// the specified index on the Database
 		/// </returns>
 		public abstract bool ExistsIndex(string Name);
-		
-		#endregion
 
-		#region Events
+        #endregion
 
-		/// <summary>
-		/// Delegate for the database interaction events
-		/// </summary>
-		public delegate void DataBaseOperationEventHandler(DataBase sender, CommandEventArgs DatabaseInteractionArgs);
+        #region Events
+
+        /// <summary>
+        /// Delegate for the database interaction events
+        /// </summary>
+        public delegate void DataBaseOperationEventHandler(DataBase sender, CommandEventArgs DatabaseInteractionArgs);
 
 		/// <summary>
 		/// Event thrown before of execute sentences against the database
@@ -419,6 +419,51 @@ namespace OKHOSTING.Sql
 			if (AfterGetDataReader != null) AfterGetDataReader(this, e);
 		}
 
-		#endregion
-	}
+        #endregion
+
+        #region Static events
+
+        /// <summary>
+        /// Delegate used for the database creation. 
+        /// </summary>
+        public delegate DataBase CreateDataBaseEventHandler();
+
+        /// <summary>
+        /// Subscribe to this event to create the actual database that will be used in your apps, system-wide. Should only have 1 subscriber. If it has more it will return the last subscriber's result
+        /// </summary>
+        public static event CreateDataBaseEventHandler Create;
+
+        /// <summary>
+        /// Allows you (or plugins) to perform adittional configurations on newly created databases
+        /// </summary>
+        public delegate void DataBaseCreatedEventHandler(DataBase dataBase);
+
+        /// <summary>
+        /// Subscribe to this event to create the actual database that will be used in your projects. Allow for "plugins" to subscribe to dabase events and affect system wide behaviour
+        /// </summary>
+        public static event DataBaseCreatedEventHandler Created;
+
+        /// <summary>
+        /// Will create a ready to use database. 
+        /// You should subscribeto Create and (optionally) Created events to return a fully configured database. Then just call this method from everywhere else.
+        /// </summary>
+        public static DataBase CreateDataBase()
+        {
+            if (DataBase.Create == null)
+            {
+                throw new NullReferenceException("DataBase.Create event has not subsrcibed method to actually create a configured DataBase. Subscribe to this event and create your own instance.");
+            }
+
+            DataBase db = DataBase.Create();
+
+            if (DataBase.Created != null)
+            {
+                DataBase.Created(db);
+            }
+
+            return db;
+        }
+
+        #endregion
+    }
 }
