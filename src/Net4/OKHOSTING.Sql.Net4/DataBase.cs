@@ -509,11 +509,26 @@ namespace OKHOSTING.Sql.Net4
 			return (System.Data.DbType) Enum.Parse(typeof(System.Data.DbType), dbType.ToString());
 		}
 
-		#endregion
+        public override void Dispose()
+        {
+            base.Dispose();
 
-		#region Abstract functionality (for implementation on child classes)
+            if (Transaction != null)
+            {
+                Transaction.Dispose();
+            }
 
-		protected abstract string SchemaProvider
+            if (Connection != null)
+            {
+                Connection.Dispose();
+            }
+        }
+
+        #endregion
+
+        #region Abstract functionality (for implementation on child classes)
+
+        protected abstract string SchemaProvider
 		{
 			get;
 		}

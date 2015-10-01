@@ -7,7 +7,7 @@ namespace OKHOSTING.Sql
 	/// <summary>
 	/// Implements methods for interact with database engines
 	/// </summary>
-	public abstract class DataBase
+	public abstract class DataBase: IDisposable
 	{
 		#region Fields and Properties
 
@@ -333,6 +333,11 @@ namespace OKHOSTING.Sql
 		/// </returns>
 		public abstract bool ExistsIndex(string Name);
 
+        public virtual void Dispose()
+        {
+            CloseConnection();
+        }
+
         #endregion
 
         #region Events
@@ -427,22 +432,22 @@ namespace OKHOSTING.Sql
         /// <summary>
         /// Delegate used for the database creation. 
         /// </summary>
-        public delegate DataBase CreateDataBaseEventHandler();
+        public delegate DataBase SetupDataBaseEventHandler();
 
         /// <summary>
         /// Subscribe to this event to create the actual database that will be used in your apps, system-wide. Should only have 1 subscriber. If it has more it will return the last subscriber's result
         /// </summary>
-        public static event CreateDataBaseEventHandler Create;
+        public static event SetupDataBaseEventHandler Setup;
 
         /// <summary>
         /// Allows you (or plugins) to perform adittional configurations on newly created databases
         /// </summary>
-        public delegate void DataBaseCreatedEventHandler(DataBase dataBase);
+        public delegate void SettingUpDataBaseEventHandler(DataBase dataBase);
 
         /// <summary>
         /// Subscribe to this event to create the actual database that will be used in your projects. Allow for "plugins" to subscribe to dabase events and affect system wide behaviour
         /// </summary>
-        public static event DataBaseCreatedEventHandler Created;
+        public static event SettingUpDataBaseEventHandler SettingUp;
 
         /// <summary>
         /// Will create a ready to use database. 
@@ -450,16 +455,16 @@ namespace OKHOSTING.Sql
         /// </summary>
         public static DataBase CreateDataBase()
         {
-            if (DataBase.Create == null)
+            if (DataBase.Setup == null)
             {
-                throw new NullReferenceException("DataBase.Create event has not subsrcibed method to actually create a configured DataBase. Subscribe to this event and create your own instance.");
+                throw new NullReferenceException("DataBase.Setup event has not subsrcibed method to actually create a configured DataBase. Subscribe to this event and create your own instance.");
             }
 
-            DataBase db = DataBase.Create();
+            DataBase db = DataBase.Setup();
 
-            if (DataBase.Created != null)
+            if (DataBase.SettingUp != null)
             {
-                DataBase.Created(db);
+                DataBase.SettingUp(db);
             }
 
             return db;
