@@ -183,7 +183,7 @@ namespace OKHOSTING.Sql.Net4.OleDb
 			Command command = 
 				"FROM " + 
 				new String('(', parentDataTypes - 1) + 
-				EncloseName(select.From.Name);
+				EncloseName(select.Table.Name);
 
 			//Crossing the parent DataTypes of the specified type
 			foreach(SelectJoin join in select.Joins)
@@ -224,7 +224,7 @@ namespace OKHOSTING.Sql.Net4.OleDb
 				throw new ArgumentNullException("delete");
 			}
 
-			Command command = "DELETE FROM " + EncloseName(delete.From.Name);
+			Command command = "DELETE FROM " + EncloseName(delete.Table.Name);
 
 			command.Append(WhereClause(delete.Where, LogicalOperator.And));
 

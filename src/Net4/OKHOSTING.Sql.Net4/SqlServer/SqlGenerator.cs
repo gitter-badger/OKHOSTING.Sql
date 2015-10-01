@@ -189,7 +189,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 
 			//Creating Insert Sentence and return it
 			command.Script =
-				"INSERT INTO " + EncloseName(insert.Into.Name) + " " +
+				"INSERT INTO " + EncloseName(insert.Table.Name) + " " +
 				EncloseOnParenthesis(columnsList) +
 				" VALUES " +
 				EncloseOnParenthesis(valuesList);

@@ -77,7 +77,7 @@ namespace OKHOSTING.Sql.Net4.OleDb
 			throw new NotSupportedException("OleDbExecuter is not compatible with the method BaseExecuter.IndexExists()");
 		}
 
-		private static new Dictionary<DbType, OleDbType> DbTypeMap;
+		private static Dictionary<DbType, OleDbType> DbTypeMap;
 
 		static DataBase()
 		{

@@ -35,7 +35,7 @@ namespace OKHOSTING.Sql.MySql
 			}
 
 			//Returning the sql sentence
-			return "DELETE FROM " + base.EncloseName(delete.From.Name) + WhereClause(delete.Where);
+			return "DELETE FROM " + base.EncloseName(delete.Table.Name) + WhereClause(delete.Where);
 		}
 
 		#region Properties
