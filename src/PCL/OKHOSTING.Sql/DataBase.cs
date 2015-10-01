@@ -333,19 +333,19 @@ namespace OKHOSTING.Sql
 		/// </returns>
 		public abstract bool ExistsIndex(string Name);
 
-        public virtual void Dispose()
-        {
-            CloseConnection();
-        }
+		public virtual void Dispose()
+		{
+			CloseConnection();
+		}
 
-        #endregion
+		#endregion
 
-        #region Events
+		#region Events
 
-        /// <summary>
-        /// Delegate for the database interaction events
-        /// </summary>
-        public delegate void DataBaseOperationEventHandler(DataBase sender, CommandEventArgs DatabaseInteractionArgs);
+		/// <summary>
+		/// Delegate for the database interaction events
+		/// </summary>
+		public delegate void DataBaseOperationEventHandler(DataBase sender, CommandEventArgs DatabaseInteractionArgs);
 
 		/// <summary>
 		/// Event thrown before of execute sentences against the database
@@ -425,51 +425,51 @@ namespace OKHOSTING.Sql
 			if (AfterGetDataReader != null) AfterGetDataReader(this, e);
 		}
 
-        #endregion
+		#endregion
 
-        #region Static events
+		#region Static events
 
-        /// <summary>
-        /// Delegate used for the database creation. 
-        /// </summary>
-        public delegate DataBase SetupDataBaseEventHandler();
+		/// <summary>
+		/// Delegate used for the database creation. 
+		/// </summary>
+		public delegate DataBase SetupDataBaseEventHandler();
 
-        /// <summary>
-        /// Subscribe to this event to create the actual database that will be used in your apps, system-wide. Should only have 1 subscriber. If it has more it will return the last subscriber's result
-        /// </summary>
-        public static event SetupDataBaseEventHandler Setup;
+		/// <summary>
+		/// Subscribe to this event to create the actual database that will be used in your apps, system-wide. Should only have 1 subscriber. If it has more it will return the last subscriber's result
+		/// </summary>
+		public static event SetupDataBaseEventHandler Setup;
 
-        /// <summary>
-        /// Allows you (or plugins) to perform adittional configurations on newly created databases
-        /// </summary>
-        public delegate void SettingUpDataBaseEventHandler(DataBase dataBase);
+		/// <summary>
+		/// Allows you (or plugins) to perform adittional configurations on newly created databases
+		/// </summary>
+		public delegate void SettingUpDataBaseEventHandler(DataBase dataBase);
 
-        /// <summary>
-        /// Subscribe to this event to create the actual database that will be used in your projects. Allow for "plugins" to subscribe to dabase events and affect system wide behaviour
-        /// </summary>
-        public static event SettingUpDataBaseEventHandler SettingUp;
+		/// <summary>
+		/// Subscribe to this event to create the actual database that will be used in your projects. Allow for "plugins" to subscribe to dabase events and affect system wide behaviour
+		/// </summary>
+		public static event SettingUpDataBaseEventHandler SettingUp;
 
-        /// <summary>
-        /// Will create a ready to use database. 
-        /// You should subscribeto Create and (optionally) Created events to return a fully configured database. Then just call this method from everywhere else.
-        /// </summary>
-        public static DataBase CreateDataBase()
-        {
-            if (DataBase.Setup == null)
-            {
-                throw new NullReferenceException("DataBase.Setup event has not subsrcibed method to actually create a configured DataBase. Subscribe to this event and create your own instance.");
-            }
+		/// <summary>
+		/// Will create a ready to use database. 
+		/// You should subscribeto Create and (optionally) Created events to return a fully configured database. Then just call this method from everywhere else.
+		/// </summary>
+		public static DataBase CreateDataBase()
+		{
+			if (DataBase.Setup == null)
+			{
+				throw new NullReferenceException("DataBase.Setup event has not subsrcibed method to actually create a configured DataBase. Subscribe to this event and create your own instance.");
+			}
 
-            DataBase db = DataBase.Setup();
+			DataBase db = DataBase.Setup();
 
-            if (DataBase.SettingUp != null)
-            {
-                DataBase.SettingUp(db);
-            }
+			if (DataBase.SettingUp != null)
+			{
+				DataBase.SettingUp(db);
+			}
 
-            return db;
-        }
+			return db;
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }

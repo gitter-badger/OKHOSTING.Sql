@@ -111,8 +111,8 @@ namespace OKHOSTING.Sql.Net4
 			{
 				CommandEventArgs e = null;
 
-                try
-                {
+				try
+				{
 					//Initializing command and connection
 					DbCommand dbCommand = ProviderFactory.CreateCommand();
 					dbCommand.Connection = Connection;
@@ -148,8 +148,8 @@ namespace OKHOSTING.Sql.Net4
 						//calling events
 						e.Result = rowsAffected;
 						OnAfterExecute(e);
-                    }
-                }
+					}
+				}
 				catch (System.Exception ex)
 				{
 					//Re throwing exception to the caller
@@ -161,13 +161,13 @@ namespace OKHOSTING.Sql.Net4
 					CloseConnection();
 				}
 
-                //Returning value
-                if (e != null)
-                {
-                    yield return (int) e.Result;
-                }
-            }
-        }
+				//Returning value
+				if (e != null)
+				{
+					yield return (int) e.Result;
+				}
+			}
+		}
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
@@ -187,9 +187,9 @@ namespace OKHOSTING.Sql.Net4
 		{
 			//Local Vars
 			DbDataReader reader = null;
-            CommandEventArgs e = new CommandEventArgs(command);
+			CommandEventArgs e = new CommandEventArgs(command);
 
-            lock (Locker)
+			lock (Locker)
 			{
 				try
 				{
@@ -260,9 +260,9 @@ namespace OKHOSTING.Sql.Net4
 		{
 			//Local Vars
 			object value = null;
-            CommandEventArgs e = new CommandEventArgs(command);
+			CommandEventArgs e = new CommandEventArgs(command);
 
-            lock (Locker)
+			lock (Locker)
 			{
 				try
 				{
@@ -509,26 +509,26 @@ namespace OKHOSTING.Sql.Net4
 			return (System.Data.DbType) Enum.Parse(typeof(System.Data.DbType), dbType.ToString());
 		}
 
-        public override void Dispose()
-        {
-            base.Dispose();
+		public override void Dispose()
+		{
+			base.Dispose();
 
-            if (Transaction != null)
-            {
-                Transaction.Dispose();
-            }
+			if (Transaction != null)
+			{
+				Transaction.Dispose();
+			}
 
-            if (Connection != null)
-            {
-                Connection.Dispose();
-            }
-        }
+			if (Connection != null)
+			{
+				Connection.Dispose();
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region Abstract functionality (for implementation on child classes)
+		#region Abstract functionality (for implementation on child classes)
 
-        protected abstract string SchemaProvider
+		protected abstract string SchemaProvider
 		{
 			get;
 		}

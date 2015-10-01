@@ -8,7 +8,7 @@ namespace OKHOSTING.Sql.Net4
 		public readonly DataTable Container;
 		public readonly System.Data.DataRow NativeRow;
 
-        public DataTableRow(DataTable container, System.Data.DataRow nativeRow)
+		public DataTableRow(DataTable container, System.Data.DataRow nativeRow)
 		{
 			if (container == null)
 			{

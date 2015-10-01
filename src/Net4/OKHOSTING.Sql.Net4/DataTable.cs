@@ -52,7 +52,7 @@ namespace OKHOSTING.Sql.Net4
 			set
 			{
 				NativeTable.TableName = value;
-            }
+			}
 		}
 
 		public IEnumerable<DataColumn> Schema

@@ -88,7 +88,7 @@ namespace OKHOSTING.Sql.Net4
 						Unique = dbi.IsUnique,
 					};
 					
-                    foreach (DatabaseColumn dbc in dbi.Columns)
+					foreach (DatabaseColumn dbc in dbi.Columns)
 					{
 						index.Columns.Add(table[dbc.Name]);
 					}

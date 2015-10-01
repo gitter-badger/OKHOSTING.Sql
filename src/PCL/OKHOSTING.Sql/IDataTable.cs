@@ -15,18 +15,18 @@ namespace OKHOSTING.Sql
 
 		//
 		// Summary:
-		//     Obtiene o establece el nombre de System.Data.DataTable.
+		//	 Obtiene o establece el nombre de System.Data.DataTable.
 		//
 		// Returns:
-		//     Nombre del objeto System.Data.DataTable.
+		//	 Nombre del objeto System.Data.DataTable.
 		//
 		// Exceptions:
 		//   T:System.ArgumentException:
-		//     Se pasa un valor null o una cadena vacía ("") y esta tabla pertenece a una colección.
+		//	 Se pasa un valor null o una cadena vacía ("") y esta tabla pertenece a una colección.
 		//
 		//   T:System.Data.DuplicateNameException:
-		//     La tabla pertenece a una colección que ya contiene una tabla con el mismo nombre.
-		//     (La comparación distingue entre mayúsculas de minúsculas.)
+		//	 La tabla pertenece a una colección que ya contiene una tabla con el mismo nombre.
+		//	 (La comparación distingue entre mayúsculas de minúsculas.)
 		string Name { get; set; }
 	}
 }
