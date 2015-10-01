@@ -98,7 +98,7 @@ namespace OKHOSTING.Sql.Net4
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public override int Execute(IEnumerable<Command> commands)
+		public override IEnumerable<int> Execute(IEnumerable<Command> commands)
 		{
 			//Local Vars
 			int rowsAffected = 0;
@@ -109,8 +109,10 @@ namespace OKHOSTING.Sql.Net4
 
 			lock (Locker)
 			{
-				try
-				{
+				CommandEventArgs e = null;
+
+                try
+                {
 					//Initializing command and connection
 					DbCommand dbCommand = ProviderFactory.CreateCommand();
 					dbCommand.Connection = Connection;
@@ -121,7 +123,7 @@ namespace OKHOSTING.Sql.Net4
 					foreach (Command command in commands)
 					{
 						//raising events
-						CommandEventArgs e = new CommandEventArgs(command);
+						e = new CommandEventArgs(command);
 						OnBeforeExecute(e);
 						current = command;
 
@@ -146,8 +148,8 @@ namespace OKHOSTING.Sql.Net4
 						//calling events
 						e.Result = rowsAffected;
 						OnAfterExecute(e);
-					}
-				}
+                    }
+                }
 				catch (System.Exception ex)
 				{
 					//Re throwing exception to the caller
@@ -158,10 +160,14 @@ namespace OKHOSTING.Sql.Net4
 					//Closing the connection
 					CloseConnection();
 				}
-			}
-			//Returning value
-			return rowsAffected;
-		}
+
+                //Returning value
+                if (e != null)
+                {
+                    yield return (int) e.Result;
+                }
+            }
+        }
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
@@ -181,13 +187,13 @@ namespace OKHOSTING.Sql.Net4
 		{
 			//Local Vars
 			DbDataReader reader = null;
+            CommandEventArgs e = new CommandEventArgs(command);
 
-			lock (Locker)
+            lock (Locker)
 			{
 				try
 				{
 					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
 					OnBeforeGetDataReader(e);
 
 					//running the script only if e.Cancel is false
@@ -235,7 +241,7 @@ namespace OKHOSTING.Sql.Net4
 			}
 
 			//Returning the DataReader
-			return new DataReader(this, reader);
+			return new DataReader(this, (DbDataReader) e.Result);
 		}
 
 		/// <summary>
@@ -254,13 +260,13 @@ namespace OKHOSTING.Sql.Net4
 		{
 			//Local Vars
 			object value = null;
+            CommandEventArgs e = new CommandEventArgs(command);
 
-			lock (Locker)
+            lock (Locker)
 			{
 				try
 				{
 					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
 					OnBeforeGetDataReader(e);
 
 					//running the script only if e.Cancel is false
@@ -304,7 +310,7 @@ namespace OKHOSTING.Sql.Net4
 			}
 
 			//Returning the DataReader
-			return value;
+			return e.Result;
 		}
 
 		/// <summary>
@@ -360,7 +366,7 @@ namespace OKHOSTING.Sql.Net4
 					OnAfterGetDataTable(e);
 
 					//Returning the data to the caller
-					return new DataTable(this, tableToReturn);
+					return new DataTable(this, (System.Data.DataTable) e.Result);
 				}
 				catch (System.Exception ex)
 				{

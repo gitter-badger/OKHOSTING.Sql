@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace OKHOSTING.Sql
@@ -36,7 +37,7 @@ namespace OKHOSTING.Sql
 		/// </returns>
 		public virtual int Execute(Command command)
 		{
-			return Execute(new List<Command>() { command });
+			return Execute(new List<Command>() { command }).First();
 		}
 
 		/// <summary>
@@ -48,7 +49,7 @@ namespace OKHOSTING.Sql
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public abstract int Execute(IEnumerable<Command> commands);
+		public abstract IEnumerable<int> Execute(IEnumerable<Command> commands);
 
 		/// <summary>
 		/// Executes a SQL Script and retrieves all data obteined
