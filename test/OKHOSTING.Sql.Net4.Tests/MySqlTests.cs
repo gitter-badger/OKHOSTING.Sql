@@ -48,7 +48,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 
 			//insert
 			Insert insert = new Insert();
-			insert.Into = table;
+			insert.Table = table;
 			insert.Values.Add(new ColumnValue(table["Id"], 1));
 			insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
 			insert.Values.Add(new ColumnValue(table["NumberField"], 100));
@@ -59,7 +59,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 
 			//select
 			Select select = new Select();
-			select.From = table;
+			select.Table = table;
 			select.Columns.Add(table["id"]);
 			select.Columns.Add(table["TextField"]);
 			select.Where.Add(new ValueCompareFilter(){ Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
@@ -70,7 +70,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 
 			//delete
 			Delete delete = new Delete();
-			delete.From = table;
+			delete.Table = table;
 			delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
 
 			sql = generator.Delete(delete);

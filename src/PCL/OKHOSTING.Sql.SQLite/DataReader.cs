@@ -1,16 +1,19 @@
-﻿using System;
+﻿using SQLitePCL.pretty;
+using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using OKHOSTING.Sql.Schema;
 
-namespace OKHOSTING.Sql.Net4
+namespace OKHOSTING.Sql.SQLite
 {
 	public class DataReader : IDataReader
 	{
 		public readonly DataBase DataBase;
-		public readonly System.Data.IDataReader NativeReader;
+		public readonly IEnumerable<IReadOnlyList<IResultSetValue>> NativeReader;
+		public readonly IReadOnlyList<IResultSetValue> CurrentResult;
+		public readonly IEnumerator<IReadOnlyList<IResultSetValue>> Enumerator;
 
-		public DataReader(DataBase dataBase, System.Data.IDataReader nativeReader)
+		public DataReader(DataBase dataBase, IEnumerable<IReadOnlyList<IResultSetValue>> nativeReader)
 		{
 			if (dataBase == null)
 			{
@@ -24,13 +27,14 @@ namespace OKHOSTING.Sql.Net4
 
 			DataBase = dataBase;
 			NativeReader = nativeReader;
+			Enumerator = nativeReader.GetEnumerator();
 		}
 
 		public object this[int ordinal]
 		{
 			get
 			{
-				return NativeReader[ordinal];
+				return CurrentResult[ordinal];
 			}
 		}
 
@@ -38,7 +42,7 @@ namespace OKHOSTING.Sql.Net4
 		{
 			get
 			{
-				return NativeReader[name];
+				return CurrentResult[GetOrdinal(name)];
 			}
 		}
 
@@ -46,7 +50,7 @@ namespace OKHOSTING.Sql.Net4
 		{
 			get
 			{
-				return NativeReader.FieldCount;
+                return CurrentResult.Count;
 			}
 		}
 
@@ -54,7 +58,7 @@ namespace OKHOSTING.Sql.Net4
 		{
 			get
 			{
-				return NativeReader.IsClosed;
+				return false;
 			}
 		}
 
@@ -71,59 +75,59 @@ namespace OKHOSTING.Sql.Net4
 
 		public void Close()
 		{
-			NativeReader.Close();
 		}
 
 		public void Dispose()
 		{
-			NativeReader.Dispose();
 		}
 
 		public string GetDataTypeName(int ordinal)
 		{
-			return NativeReader.GetDataTypeName(ordinal);
+			return CurrentResult[ordinal].ColumnInfo.DeclaredType;
 		}
 
 		public Type GetType(int ordinal)
 		{
-			return NativeReader.GetFieldType(ordinal);
+			DbType dbType = OKHOSTING.Sql.SQLite.DataBase.Parse(CurrentResult[ordinal].SQLiteType);
+			return DbTypeMapper.Parse(dbType);
 		}
 
 		public T GetFieldValue<T>(int ordinal)
 		{
-			return OKHOSTING.Data.Convert.ChangeType<T>(NativeReader.GetValue(ordinal));
+			return OKHOSTING.Data.Convert.ChangeType<T>(CurrentResult[ordinal]);
 		}
 
 		public string GetName(int ordinal)
 		{
-			return NativeReader.GetName(ordinal);
+			return CurrentResult[ordinal].ColumnInfo.Name;
 		}
 
 		public int GetOrdinal(string name)
 		{
-			return NativeReader.GetOrdinal(name);
-		}
+			var column = CurrentResult.Columns().Where(c=> c.Name == name).Single();
+			return CurrentResult.Columns().ToList().IndexOf(column);
+        }
 
 		public bool IsNull(int ordinal)
 		{
-			return NativeReader.IsDBNull(ordinal);
+			return CurrentResult[ordinal] != null;
 		}
 
 		public bool NextResult()
 		{
-			return NativeReader.NextResult();
+			throw new NotSupportedException();
 		}
 
 		public bool Read()
 		{
-			return NativeReader.Read();
+			return Enumerator.MoveNext();
 		}
 
 		public IEnumerator GetEnumerator()
 		{
 			for (int i = 0; i < FieldCount; i++)
 			{
-				yield return NativeReader[i];
+				yield return CurrentResult[i];
 			}
 		}
 

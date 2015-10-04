@@ -7,16 +7,11 @@ namespace OKHOSTING.Sql
 	/// </summary>
 	public class DataColumn
 	{
-		public DataColumn(string name, Type columnType)
+		public DataColumn(string name, DbType columnType)
 		{
 			if (name == null)
 			{
 				throw new ArgumentNullException("name");
-			}
-
-			if (columnType == null)
-			{
-				throw new ArgumentNullException("columnType");
 			}
 
 			Name = name;
@@ -24,6 +19,6 @@ namespace OKHOSTING.Sql
 		}
 
 		public readonly string Name;
-		public readonly Type ColumnType;
+		public readonly DbType ColumnType;
 	}
 }

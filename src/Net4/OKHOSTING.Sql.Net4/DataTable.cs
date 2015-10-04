@@ -61,7 +61,7 @@ namespace OKHOSTING.Sql.Net4
 			{
 				foreach (System.Data.DataColumn nativeColumn in NativeTable.Columns)
 				{
-					yield return new DataColumn(nativeColumn.ColumnName, nativeColumn.DataType);
+					yield return new DataColumn(nativeColumn.ColumnName, DbTypeMapper.Parse(nativeColumn.DataType));
 				}
 			}
 		}
