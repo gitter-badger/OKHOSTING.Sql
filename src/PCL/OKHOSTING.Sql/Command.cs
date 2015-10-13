@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OKHOSTING.Data.Validation;
+using System;
 using System.Collections.Generic;
 
 namespace OKHOSTING.Sql
@@ -13,6 +14,8 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// A SQL script that you want to execute on a DataBase
 		/// </summary>
+		[RequiredValidator]
+		[StringLengthValidator(StringLengthValidator.Unlimited)]
 		public string Script { get; set; }
 
 		/// <summary>

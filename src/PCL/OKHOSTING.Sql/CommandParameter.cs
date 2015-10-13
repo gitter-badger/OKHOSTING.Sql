@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OKHOSTING.Data.Validation;
+using System;
 
 namespace OKHOSTING.Sql
 {
@@ -60,11 +61,14 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// Name of the parameter
 		/// </summary>
+		[RequiredValidator]
+		[StringLengthValidator(200)]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// DbType 
 		/// </summary>
+		[RequiredValidator]
 		public DbType DbType { get; set; }
 
 		/// <summary>
@@ -75,11 +79,13 @@ namespace OKHOSTING.Sql
 		/// <summary>
 		/// Actual value of the parameter, can be null
 		/// </summary>
+		[RequiredValidator]
 		public object Value { get; set; }
 
 		/// <summary>
 		/// Direction of the parameter
 		/// </summary>
+		[RequiredValidator]
 		public ParameterDirection Direction { get; set; }
 
 		private static readonly Random Random = new Random();

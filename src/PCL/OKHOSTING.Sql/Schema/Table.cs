@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OKHOSTING.Data.Validation;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace OKHOSTING.Sql.Schema
@@ -22,8 +23,14 @@ namespace OKHOSTING.Sql.Schema
 		/// <summary>
 		/// The name of the table
 		/// </summary>
+		[RequiredValidator]
+		[StringLengthValidator(200)]
 		public string Name { get; set; }
+
+		[StringLengthValidator(StringLengthValidator.Unlimited)]
 		public string Description { get; set; }
+
+		[RequiredValidator]
 		public DataBaseSchema DataBase { get; set; }
 
 		public Column this[string name]

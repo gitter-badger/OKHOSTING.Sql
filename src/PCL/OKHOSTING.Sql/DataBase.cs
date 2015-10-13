@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using OKHOSTING.Data.Validation;
 
 namespace OKHOSTING.Sql
 {
@@ -13,10 +14,13 @@ namespace OKHOSTING.Sql
 
 		public virtual int Id { get; set; }
 
+		[StringLengthValidator(50)]
 		public virtual string Name { get; set; }
 
 		public virtual Schema.DataBaseSchema Schema { get; set; }
 
+		[RequiredValidator]
+		[StringLengthValidator(250)]
 		public virtual string ConnectionString
 		{
 			get; set;

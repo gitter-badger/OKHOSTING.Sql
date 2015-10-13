@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using OKHOSTING.Data.Validation;
+using System.Linq;
 
 namespace OKHOSTING.Sql.Schema
 {
@@ -12,21 +13,26 @@ namespace OKHOSTING.Sql.Schema
 		/// <summary>
 		/// Name of the column
 		/// </summary>
+		[RequiredValidator]
+		[StringLengthValidator(200)]
 		public string Name { get; set; }
 
 		/// <summary>
 		/// Gets or sets the description.
 		/// </summary>
+		[StringLengthValidator(StringLengthValidator.Unlimited)]
 		public string Description { get; set; }
 
 		/// <summary>
 		/// Table where this column exist
 		/// </summary>
+		[RequiredValidator]
 		public Table Table { get; set; }
 
 		/// <summary>
 		/// Gets or sets the type of the data
 		/// </summary>
+		[RequiredValidator]
 		public DbType DbType { get; set; }
 
 		/// <summary>
@@ -47,16 +53,19 @@ namespace OKHOSTING.Sql.Schema
 		/// <summary>
 		/// Gets or sets a value indicating whether this column is an autonumber column (identity or equivalent)
 		/// </summary>
+		[RequiredValidator]
 		public bool IsAutoNumber { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this instance is part of the primary key.
 		/// </summary>
+		[RequiredValidator]
 		public bool IsPrimaryKey { get; set; }
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this is nullable.
 		/// </summary>
+		[RequiredValidator]
 		public bool IsNullable { get; set; }
 
 		/// <summary>
@@ -73,6 +82,7 @@ namespace OKHOSTING.Sql.Schema
 		/// <summary>
 		/// Gets or sets the "computed" (or "virtual") definition.
 		/// </summary>
+		[StringLengthValidator(100)]
 		public string ComputedDefinition { get; set; }
 		
 		/// <summary>

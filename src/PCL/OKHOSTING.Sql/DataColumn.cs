@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OKHOSTING.Data.Validation;
+using System;
 
 namespace OKHOSTING.Sql
 {
@@ -7,7 +8,11 @@ namespace OKHOSTING.Sql
 	/// </summary>
 	public class DataColumn
 	{
-		public DataColumn(string name, DbType columnType)
+		public DataColumn()
+		{
+		}
+
+        public DataColumn(string name, DbType columnType)
 		{
 			if (name == null)
 			{
@@ -18,7 +23,17 @@ namespace OKHOSTING.Sql
 			ColumnType = columnType;
 		}
 
-		public readonly string Name;
-		public readonly DbType ColumnType;
+		[RequiredValidator]
+		[StringLengthValidator(50)]
+		public string Name
+		{
+			get; set;
+		}
+
+		[RequiredValidator]
+		public DbType ColumnType
+		{
+			get; set;
+		}
 	}
 }
