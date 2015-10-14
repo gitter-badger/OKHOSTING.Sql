@@ -285,6 +285,11 @@ namespace OKHOSTING.Sql
 			//Validating if the table argument is null
 			if (select == null) throw new ArgumentNullException("select");
 
+			if (select is SelectAggregate)
+			{
+				return Select((SelectAggregate) select);
+			}
+
 			//fix column filters tables names, if they come from a join, we should use the join alias if it exist
 			foreach (ColumnFilter filter in select.Where.Where(f => f is ColumnFilter))
 			{

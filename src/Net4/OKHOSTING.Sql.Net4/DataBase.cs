@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.Common;
 using System.Collections.Generic;
+using OKHOSTING.Sql.Schema;
 
 namespace OKHOSTING.Sql.Net4
 {
@@ -46,28 +47,6 @@ namespace OKHOSTING.Sql.Net4
 
 		#region Fields and Properties
 
-		/// <summary>
-		/// Object used for lock operations
-		/// </summary>
-		private readonly object Locker = new object();
-
-		/// <summary>
-		/// Connection in which all the operations are performed
-		/// </summary>
-		protected readonly DbConnection Connection;
-
-		/// <summary>
-		/// Transaction in which all the operations are performed, after BeginTrans() is called
-		/// </summary>
-		protected DbTransaction Transaction;
-
-		/// <summary>
-		/// Used to create connections, commands and parameters for a specific database engine
-		/// </summary>
-		protected DbProviderFactory ProviderFactory;
-
-		protected OKHOSTING.Sql.Schema.DataBaseSchema _Schema;
-
 		public override string ConnectionString
 		{
 			get
@@ -84,6 +63,31 @@ namespace OKHOSTING.Sql.Net4
 				}
 			}
 		}
+
+		public virtual void LoadSchema()
+		{
+			base.Schema = SchemaLoader.Load(this, SchemaProvider);
+		}
+
+		/// <summary>
+		/// Connection in which all the operations are performed
+		/// </summary>
+		protected readonly DbConnection Connection;
+
+		/// <summary>
+		/// Transaction in which all the operations are performed, after BeginTrans() is called
+		/// </summary>
+		protected DbTransaction Transaction;
+
+		/// <summary>
+		/// Used to create connections, commands and parameters for a specific database engine
+		/// </summary>
+		protected DbProviderFactory ProviderFactory;
+
+		/// <summary>
+		/// Object used for lock operations
+		/// </summary>
+		private readonly object Locker = new object();
 
 		#endregion
 

@@ -60,10 +60,9 @@ namespace OKHOSTING.Sql.Net4
 
 				foreach (DatabaseColumn dbc in dbt.Columns)
 				{
-					table.Columns.Add(new Column()
+					Column column = new Column()
 					{
 						Name = dbc.Name,
-						DbType = DbTypeMapper.Parse(dbc.DataType.GetNetType()),
 						Table = table,
 						Description = dbc.Description,
 						IsNullable = dbc.Nullable,
@@ -71,11 +70,23 @@ namespace OKHOSTING.Sql.Net4
 						ComputedDefinition = dbc.ComputedDefinition,
 						DefaultValue = dbc.DefaultValue,
 						IsPrimaryKey = dbc.IsPrimaryKey,
-						Length = (uint) dbc.Length,
+						Length = (uint?) dbc.Length,
 						Ordinal = dbc.Ordinal,
 						Precision = dbc.Precision,
 						Scale = dbc.Scale,
-					});
+					};
+
+						
+					if (dbc.DataType != null)
+					{
+						column.DbType = DbTypeMapper.Parse(dbc.DataType.GetNetType());
+					}
+					else
+					{
+						column.DbType = DbType.Int32; //just guessing?
+					}
+
+					table.Columns.Add(column);
 				}
 
 				foreach (DatabaseIndex dbi in dbt.Indexes)
