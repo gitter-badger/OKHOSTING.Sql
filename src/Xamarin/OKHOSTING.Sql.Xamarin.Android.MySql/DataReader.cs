@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using OKHOSTING.Sql.Schema;
 using MySqlPCL = global::MySql.Data.MySqlClient;
 
-namespace OKHOSTING.Sql.MySql.Android
+namespace OKHOSTING.Sql.Xamarin.Android.MySql
 {
 	public class DataReader : IDataReader
 	{
@@ -65,7 +65,7 @@ namespace OKHOSTING.Sql.MySql.Android
 			{
 				for(int i = 0; i < FieldCount; i++)
 				{
-					yield return new DataColumn(GetName(i), GetType(i));
+					yield return new DataColumn(GetName(i), DbTypeMapper.Parse(GetType(i)));
 				}
 			}
 		}

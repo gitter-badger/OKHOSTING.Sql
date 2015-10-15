@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using OKHOSTING.Sql.Schema;
 
-namespace OKHOSTING.Sql.MySql.Android
+namespace OKHOSTING.Sql.Xamarin.Android.MySql
 {
 	public class DataTable : IDataTable
 	{
@@ -61,7 +61,7 @@ namespace OKHOSTING.Sql.MySql.Android
 			{
 				foreach (System.Data.DataColumn nativeColumn in NativeTable.Columns)
 				{
-					yield return new DataColumn(nativeColumn.ColumnName, nativeColumn.DataType);
+					yield return new DataColumn(nativeColumn.ColumnName, DbTypeMapper.Parse(nativeColumn.DataType));
 				}
 			}
 		}

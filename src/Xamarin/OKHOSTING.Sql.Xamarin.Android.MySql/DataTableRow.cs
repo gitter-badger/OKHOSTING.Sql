@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace OKHOSTING.Sql.MySql.Android
+namespace OKHOSTING.Sql.Xamarin.Android.MySql
 {
 	public class DataTableRow : IDataRow
 	{

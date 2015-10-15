@@ -3,7 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using MySqlPCL = global::MySql.Data.MySqlClient;
 
-namespace OKHOSTING.Sql.MySql.Android
+namespace OKHOSTING.Sql.Xamarin.Android.MySql
 {
 	public class DataBase: Sql.DataBase
 	{
@@ -41,7 +41,7 @@ namespace OKHOSTING.Sql.MySql.Android
 		/// <returns>
 		/// An int indicating the number of affected rows
 		/// </returns>
-		public override int Execute(List<Command> commands)
+		public override IEnumerable<int> Execute(IEnumerable<Command> commands)
 		{
 			//Local Vars
 			int rowsAffected = 0;
@@ -52,6 +52,8 @@ namespace OKHOSTING.Sql.MySql.Android
 
 			lock (Locker)
 			{
+				CommandEventArgs e = null;
+
 				try
 				{
 					//Initializing command and connection
@@ -64,7 +66,7 @@ namespace OKHOSTING.Sql.MySql.Android
 					foreach (Command command in commands)
 					{
 						//raising events
-						CommandEventArgs e = new CommandEventArgs(command);
+						e = new CommandEventArgs(command);
 						OnBeforeExecute(e);
 						current = command;
 
@@ -101,9 +103,13 @@ namespace OKHOSTING.Sql.MySql.Android
 					//Closing the connection
 					CloseConnection();
 				}
+
+				//Returning value
+				if (e != null)
+				{
+					yield return (int) e.Result;
+				}
 			}
-			//Returning value
-			return rowsAffected;
 		}
 
 		/// <summary>
@@ -124,13 +130,13 @@ namespace OKHOSTING.Sql.MySql.Android
 		{
 			//Local Vars
 			MySqlPCL.MySqlDataReader reader = null;
+			CommandEventArgs e = new CommandEventArgs(command);
 
 			lock (Locker)
 			{
 				try
 				{
 					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
 					OnBeforeGetDataReader(e);
 
 					//running the script only if e.Cancel is false
@@ -154,7 +160,7 @@ namespace OKHOSTING.Sql.MySql.Android
 						{
 							//Loading the data reader indicating that the close of the reader
 							//must close the connection too
-							reader = dbCommand.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+							reader = dbCommand.ExecuteReader(CommandBehavior.CloseConnection);
 						}
 						else
 						{
@@ -178,7 +184,7 @@ namespace OKHOSTING.Sql.MySql.Android
 			}
 
 			//Returning the DataReader
-			return new DataReader(this, reader);
+			return new DataReader(this, (MySqlPCL.MySqlDataReader) e.Result);
 		}
 
 		/// <summary>
@@ -197,13 +203,13 @@ namespace OKHOSTING.Sql.MySql.Android
 		{
 			//Local Vars
 			object value = null;
+			CommandEventArgs e = new CommandEventArgs(command);
 
 			lock (Locker)
 			{
 				try
 				{
 					//raising events
-					CommandEventArgs e = new CommandEventArgs(command);
 					OnBeforeGetDataReader(e);
 
 					//running the script only if e.Cancel is false
@@ -247,7 +253,7 @@ namespace OKHOSTING.Sql.MySql.Android
 			}
 
 			//Returning the DataReader
-			return value;
+			return e.Result;
 		}
 
 		/// <summary>

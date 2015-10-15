@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("OKHOSTING.Sql.MySql.Android.Resource", IsApplication=false)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("OKHOSTING.Sql.Xamarin.Android.MySql.Resource", IsApplication=false)]
 
-namespace OKHOSTING.Sql.MySql.Android
+namespace OKHOSTING.Sql.Xamarin.Android.MySql
 {
 	
 	
