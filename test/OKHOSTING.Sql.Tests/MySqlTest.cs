@@ -1,20 +1,20 @@
 ﻿using System;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;
 using OKHOSTING.Sql.Filters;
 
-namespace OKHOSTING.Sql.Net4.Tests
+namespace OKHOSTING.Sql.Tests
 {
-	[TestFixture]
-	public class MySqlTests
+	[TestClass]
+	public class MySqlTest
 	{
 		public DataBase Connect()
 		{
-			return new MySql.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString };
+			return new Net4.MySql.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["mysql"].ConnectionString };
 		}
 
-		[Test]
+		[TestMethod]
 		public void LoadSchema()
 		{
 			DataBase db = Connect();
@@ -23,7 +23,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 			Assert.IsNotNull(schema);
 		}
 
-		[Test]
+		[TestMethod]
 		public void CreateTable()
 		{
 			DataBase db = Connect();
@@ -40,7 +40,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 			//create
 			var sql = generator.Create(table);
 			db.Execute(sql);
-			Assert.True(db.ExistsTable(table.Name));
+			Assert.IsTrue(db.ExistsTable(table.Name));
 
 			//add index
 			sql = generator.Create(table.Indexes[0]);
@@ -80,7 +80,7 @@ namespace OKHOSTING.Sql.Net4.Tests
 			//drop
 			sql = generator.Drop(table);
 			db.Execute(sql);
-			Assert.False(db.ExistsTable(table.Name));
+			Assert.IsFalse(db.ExistsTable(table.Name));
 		}
 	}
 }
