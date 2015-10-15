@@ -141,8 +141,15 @@ namespace OKHOSTING.Sql
 			}
 
 			//Removing last ", "
-			columnsList = columnsList.Remove(columnsList.Length - 2, 2);
-			valuesList = valuesList.Remove(valuesList.Length - 2, 2);
+			if (columnsList.EndsWith(", "))
+			{
+				columnsList = columnsList.Remove(columnsList.Length - 2, 2);
+			}
+
+			if (valuesList.EndsWith(", "))
+			{
+				valuesList = valuesList.Remove(valuesList.Length - 2, 2);
+			}
 
 			//Creating Insert Sentence and return it
 			command.Script =
@@ -311,8 +318,8 @@ namespace OKHOSTING.Sql
 			Command command = SelectClause(select);
 			command.Append(FromClause(select));
 			command.Append(WhereClause(select.Where, LogicalOperator.And));
-			command.Append(LimitClause(select.Limit));
 			command.Append(OrderByClause(select.OrderBy));
+			command.Append(LimitClause(select.Limit));
 			command.Script += ScriptSeparator;
 
 			//Returning the sql sentence
@@ -346,26 +353,19 @@ namespace OKHOSTING.Sql
 			Command command = "SELECT ";
 
 			//Crossing the fields definitions
-			for (int counter = 0; counter < select.AggregateColumns.Count(); counter++)
+			foreach (var column in select.AggregateColumns)
 			{
-				command.Script += SelectAggregateColumn(select.AggregateColumns.ToList()[counter]) + ", ";
+				command.Script += SelectAggregateColumn(column) + ", ";
 			}
 
 			//Removing the last commas
 			command.Script = command.Script.TrimEnd(',', ' ') + " ";
 
-			//Adding From Clause
 			command.Append(FromClause(select));
-
-			//Adding Where Clause
 			command.Append(WhereClause(select.Where, LogicalOperator.And));
-
-
-			//Adding Group by Clause
 			command.Append(GroupByClause(select.GroupBy));
-
-			//adding the Order By clause, if exists
 			command.Append(OrderByClause(select.OrderBy));
+			command.Append(LimitClause(select.Limit));
 
 			command.Script += ScriptSeparator;
 
@@ -1256,9 +1256,10 @@ namespace OKHOSTING.Sql
 			fieldText += (selectAggregateColumn.AggregateFunction != SelectAggregateFunction.None ? ")" : string.Empty);
 
 			//Adding alias 
-			fieldText += string.IsNullOrWhiteSpace(selectAggregateColumn.Alias)?
-				" AS " + selectAggregateColumn.Alias :
-				string.Empty;
+			if (!string.IsNullOrWhiteSpace(selectAggregateColumn.Alias))
+			{
+				fieldText += " AS " + selectAggregateColumn.Alias;
+			}
 
 			//Returning the aggregate field
 			return fieldText;
