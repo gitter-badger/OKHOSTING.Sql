@@ -21,7 +21,7 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-app.config
+
 
 # Roslyn cache directories
 *.ide/
