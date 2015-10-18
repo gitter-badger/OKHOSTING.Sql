@@ -218,7 +218,7 @@ namespace OKHOSTING.Sql.Net4.OleDb
 		/// </returns>
 		public override Command Delete(Delete delete)
 		{
-			//Validating if the specified DataObject is null
+			//Validating if the specified Object is null
 			if (delete == null)
 			{
 				throw new ArgumentNullException("delete");
@@ -245,14 +245,14 @@ namespace OKHOSTING.Sql.Net4.OleDb
 
 		/// <summary>
 		/// Returns the DML for create the column corresponding 
-		/// with the specified DataValue
+		/// with the specified DataMember
 		/// </summary>
 		/// <param name="dataValue">
-		/// DataValue for DML column creation
+		/// DataMember for DML column creation
 		/// </param>
 		/// <returns>
 		/// DML for create the column corresponding 
-		/// with the specified DataValue
+		/// with the specified DataMember
 		/// </returns>
 		protected override Command CreateColumnClause(Column column)
 		{

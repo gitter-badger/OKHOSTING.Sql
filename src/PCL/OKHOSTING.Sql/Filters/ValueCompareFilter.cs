@@ -3,7 +3,7 @@ using System;
 namespace OKHOSTING.Sql.Filters
 {
 	/// <summary>
-	/// Compare a DataValue with a value
+	/// Compare a DataMember with a value
 	/// </summary>
 	public class ValueCompareFilter : CompareFilter
 	{

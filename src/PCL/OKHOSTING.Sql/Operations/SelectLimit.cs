@@ -1,7 +1,7 @@
 ﻿namespace OKHOSTING.Sql.Operations
 {
 	/// <summary>
-	/// Use to define paging in select operations, for example, if you only want to retrieve DataObjects from index 0 to 100, or 101 to 200
+	/// Use to define paging in select operations, for example, if you only want to retrieve Objects from index 0 to 100, or 101 to 200
 	/// </summary>
 	public class SelectLimit
 	{

@@ -140,13 +140,13 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 
 		/// <summary>
 		/// Creates a Insert Sentence for the specified TypeMap<T> with 
-		/// the values of the DataObject indicated
+		/// the values of the Object indicated
 		/// </summary>
 		/// <param name="dtype">
 		/// TypeMap<T> for Insert sentence create
 		/// </param>
 		/// <param name="dobj">
-		/// DataObject instance with the values to use in the Insert sentence
+		/// Object instance with the values to use in the Insert sentence
 		/// </param>
 		/// <returns>
 		/// Insert Sql Sentence 

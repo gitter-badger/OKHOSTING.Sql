@@ -208,7 +208,7 @@ namespace OKHOSTING.Sql
 			//Creating Update sentence begin
 			Command command = "UPDATE " + EncloseName(update.Table.Name) + " SET ";
 
-			//Crossing DataValues that aren't primary key
+			//Crossing DataMembers that aren't primary key
 			foreach (var value in update.Set)
 			{
 				CommandParameter param = new CommandParameter(value.Value, "@" + value.Column.Name, value.Column.DbType);
@@ -238,19 +238,19 @@ namespace OKHOSTING.Sql
 		#region Delete
 
 		/// <summary>
-		/// Get the Sql sentences for delete the specified DataObject and
+		/// Get the Sql sentences for delete the specified Object and
 		/// all his aggregate objects
 		/// </summary>
 		/// <param name="dobj">
-		/// DataObject to Delete
+		/// Object to Delete
 		/// </param>
 		/// <returns>
-		/// Sql sentences for delete the specified DataObject and
+		/// Sql sentences for delete the specified Object and
 		/// all his aggregate objects
 		/// </returns>
 		public virtual Command Delete(Delete delete)
 		{
-			//Validating if the specified DataObject is null
+			//Validating if the specified Object is null
 			if (delete == null)
 			{
 				throw new ArgumentNullException("delete");
@@ -783,7 +783,7 @@ namespace OKHOSTING.Sql
 		/// Creates the Limit clause for a Select sql sentence, used for paging
 		/// </summary>
 		/// <param name="limit">
-		/// Starting and finishing indexes that define the subgroup of DataObjects retrieved by the select operation
+		/// Starting and finishing indexes that define the subgroup of Objects retrieved by the select operation
 		/// </param>
 		/// <returns>
 		/// Limit clause for a Select sql sentence
@@ -1076,7 +1076,7 @@ namespace OKHOSTING.Sql
 			//Begin the primary key definition
 			primaryKeyConstraint = "CONSTRAINT " + EncloseName("PK_" + table.Name) + " PRIMARY KEY (";
 
-			//Crossing the DataValues for the primary key
+			//Crossing the DataMembers for the primary key
 			foreach (Column pk in table.PrimaryKey)
 			{
 				primaryKeyConstraint += EncloseName(pk.Name) + ", ";
