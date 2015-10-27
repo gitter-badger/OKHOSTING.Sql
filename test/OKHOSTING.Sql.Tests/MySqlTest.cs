@@ -46,7 +46,7 @@ namespace OKHOSTING.Sql.Tests
             countryFK.Columns.Add(new Tuple<Column, Column>(customer["Country"], country["id"]));
             countryFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
 
-            Command sql = generator.Create(customer);
+            var sql = generator.Create(customer);
             db.Execute(sql);
 
             sql = generator.Create(country);
@@ -56,7 +56,24 @@ namespace OKHOSTING.Sql.Tests
             db.Execute(sql);
 
             //insert
+            Insert insert2 = new Insert();
+            insert2.Table = country;
+            insert2.Values.Add(new ColumnValue(country["Id"], 1));
+            insert2.Values.Add(new ColumnValue(country["Name"], "Mexico"));
 
+            sql = generator.Insert(insert2);
+            int affectedRows2 = db.Execute(sql);
+            Assert.AreEqual(affectedRows2, 1);
+
+            Insert insert = new Insert();
+            insert.Table = customer;
+            insert.Values.Add(new ColumnValue(customer["Id"], 1));
+            insert.Values.Add(new ColumnValue(customer["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(customer["Country"], 1));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
 
             //select
             Select select = new Select();
@@ -71,6 +88,19 @@ namespace OKHOSTING.Sql.Tests
             join.JoinType = SelectJoinType.Inner;
 
             select.Joins.Add(join);
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+            Assert.AreEqual(result.Count, 1);
         }
 
         [TestMethod]
@@ -142,5 +172,91 @@ namespace OKHOSTING.Sql.Tests
 			db.Execute(sql);
 			Assert.IsFalse(db.ExistsTable(table.Name));
 		}
-	}
+
+        [TestMethod]
+        public void InserInTable()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Person");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Age", DbType = DbType.Int32, IsNullable = false, Table = table });
+            
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(table["Age"], 25));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+        }
+
+        [TestMethod]
+        public void selectPerson()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Person");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Age", DbType = DbType.Int32, IsNullable = false, Table = table });
+
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(table["Age"], 25));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //select
+            Select select = new Select();
+            select.Table = table;
+            select.Columns.Add(table["Id"]);
+            select.Columns.Add(table["Name"]);
+            select.Columns.Add(table["Age"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["Name"], ValueToCompare = "Angel", Operator = Data.CompareOperator.Equal });
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+            Assert.AreEqual(result.Count, 1);
+        }
+
+    }
+
+
 }
