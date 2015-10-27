@@ -24,6 +24,27 @@ namespace OKHOSTING.Sql.Tests
 		}
 
         [TestMethod]
+        public void TablesTest()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            Table team = new Table("team");
+            team.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team });
+            team.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false,  Table = team });
+            team.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team });
+            team.Columns.Add(new Column() { Name = "Country", DbType = DbType.Int32, IsNullable = false, Table = team });
+
+            Table leage = new Table("leage");
+            leage.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = leage });
+            leage.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = leage });
+
+            Table country = new Table("country");
+            country.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = country });
+            country.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = country });
+        }
+
+        [TestMethod]
         public void InnerJoinTest()
         {
             DataBase db = Connect();
@@ -55,8 +76,27 @@ namespace OKHOSTING.Sql.Tests
             sql = generator.Create(countryFK);
             db.Execute(sql);
 
+            
             //insert
+            Insert insert = new Insert();
+            insert.Table = country;
+            insert.Values.Add(new ColumnValue(country["Id"], 45));
+            insert.Values.Add(new ColumnValue(country["Name"], "Japan"));
+            
 
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            Insert insert2 = new Insert();
+            insert2.Table = customer;
+            insert2.Values.Add(new ColumnValue(customer["Id"], 1));
+            insert2.Values.Add(new ColumnValue(customer["Name"], "Raul"));
+            insert2.Values.Add(new ColumnValue(customer["Country"], 45));
+
+            sql = generator.Insert(insert2);
+            int affectedRows2 = db.Execute(sql);
+            Assert.AreEqual(affectedRows2, 1);
 
             //select
             Select select = new Select();
@@ -71,6 +111,7 @@ namespace OKHOSTING.Sql.Tests
             join.JoinType = SelectJoinType.Inner;
 
             select.Joins.Add(join);
+            sql = generator.Select(select);
         }
 
         [TestMethod]
