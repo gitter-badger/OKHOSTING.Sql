@@ -205,6 +205,61 @@ namespace OKHOSTING.Sql.Tests
         }
 
         [TestMethod]
+        public void dropRow()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Customer");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Company", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Address", DbType = DbType.AnsiString, Length = 500, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Email", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Telephone", DbType = DbType.AnsiString, Length = 12, IsNullable = false, Table = table });
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Company"], "Software Create Inc."));
+            insert.Values.Add(new ColumnValue(table["Address"], "San Angel #123-A Col. Metropolis Mexico. D.F."));
+            insert.Values.Add(new ColumnValue(table["Email"], "softcreate@admind.mx"));
+            insert.Values.Add(new ColumnValue(table["Telephone"], "013318592634"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 2));
+            insert.Values.Add(new ColumnValue(table["Company"], "Monsters Inc. Corporate"));
+            insert.Values.Add(new ColumnValue(table["Address"], "First Street #12 Blv. Flowers San Diego. C.A."));
+            insert.Values.Add(new ColumnValue(table["Email"], "mic_admind@info.com"));
+            insert.Values.Add(new ColumnValue(table["Telephone"], "0122389456278"));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //delete
+            Delete delete = new Delete();
+            delete.Table = table;
+            delete.Where.Add(new ValueCompareFilter() { Column = table["Company"], ValueToCompare = "Monsters Inc. Corporate", Operator = Data.CompareOperator.Equal });
+
+            sql = generator.Delete(delete);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+        }
+
+        [TestMethod]
         public void selectPerson()
         {
             DataBase db = Connect();
@@ -256,6 +311,41 @@ namespace OKHOSTING.Sql.Tests
             Assert.AreEqual(result.Count, 1);
         }
 
+        [TestMethod]
+        public void DropTable()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Song");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Sing", DbType = DbType.AnsiString, Length = 120, IsNullable = false, Table = table });
+
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "More than words"));
+            insert.Values.Add(new ColumnValue(table["Sing"], "Extreme"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //drop
+            sql = generator.Drop(table);
+            db.Execute(sql);
+            Assert.IsFalse(db.ExistsTable(table.Name));
+        }
     }
 
 
