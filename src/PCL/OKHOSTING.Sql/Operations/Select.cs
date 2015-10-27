@@ -8,7 +8,6 @@ namespace OKHOSTING.Sql.Operations
 	/// </summary>
 	public class Select: Operation
 	{
-		public int Id { get; set; }
 		public SelectLimit Limit { get; set; }
 		public readonly List<SelectColumn> Columns = new List<SelectColumn>();
 		public readonly List<SelectJoin> Joins = new List<SelectJoin>();
