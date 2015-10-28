@@ -38,7 +38,11 @@ namespace OKHOSTING.Sql.Filters
 		/// </param>
 		public LogicalOperatorFilter(List<Filters.FilterBase> innerFilters, LogicalOperator logicalOperator)
 		{
-			InnerFilters = innerFilters;
+            if (innerFilters != null)
+            {
+                InnerFilters = innerFilters;
+            }
+
 			LogicalOperator = logicalOperator;
 		}
 	}
