@@ -14,15 +14,6 @@ namespace OKHOSTING.Sql.Tests
             return new Net4.SqlServer.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString };
         }
 
-        [TestMethod]
-        public void LoadSchema()
-        {
-            DataBase db = Connect();
-            var schema = db.Schema;
-
-            Assert.IsNotNull(schema);
-        }
-
         /// <summary>
         /// Create Table Person and use insert
         /// </summary>
@@ -31,7 +22,7 @@ namespace OKHOSTING.Sql.Tests
         {
             //open connect to database
             DataBase db = Connect();
-            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+            var generator = new Net4.SqlServer.SqlGenerator();
 
             //define table person
             Table table = new Table("AnyTable");
