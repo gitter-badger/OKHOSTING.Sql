@@ -126,6 +126,20 @@ namespace OKHOSTING.Sql.Tests
             sql = generator.Insert(insert6);
             int affectedRows6 = db.Execute(sql);
             Assert.AreEqual(affectedRows6, 1);
+
+            //select
+            Select select = new Select();
+            select.Table = team;
+            select.Columns.Add(new SelectColumn(team["id"]));
+            select.Columns.Add(new SelectColumn(team["Name"]));
+
+            SelectJoin join = new SelectJoin();
+            join.Table = country;
+            join.On.Add(new ColumnCompareFilter() { Column = team["country"], ColumnToCompare = country["id"], Operator = Data.CompareOperator.Equal });
+            join.Columns.Add(new SelectColumn(country["name"], "countryName"));
+            join.JoinType = SelectJoinType.Inner;
+
+            select.Joins.Add(join);
         }
 
         [TestMethod]
