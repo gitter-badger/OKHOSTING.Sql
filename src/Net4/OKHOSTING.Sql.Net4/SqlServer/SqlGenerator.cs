@@ -179,7 +179,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 					command.Parameters.Add(param);
 
 					columnsList += EncloseName(cv.Column.Name) + ", ";
-					valuesList += "@" + param.Name + ", ";
+					valuesList +=  param.Name + ", ";
 				}
 			}
 
