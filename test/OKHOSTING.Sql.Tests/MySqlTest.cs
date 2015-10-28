@@ -346,7 +346,75 @@ namespace OKHOSTING.Sql.Tests
             db.Execute(sql);
             Assert.IsFalse(db.ExistsTable(table.Name));
         }
+
+
+        [TestMethod]
+        public void selectLike()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Address");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Street", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Number", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Suburb", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "State", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Country", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Street"], "First Avenue"));
+            insert.Values.Add(new ColumnValue(table["Number"], "12-B"));
+            insert.Values.Add(new ColumnValue(table["Suburb"], "The Roses"));
+            insert.Values.Add(new ColumnValue(table["State"], "California"));
+            insert.Values.Add(new ColumnValue(table["Country"], "United States"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 2));
+            insert.Values.Add(new ColumnValue(table["Street"], "Second Life"));
+            insert.Values.Add(new ColumnValue(table["Number"], "1120"));
+            insert.Values.Add(new ColumnValue(table["Suburb"], "Park Avenue"));
+            insert.Values.Add(new ColumnValue(table["State"], "New York"));
+            insert.Values.Add(new ColumnValue(table["Country"], "United States"));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //select
+            Select select = new Select();
+            select.Table = table;
+            select.Columns.Add(table["Id"]);
+            select.Columns.Add(table["Street"]);
+            select.Columns.Add(table["Suburb"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["Street"], ValueToCompare = "Second", Operator = Data.CompareOperator.Like });
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+        }
     }
-
-
 }
