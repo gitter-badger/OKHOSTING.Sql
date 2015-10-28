@@ -24,125 +24,6 @@ namespace OKHOSTING.Sql.Tests
 		}
 
         [TestMethod]
-        public void TablesTest()
-        {
-            DataBase db = Connect();
-            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
-
-            Table team = new Table("team");
-            team.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team });
-            team.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = team });
-            team.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team });
-            team.Columns.Add(new Column() { Name = "Country", DbType = DbType.Int32, IsNullable = false, Table = team });
-
-            Table leage = new Table("leage");
-            leage.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = leage });
-            leage.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = leage });
-
-            Table country = new Table("country");
-            country.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = country });
-            country.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = country });
-
-            ForeignKey countryFK = new ForeignKey();
-            countryFK.Table = team;
-            countryFK.RemoteTable = country;
-            countryFK.Name = "FK_team_country";
-            countryFK.Columns.Add(new Tuple<Column, Column>(team["Country"], country["Id"]));
-            countryFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
-
-            ForeignKey leageFK = new ForeignKey();
-            leageFK.Table = team;
-            leageFK.RemoteTable = leage;
-            leageFK.Name = "FK_team_leage";
-            leageFK.Columns.Add(new Tuple<Column, Column>(team["Leage"], leage["Id"]));
-            leageFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
-
-            Command sql = generator.Create(team);
-            db.Execute(sql);
-
-            sql = generator.Create(leage);
-            db.Execute(sql);
-
-            sql = generator.Create(country);
-            db.Execute(sql);
-
-            //insert Country
-            Insert insert = new Insert();
-            insert.Table = country;
-            insert.Values.Add(new ColumnValue(country["Id"], 15));
-            insert.Values.Add(new ColumnValue(country["Name"], "Argentina"));
-
-            sql = generator.Insert(insert);
-            int affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
-
-            Insert insert2 = new Insert();
-            insert2.Table = country;
-            insert2.Values.Add(new ColumnValue(country["Id"], 10));
-            insert2.Values.Add(new ColumnValue(country["Name"], "Brasil"));
-
-            sql = generator.Insert(insert2);
-            int affectedRows2 = db.Execute(sql);
-            Assert.AreEqual(affectedRows2, 1);
-
-            //insert leage
-            Insert insert3 = new Insert();
-            insert3.Table = leage;
-            insert3.Values.Add(new ColumnValue(leage["Id"], 100));
-            insert3.Values.Add(new ColumnValue(leage["Name"], "Champions"));
-
-            sql = generator.Insert(insert3);
-            int affectedRows3 = db.Execute(sql);
-            Assert.AreEqual(affectedRows3, 1);
-
-            Insert insert4 = new Insert();
-            insert4.Table = leage;
-            insert4.Values.Add(new ColumnValue(leage["Id"], 110));
-            insert4.Values.Add(new ColumnValue(leage["Name"], "Concacaff"));
-
-            sql = generator.Insert(insert4);
-            int affectedRows4 = db.Execute(sql);
-            Assert.AreEqual(affectedRows4, 1);
-
-            //insert team
-            Insert insert5 = new Insert();
-            insert5.Table = team;
-            insert5.Values.Add(new ColumnValue(team["Id"], 1));
-            insert5.Values.Add(new ColumnValue(team["Name"], "Barza"));
-            insert5.Values.Add(new ColumnValue(team["Leage"], 100));
-            insert5.Values.Add(new ColumnValue(team["Country"], 10));
-
-            sql = generator.Insert(insert5);
-            int affectedRows5 = db.Execute(sql);
-            Assert.AreEqual(affectedRows5, 1);
-
-            Insert insert6 = new Insert();
-            insert6.Table = team;
-            insert6.Values.Add(new ColumnValue(team["Id"], 2));
-            insert6.Values.Add(new ColumnValue(team["Name"], "Pumas"));
-            insert6.Values.Add(new ColumnValue(team["Leage"], 110));
-            insert6.Values.Add(new ColumnValue(team["Country"], 15));
-
-            sql = generator.Insert(insert6);
-            int affectedRows6 = db.Execute(sql);
-            Assert.AreEqual(affectedRows6, 1);
-
-            //select
-            Select select = new Select();
-            select.Table = team;
-            select.Columns.Add(new SelectColumn(team["id"]));
-            select.Columns.Add(new SelectColumn(team["Name"]));
-
-            SelectJoin join = new SelectJoin();
-            join.Table = country;
-            join.On.Add(new ColumnCompareFilter() { Column = team["country"], ColumnToCompare = country["id"], Operator = Data.CompareOperator.Equal });
-            join.Columns.Add(new SelectColumn(country["name"], "countryName"));
-            join.JoinType = SelectJoinType.Inner;
-
-            select.Joins.Add(join);
-        }
-
-        [TestMethod]
         public void InnerJoinTest()
         {
             DataBase db = Connect();
@@ -165,7 +46,7 @@ namespace OKHOSTING.Sql.Tests
             countryFK.Columns.Add(new Tuple<Column, Column>(customer["Country"], country["id"]));
             countryFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
 
-            Command sql = generator.Create(customer);
+            var sql = generator.Create(customer);
             db.Execute(sql);
 
             sql = generator.Create(country);
@@ -175,7 +56,24 @@ namespace OKHOSTING.Sql.Tests
             db.Execute(sql);
 
             //insert
+            Insert insert2 = new Insert();
+            insert2.Table = country;
+            insert2.Values.Add(new ColumnValue(country["Id"], 1));
+            insert2.Values.Add(new ColumnValue(country["Name"], "Mexico"));
 
+            sql = generator.Insert(insert2);
+            int affectedRows2 = db.Execute(sql);
+            Assert.AreEqual(affectedRows2, 1);
+
+            Insert insert = new Insert();
+            insert.Table = customer;
+            insert.Values.Add(new ColumnValue(customer["Id"], 1));
+            insert.Values.Add(new ColumnValue(customer["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(customer["Country"], 1));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
 
             //select
             Select select = new Select();
@@ -190,6 +88,19 @@ namespace OKHOSTING.Sql.Tests
             join.JoinType = SelectJoinType.Inner;
 
             select.Joins.Add(join);
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+            Assert.AreEqual(result.Count, 1);
         }
 
         [TestMethod]
@@ -261,5 +172,249 @@ namespace OKHOSTING.Sql.Tests
 			db.Execute(sql);
 			Assert.IsFalse(db.ExistsTable(table.Name));
 		}
-	}
+
+        [TestMethod]
+        public void InserInTable()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Person");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Age", DbType = DbType.Int32, IsNullable = false, Table = table });
+            
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(table["Age"], 25));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+        }
+
+        [TestMethod]
+        public void dropRow()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Customer");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Company", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Address", DbType = DbType.AnsiString, Length = 500, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Email", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Telephone", DbType = DbType.AnsiString, Length = 12, IsNullable = false, Table = table });
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Company"], "Software Create Inc."));
+            insert.Values.Add(new ColumnValue(table["Address"], "San Angel #123-A Col. Metropolis Mexico. D.F."));
+            insert.Values.Add(new ColumnValue(table["Email"], "softcreate@admind.mx"));
+            insert.Values.Add(new ColumnValue(table["Telephone"], "013318592634"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 2));
+            insert.Values.Add(new ColumnValue(table["Company"], "Monsters Inc. Corporate"));
+            insert.Values.Add(new ColumnValue(table["Address"], "First Street #12 Blv. Flowers San Diego. C.A."));
+            insert.Values.Add(new ColumnValue(table["Email"], "mic_admind@info.com"));
+            insert.Values.Add(new ColumnValue(table["Telephone"], "0122389456278"));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //delete
+            Delete delete = new Delete();
+            delete.Table = table;
+            delete.Where.Add(new ValueCompareFilter() { Column = table["Company"], ValueToCompare = "Monsters Inc. Corporate", Operator = Data.CompareOperator.Equal });
+
+            sql = generator.Delete(delete);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+        }
+
+        [TestMethod]
+        public void selectPerson()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Person");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Age", DbType = DbType.Int32, IsNullable = false, Table = table });
+
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "Angel"));
+            insert.Values.Add(new ColumnValue(table["Age"], 25));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //select
+            Select select = new Select();
+            select.Table = table;
+            select.Columns.Add(table["Id"]);
+            select.Columns.Add(table["Name"]);
+            select.Columns.Add(table["Age"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["Name"], ValueToCompare = "Angel", Operator = Data.CompareOperator.Equal });
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+            Assert.AreEqual(result.Count, 1);
+        }
+
+        [TestMethod]
+        public void DropTable()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Song");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Sing", DbType = DbType.AnsiString, Length = 120, IsNullable = false, Table = table });
+
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Name"], "More than words"));
+            insert.Values.Add(new ColumnValue(table["Sing"], "Extreme"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //drop
+            sql = generator.Drop(table);
+            db.Execute(sql);
+            Assert.IsFalse(db.ExistsTable(table.Name));
+        }
+
+
+        [TestMethod]
+        public void selectLike()
+        {
+            DataBase db = Connect();
+            var generator = new OKHOSTING.Sql.MySql.SqlGenerator();
+
+            //define table schema
+            Table table = new Table("Address");
+
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Street", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Number", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Suburb", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "State", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Country", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
+
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["Street"], "First Avenue"));
+            insert.Values.Add(new ColumnValue(table["Number"], "12-B"));
+            insert.Values.Add(new ColumnValue(table["Suburb"], "The Roses"));
+            insert.Values.Add(new ColumnValue(table["State"], "California"));
+            insert.Values.Add(new ColumnValue(table["Country"], "United States"));
+
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Id"], 2));
+            insert.Values.Add(new ColumnValue(table["Street"], "Second Life"));
+            insert.Values.Add(new ColumnValue(table["Number"], "1120"));
+            insert.Values.Add(new ColumnValue(table["Suburb"], "Park Avenue"));
+            insert.Values.Add(new ColumnValue(table["State"], "New York"));
+            insert.Values.Add(new ColumnValue(table["Country"], "United States"));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //select
+            Select select = new Select();
+            select.Table = table;
+            select.Columns.Add(table["Id"]);
+            select.Columns.Add(table["Street"]);
+            select.Columns.Add(table["Suburb"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["Street"], ValueToCompare = "Second", Operator = Data.CompareOperator.Like });
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+
+            foreach (IDataRow row in result)
+            {
+                foreach (object obj in row)
+                {
+                    Console.Write(obj);
+                }
+            }
+
+        }
+    }
 }
