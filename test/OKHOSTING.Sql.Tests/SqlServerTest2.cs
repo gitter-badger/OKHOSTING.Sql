@@ -54,13 +54,13 @@ namespace OKHOSTING.Sql.Tests
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
             //define table customer
-            Table table = new Table("test3");
+            Table table = new Table("test4");
 
-            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
             table.Columns.Add(new Column() { Name = "Company", DbType = DbType.AnsiString, Length = 200, IsNullable = false, Table = table });
             table.Columns.Add(new Column() { Name = "Address", DbType = DbType.AnsiString, Length = 500, IsNullable = false, Table = table });
-            table.Columns.Add(new Column() { Name = "Email", DbType = DbType.AnsiString, Length = 10, IsNullable = false, Table = table });
-            table.Columns.Add(new Column() { Name = "Telephone", DbType = DbType.AnsiString, Length = 12, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Email", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "Telephone", DbType = DbType.AnsiString, Length = 20, IsNullable = false, Table = table });
             table.Indexes.Add(new Index() { Name = "IX_Company", Unique = true, Table = table });
             table.Indexes[0].Columns.Add(table["Company"]);
 
@@ -73,10 +73,9 @@ namespace OKHOSTING.Sql.Tests
             sql = generator.Create(table.Indexes[0]);
             db.Execute(sql);
 
-            //insert values into customer
+            //insert values into test3
             Insert insert = new Insert();
             insert.Table = table;
-            insert.Values.Add(new ColumnValue(table["Id"], 2));
             insert.Values.Add(new ColumnValue(table["Company"], "Monsters Inc. Corporate"));
             insert.Values.Add(new ColumnValue(table["Address"], "First Street #12 Blv. Flowers San Diego. C.A."));
             insert.Values.Add(new ColumnValue(table["Email"], "mic_admind@info.com"));
@@ -84,6 +83,18 @@ namespace OKHOSTING.Sql.Tests
 
             sql = generator.Insert(insert);
             int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //insert values into test3
+            insert = new Insert();
+            insert.Table = table;
+            insert.Values.Add(new ColumnValue(table["Company"], "Baby tunes SA de CV"));
+            insert.Values.Add(new ColumnValue(table["Address"], "Paid Call #202 Blv. Saint, James Tucson. Arizona"));
+            insert.Values.Add(new ColumnValue(table["Email"], "info@babyyunes.com"));
+            insert.Values.Add(new ColumnValue(table["Telephone"], "012235656178"));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
             //delete row from customer.company = Monsters Inc. Corporate
