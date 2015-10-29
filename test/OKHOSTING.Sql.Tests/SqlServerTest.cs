@@ -110,7 +110,7 @@ namespace OKHOSTING.Sql.Tests
 			table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = false, Table = table });
 			table.Indexes[0].Columns.Add(table["TextField"]);
 
-			//create table
+			//create
 			var sql = generator.Create(table);
 			db.Execute(sql);
 			Assert.IsTrue(db.ExistsTable(table.Name));
@@ -121,7 +121,8 @@ namespace OKHOSTING.Sql.Tests
 
 			//insert
 			Insert insert = new Insert();
-			insert.Table = table;			
+			insert.Table = table;
+			//insert.Values.Add(new ColumnValue(table["Id"], 1));
 			insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
 			insert.Values.Add(new ColumnValue(table["NumberField"], 100));
 
@@ -131,19 +132,10 @@ namespace OKHOSTING.Sql.Tests
 
             //insert
             insert = new Insert();
-            insert.Table = table;            
+            insert.Table = table;
+            //insert.Values.Add(new ColumnValue(table["Id"], 2));
             insert.Values.Add(new ColumnValue(table["TextField"], "test15"));
             insert.Values.Add(new ColumnValue(table["NumberField"], 110));
-
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
-
-            //insert
-            insert = new Insert();
-            insert.Table = table;
-            insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
-            insert.Values.Add(new ColumnValue(table["NumberField"], 250));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
@@ -164,11 +156,7 @@ namespace OKHOSTING.Sql.Tests
             Update update = new Update();
             update.Table = table;
             update.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
-            update.Set.Add(new ColumnValue(table["TextField"], "test12"));
-
-            sql = generator.Update(update);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+            
 
 			//delete
 			Delete delete = new Delete();
@@ -177,7 +165,7 @@ namespace OKHOSTING.Sql.Tests
 
 			sql = generator.Delete(delete);
 			affectedRows = db.Execute(sql);
-			Assert.AreEqual(affectedRows, 0);
+			Assert.AreEqual(affectedRows, 1);
 
 			//drop
 			sql = generator.Drop(table);
@@ -194,78 +182,71 @@ namespace OKHOSTING.Sql.Tests
             DataBase db = Connect();
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
-            //Declare table team            
-            Table team2 = new Table("team2");
-            team2.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team2 });
-            team2.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = team2 });
-            team2.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team2 });
-            team2.Columns.Add(new Column() { Name = "Country", DbType = DbType.Int32, IsNullable = false, Table = team2 });
+            //Create table team            
+            Table team = new Table("team");
+            team.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team });
+            team.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = team });
+            team.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team });
+            team.Columns.Add(new Column() { Name = "Country", DbType = DbType.Int32, IsNullable = false, Table = team });
 
-            //Declare table leage
+            //Create table leage
             Table leage = new Table("leage");
             leage.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = leage });
             leage.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = leage });
 
-            //Declare table country
-            Table country2 = new Table("country2");
-            country2.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = country2 });
-            country2.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = country2 });
+            //Create table country
+            Table country = new Table("country");
+            country.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = country });
+            country.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, IsNullable = false, Table = country });
 
-            //Declare ForeignKey FK_team_country
+            //Create ForeignKey FK_team_country
             ForeignKey countryFK = new ForeignKey();
-            countryFK.Table = team2;
-            countryFK.RemoteTable = country2;
+            countryFK.Table = team;
+            countryFK.RemoteTable = country;
             countryFK.Name = "FK_team_country";
-            countryFK.Columns.Add(new Tuple<Column, Column>(team2["Country"], country2["Id"]));
+            countryFK.Columns.Add(new Tuple<Column, Column>(team["Country"], country["Id"]));
             countryFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
 
-            //Declare ForeignKey FK_team_leage
+            //Create ForeignKey FK_team_leage
             ForeignKey leageFK = new ForeignKey();
-            leageFK.Table = team2;
+            leageFK.Table = team;
             leageFK.RemoteTable = leage;
             leageFK.Name = "FK_team_leage";
-            leageFK.Columns.Add(new Tuple<Column, Column>(team2["Leage"], leage["Id"]));
+            leageFK.Columns.Add(new Tuple<Column, Column>(team["Leage"], leage["Id"]));
             leageFK.DeleteAction = countryFK.UpdateAction = ConstraintAction.Restrict;
 
-            //Create table team2
-            Command sql = generator.Create(team2);
+            Command sql = generator.Create(team);
             db.Execute(sql);
 
-            //Create table Leage
             sql = generator.Create(leage);
             db.Execute(sql);
 
-            //Create table country2
-            sql = generator.Create(country2);
-            db.Execute(sql);
-            //Create Foreign Key countryFK
-            sql = generator.Create(countryFK);
+            sql = generator.Create(country);
             db.Execute(sql);
 
-            //Create Foreign Key leageFK
-            sql = generator.Create(leageFK);
-            db.Execute(sql);
-
-            //inserts Country
+            //insert Country
             Insert insert = new Insert();
-            insert.Table = country2;            
-            insert.Values.Add(new ColumnValue(country2["Name"], "Argentina"));
+            insert.Table = country;
+            insert.Values.Add(new ColumnValue(country["Id"], 15));
+            insert.Values.Add(new ColumnValue(country["Name"], "Argentina"));
 
             sql = generator.Insert(insert);
             int affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
             insert = new Insert();
-            insert.Table = country2;            
-            insert.Values.Add(new ColumnValue(country2["Name"], "Brasil"));
+            insert.Table = country;
+            insert.Values.Add(new ColumnValue(country["Id"], 10));
+            insert.Values.Add(new ColumnValue(country["Name"], "Brasil"));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
-            //inserts leage
+            //insert leage
             insert = new Insert();
-            insert.Table = leage;            
+            insert.Table = leage;
+            insert.Values.Add(new ColumnValue(leage["Id"], 100));
             insert.Values.Add(new ColumnValue(leage["Name"], "Champions"));
 
             sql = generator.Insert(insert);
@@ -273,45 +254,48 @@ namespace OKHOSTING.Sql.Tests
             Assert.AreEqual(affectedRows, 1);
 
             insert = new Insert();
-            insert.Table = leage;            
+            insert.Table = leage;
+            insert.Values.Add(new ColumnValue(leage["Id"], 110));
             insert.Values.Add(new ColumnValue(leage["Name"], "Concacaff"));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
-            //inserts team
+            //insert team
             insert = new Insert();
-            insert.Table = team2;            
-            insert.Values.Add(new ColumnValue(team2["Name"], "Barza"));
-            insert.Values.Add(new ColumnValue(team2["Leage"], 1));
-            insert.Values.Add(new ColumnValue(team2["Country"], 1));
+            insert.Table = team;
+            insert.Values.Add(new ColumnValue(team["Id"], 1));
+            insert.Values.Add(new ColumnValue(team["Name"], "Barza"));
+            insert.Values.Add(new ColumnValue(team["Leage"], 100));
+            insert.Values.Add(new ColumnValue(team["Country"], 10));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
             insert = new Insert();
-            insert.Table = team2;            
-            insert.Values.Add(new ColumnValue(team2["Name"], "Pumas"));
-            insert.Values.Add(new ColumnValue(team2["Leage"], 2));
-            insert.Values.Add(new ColumnValue(team2["Country"], 2));
+            insert.Table = team;
+            insert.Values.Add(new ColumnValue(team["Id"], 2));
+            insert.Values.Add(new ColumnValue(team["Name"], "Pumas"));
+            insert.Values.Add(new ColumnValue(team["Leage"], 110));
+            insert.Values.Add(new ColumnValue(team["Country"], 15));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
-            //select whit inner join
+            //select
             Select select = new Select();
-            select.Table = team2;
-            select.Columns.Add(new SelectColumn(team2["id"]));
-            select.Columns.Add(new SelectColumn(team2["Name"]));
+            select.Table = team;
+            select.Columns.Add(new SelectColumn(team["id"]));
+            select.Columns.Add(new SelectColumn(team["Name"]));
 
             //Create inner join to country
             SelectJoin join = new SelectJoin();
-            join.Table = country2;
-            join.On.Add(new ColumnCompareFilter() { Column = team2["country"], ColumnToCompare = country2["id"], Operator = Data.CompareOperator.Equal });
-            join.Columns.Add(new SelectColumn(country2["name"], "countryName"));
+            join.Table = country;
+            join.On.Add(new ColumnCompareFilter() { Column = team["country"], ColumnToCompare = country["id"], Operator = Data.CompareOperator.Equal });
+            join.Columns.Add(new SelectColumn(country["name"], "countryName"));
             join.JoinType = SelectJoinType.Inner;
 
             select.Joins.Add(join);
@@ -319,7 +303,7 @@ namespace OKHOSTING.Sql.Tests
             //Create inner join to leage
             SelectJoin join2 = new SelectJoin();
             join2.Table = leage;
-            join2.On.Add(new ColumnCompareFilter() { Column = team2["leage"], ColumnToCompare = leage["id"], Operator = Data.CompareOperator.Equal });
+            join2.On.Add(new ColumnCompareFilter() { Column = team["leage"], ColumnToCompare = leage["id"], Operator = Data.CompareOperator.Equal });
             join2.Columns.Add(new SelectColumn(leage["name"], "leageName"));
             join2.JoinType = SelectJoinType.Inner;
 
@@ -336,7 +320,7 @@ namespace OKHOSTING.Sql.Tests
 
             sql = generator.Delete(delete);
             affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 0);
+            Assert.AreEqual(affectedRows, 1);
 
             //drop table leage
             sql = generator.Drop(leage);
@@ -344,14 +328,14 @@ namespace OKHOSTING.Sql.Tests
             Assert.IsFalse(db.ExistsTable(leage.Name));
 
             //drop table country
-            sql = generator.Drop(country2);
+            sql = generator.Drop(country);
             db.Execute(sql);
-            Assert.IsFalse(db.ExistsTable(country2.Name));
+            Assert.IsFalse(db.ExistsTable(country.Name));
 
             //drop table team
-            sql = generator.Drop(team2);
+            sql = generator.Drop(team);
             db.Execute(sql);
-            Assert.IsFalse(db.ExistsTable(team2.Name));
+            Assert.IsFalse(db.ExistsTable(team.Name));
         }
 
         /// <summary>
@@ -363,20 +347,20 @@ namespace OKHOSTING.Sql.Tests
             DataBase db = Connect();
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
-            //Define table store
+            //Create table store
             Table store = new Table("store");
             store.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = store });
             store.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
             store.Columns.Add(new Column() { Name = "Inventory", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
             store.Columns.Add(new Column() { Name = "Employee", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = store });
 
-            //Create table store
             Command sql = generator.Create(store);
             db.Execute(sql);
 
             //First inserts store 
             Insert insert = new Insert();
-            insert.Table = store;            
+            insert.Table = store;
+            insert.Values.Add(new ColumnValue(store["Id"], 1));
             insert.Values.Add(new ColumnValue(store["Name"], "Abarrotes Torrez"));
             insert.Values.Add(new ColumnValue(store["Inventory"], "Torreon"));
             insert.Values.Add(new ColumnValue(store["Employee"], "Juan Rocha Gomez"));
@@ -387,7 +371,8 @@ namespace OKHOSTING.Sql.Tests
 
             //Second inserts store
             insert = new Insert();
-            insert.Table = store;           
+            insert.Table = store;
+            insert.Values.Add(new ColumnValue(store["Id"], 2));
             insert.Values.Add(new ColumnValue(store["Name"], "La Furiosa"));
             insert.Values.Add(new ColumnValue(store["Inventory"], "Zacatecas"));
             insert.Values.Add(new ColumnValue(store["Employee"], "Martin Torrez"));
@@ -398,7 +383,8 @@ namespace OKHOSTING.Sql.Tests
 
             //third inserts store
             insert = new Insert();
-            insert.Table = store;            
+            insert.Table = store;
+            insert.Values.Add(new ColumnValue(store["Id"], 3));
             insert.Values.Add(new ColumnValue(store["Name"], "Los dos amigos"));
             insert.Values.Add(new ColumnValue(store["Inventory"], "Durango"));
             insert.Values.Add(new ColumnValue(store["Employee"], "Luis Martinez"));
@@ -409,14 +395,15 @@ namespace OKHOSTING.Sql.Tests
 
             //Fourth inserts store
             insert = new Insert();
-            insert.Table = store;            
+            insert.Table = store;
+            insert.Values.Add(new ColumnValue(store["Id"], 4));
             insert.Values.Add(new ColumnValue(store["Name"], "La Pasada"));
             insert.Values.Add(new ColumnValue(store["Inventory"], "Nayarit"));
             insert.Values.Add(new ColumnValue(store["Employee"], "Raul Gomez"));
 
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);            
+            Assert.AreEqual(affectedRows, 1);
 
             //select whit OrFilter
             Select select = new Select();
@@ -433,6 +420,7 @@ namespace OKHOSTING.Sql.Tests
 
             sql = generator.Select(select);
             var result = db.GetDataTable(sql);
+<<<<<<< HEAD
             Assert.AreEqual(result.Count, 2);                    
         
             //select whit like
@@ -446,6 +434,9 @@ namespace OKHOSTING.Sql.Tests
             result = db.GetDataTable(sql);
             Assert.AreEqual(result.Count, 2);
 
+=======
+            Assert.AreEqual(result.Count, 0);
+>>>>>>> origin/master
 
             //select whit AndFilter
             select = new Select();
@@ -461,7 +452,7 @@ namespace OKHOSTING.Sql.Tests
 
             sql = generator.Select(select);
             result = db.GetDataTable(sql);            
-            Assert.AreEqual(result.Count, 1);            
+            Assert.AreEqual(result.Count, 0);            
 
             //Drop table
             sql = generator.Drop(store);
@@ -469,15 +460,22 @@ namespace OKHOSTING.Sql.Tests
             Assert.IsFalse(db.ExistsTable(store.Name));
         }
 
+<<<<<<< HEAD
         /// <summary>
         /// Create 3 tables a user whit 1 joins
         /// </summary>
         [TestMethod]
         public void PriceadjustmentTest()
+=======
+        /*
+        [TestMethod]
+        public void CreateTable()
+>>>>>>> origin/master
         {
             DataBase db = Connect();
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
+<<<<<<< HEAD
             //Declare table application            
             Table application = new Table("application");
             application.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = application });
@@ -538,11 +536,31 @@ namespace OKHOSTING.Sql.Tests
             insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Afiliados"));
             insert.Values.Add(new ColumnValue(priceadjustment["Customer"], "Raul Gomez"));
             insert.Values.Add(new ColumnValue(priceadjustment["Amount"], "$550"));
+=======
+            //Create table store
+            Table store = new Table("store");
+            store.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = store });
+            store.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
+            store.Columns.Add(new Column() { Name = "Inventory", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
+            store.Columns.Add(new Column() { Name = "Employee", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = store });
+
+            Command sql = generator.Create(store);
+            db.Execute(sql);
+
+            //First inserts store 
+            Insert insert = new Insert();
+            insert.Table = store;
+            insert.Values.Add(new ColumnValue(store["Id"], 1));
+            insert.Values.Add(new ColumnValue(store["Name"], "Abarrotes Torrez"));
+            insert.Values.Add(new ColumnValue(store["Inventory"], "Torreon"));
+            insert.Values.Add(new ColumnValue(store["Employee"], "Juan Rocha Gomez"));
+>>>>>>> origin/master
 
             sql = generator.Insert(insert);
             int affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
 
+<<<<<<< HEAD
             insert = new Insert();
             insert.Table = priceadjustment;
             insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Clientes Frecuentes"));
@@ -624,6 +642,21 @@ namespace OKHOSTING.Sql.Tests
             Assert.IsFalse(db.ExistsTable(priceadjustment.Name));            
         }
 
+=======
+            //select
+            Select select = new Select();
+            select.Table = ;
+            select.Columns.Add(table["id"]);
+            select.Columns.Add(table["TextField"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
+
+            Command sql = generator.Select(select);
+            var result = db.GetDataTable(sql);            
+
+            Assert.AreEqual(result.Count, 1);
+        }*/
+        
+>>>>>>> origin/master
     }
 
 }
