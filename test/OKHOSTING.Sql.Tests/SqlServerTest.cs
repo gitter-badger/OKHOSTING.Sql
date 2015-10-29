@@ -104,10 +104,10 @@ namespace OKHOSTING.Sql.Tests
             //define table schema
             Table table = new Table("test1");
 
-            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = table });
+            table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, Table = table, IsAutoNumber = true });
 			table.Columns.Add(new Column() { Name = "TextField", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
 			table.Columns.Add(new Column() { Name = "NumberField", DbType = DbType.Int32, IsNullable = false, Table = table });
-			table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = true, Table = table });
+			table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = false, Table = table });
 			table.Indexes[0].Columns.Add(table["TextField"]);
 
 			//create
@@ -122,7 +122,7 @@ namespace OKHOSTING.Sql.Tests
 			//insert
 			Insert insert = new Insert();
 			insert.Table = table;
-			insert.Values.Add(new ColumnValue(table["Id"], 1));
+			//insert.Values.Add(new ColumnValue(table["Id"], 1));
 			insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
 			insert.Values.Add(new ColumnValue(table["NumberField"], 100));
 
@@ -130,6 +130,17 @@ namespace OKHOSTING.Sql.Tests
 			int affectedRows = db.Execute(sql);
 			Assert.AreEqual(affectedRows, 1);
 
+            //insert
+            insert = new Insert();
+            insert.Table = table;
+            //insert.Values.Add(new ColumnValue(table["Id"], 2));
+            insert.Values.Add(new ColumnValue(table["TextField"], "test15"));
+            insert.Values.Add(new ColumnValue(table["NumberField"], 110));
+
+            sql = generator.Insert(insert);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+            
 			//select
 			Select select = new Select();
 			select.Table = table;
@@ -138,22 +149,19 @@ namespace OKHOSTING.Sql.Tests
 			select.Where.Add(new ValueCompareFilter(){ Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
 
 			sql = generator.Select(select);
-			var result = db.GetDataTable(sql);
-
-            foreach (IDataRow row in result)
-            {
-                foreach (object obj in row)
-                {
-                    Console.Write(obj);
-                }
-            }
-
+			var result = db.GetDataTable(sql);            
 			Assert.AreEqual(result.Count, 1);
+
+            //update
+            Update update = new Update();
+            update.Table = table;
+            update.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
+            
 
 			//delete
 			Delete delete = new Delete();
 			delete.Table = table;
-			delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
+			delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
 
 			sql = generator.Delete(delete);
 			affectedRows = db.Execute(sql);
@@ -175,7 +183,7 @@ namespace OKHOSTING.Sql.Tests
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
             //Create table team            
-            Table team = new Table("team");
+            Table team2 = new Table("team");
             team.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team });
             team.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = team });
             team.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team });
