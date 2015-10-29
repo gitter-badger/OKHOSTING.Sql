@@ -183,7 +183,7 @@ namespace OKHOSTING.Sql.Tests
             var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
             //Create table team            
-            Table team2 = new Table("team");
+            Table team = new Table("team");
             team.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = team });
             team.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = team });
             team.Columns.Add(new Column() { Name = "Leage", DbType = DbType.Int32, IsNullable = false, Table = team });
