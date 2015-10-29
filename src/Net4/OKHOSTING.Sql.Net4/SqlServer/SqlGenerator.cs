@@ -24,8 +24,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		protected override string ScriptSeparator
 		{
 			get
-			{
-				//return " GO ";
+			{				
                 return " ";
 			}
 		}
