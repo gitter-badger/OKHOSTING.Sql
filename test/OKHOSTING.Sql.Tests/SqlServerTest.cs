@@ -6,13 +6,13 @@ using OKHOSTING.Sql.Filters;
 
 namespace OKHOSTING.Sql.Tests
 {
-	[TestClass]
-	public class SqlServerTest
-	{
-		public DataBase Connect()
-		{
-			return new Net4.SqlServer.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString };
-		}
+    [TestClass]
+    public class SqlServerTest
+    {
+        public DataBase Connect()
+        {
+            return new Net4.SqlServer.DataBase() { ConnectionString = System.Configuration.ConfigurationManager.ConnectionStrings["sqlserver"].ConnectionString };
+        }
 
 
         [TestMethod]
@@ -26,7 +26,7 @@ namespace OKHOSTING.Sql.Tests
             customer.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = customer });
             customer.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = customer });
             customer.Columns.Add(new Column() { Name = "Country", DbType = DbType.Int32, IsNullable = false, Table = customer });
-            
+
             Table country = new Table("country");
             country.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = country });
             country.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = country });
@@ -105,30 +105,30 @@ namespace OKHOSTING.Sql.Tests
             Table table = new Table("test1");
 
             table.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, Table = table, IsAutoNumber = true });
-			table.Columns.Add(new Column() { Name = "TextField", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
-			table.Columns.Add(new Column() { Name = "NumberField", DbType = DbType.Int32, IsNullable = false, Table = table });
-			table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = false, Table = table });
-			table.Indexes[0].Columns.Add(table["TextField"]);
+            table.Columns.Add(new Column() { Name = "TextField", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = table });
+            table.Columns.Add(new Column() { Name = "NumberField", DbType = DbType.Int32, IsNullable = false, Table = table });
+            table.Indexes.Add(new Index() { Name = "IX_TextField", Unique = false, Table = table });
+            table.Indexes[0].Columns.Add(table["TextField"]);
 
-			//create
-			var sql = generator.Create(table);
-			db.Execute(sql);
-			Assert.IsTrue(db.ExistsTable(table.Name));
+            //create
+            var sql = generator.Create(table);
+            db.Execute(sql);
+            Assert.IsTrue(db.ExistsTable(table.Name));
 
-			//add index
-			sql = generator.Create(table.Indexes[0]);
-			db.Execute(sql);
+            //add index
+            sql = generator.Create(table.Indexes[0]);
+            db.Execute(sql);
 
-			//insert
-			Insert insert = new Insert();
-			insert.Table = table;
-			//insert.Values.Add(new ColumnValue(table["Id"], 1));
-			insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
-			insert.Values.Add(new ColumnValue(table["NumberField"], 100));
+            //insert
+            Insert insert = new Insert();
+            insert.Table = table;
+            //insert.Values.Add(new ColumnValue(table["Id"], 1));
+            insert.Values.Add(new ColumnValue(table["TextField"], "test11"));
+            insert.Values.Add(new ColumnValue(table["NumberField"], 100));
 
-			sql = generator.Insert(insert);
-			int affectedRows = db.Execute(sql);
-			Assert.AreEqual(affectedRows, 1);
+            sql = generator.Insert(insert);
+            int affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
 
             //insert
             insert = new Insert();
@@ -140,38 +140,38 @@ namespace OKHOSTING.Sql.Tests
             sql = generator.Insert(insert);
             affectedRows = db.Execute(sql);
             Assert.AreEqual(affectedRows, 1);
-            
-			//select
-			Select select = new Select();
-			select.Table = table;
-			select.Columns.Add(table["id"]);
-			select.Columns.Add(table["TextField"]);
-			select.Where.Add(new ValueCompareFilter(){ Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
 
-			sql = generator.Select(select);
-			var result = db.GetDataTable(sql);            
-			Assert.AreEqual(result.Count, 1);
+            //select
+            Select select = new Select();
+            select.Table = table;
+            select.Columns.Add(table["id"]);
+            select.Columns.Add(table["TextField"]);
+            select.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
+
+            sql = generator.Select(select);
+            var result = db.GetDataTable(sql);
+            Assert.AreEqual(result.Count, 1);
 
             //update
             Update update = new Update();
             update.Table = table;
             update.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
-            
 
-			//delete
-			Delete delete = new Delete();
-			delete.Table = table;
-			delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
 
-			sql = generator.Delete(delete);
-			affectedRows = db.Execute(sql);
-			Assert.AreEqual(affectedRows, 1);
+            //delete
+            Delete delete = new Delete();
+            delete.Table = table;
+            delete.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11" });
 
-			//drop
-			sql = generator.Drop(table);
-			db.Execute(sql);
-			Assert.IsFalse(db.ExistsTable(table.Name));
-		}
+            sql = generator.Delete(delete);
+            affectedRows = db.Execute(sql);
+            Assert.AreEqual(affectedRows, 1);
+
+            //drop
+            sql = generator.Drop(table);
+            db.Execute(sql);
+            Assert.IsFalse(db.ExistsTable(table.Name));
+        }
 
         /// <summary>
         /// Create 3 tables a user whit 2 joins
@@ -309,7 +309,7 @@ namespace OKHOSTING.Sql.Tests
 
             select.Joins.Add(join2);
 
-            select.Where.Add(new ValueCompareFilter() { Column = team2["Name"], ValueToCompare = "Pumas", Operator = Data.CompareOperator.Equal });
+            select.Where.Add(new ValueCompareFilter() { Column = team["Name"], ValueToCompare = "Pumas", Operator = Data.CompareOperator.Equal });
             sql = generator.Select(select);
             var result = db.GetDataTable(sql);
 
@@ -416,13 +416,13 @@ namespace OKHOSTING.Sql.Tests
             filter.InnerFilters.Add(new ValueCompareFilter() { Column = store["id"], ValueToCompare = 1, Operator = Data.CompareOperator.Equal });
             filter.InnerFilters.Add(new ValueCompareFilter() { Column = store["id"], ValueToCompare = 2, Operator = Data.CompareOperator.Equal });
             select.Where.Add(filter);
-            
+
 
             sql = generator.Select(select);
             var result = db.GetDataTable(sql);
-<<<<<<< HEAD
-            Assert.AreEqual(result.Count, 2);                    
-        
+
+            Assert.AreEqual(result.Count, 2);
+
             //select whit like
             select = new Select();
             select.Table = store;
@@ -434,9 +434,9 @@ namespace OKHOSTING.Sql.Tests
             result = db.GetDataTable(sql);
             Assert.AreEqual(result.Count, 2);
 
-=======
+
             Assert.AreEqual(result.Count, 0);
->>>>>>> origin/master
+
 
             //select whit AndFilter
             select = new Select();
@@ -451,8 +451,8 @@ namespace OKHOSTING.Sql.Tests
             select.Where.Add(and);
 
             sql = generator.Select(select);
-            result = db.GetDataTable(sql);            
-            Assert.AreEqual(result.Count, 0);            
+            result = db.GetDataTable(sql);
+            Assert.AreEqual(result.Count, 0);
 
             //Drop table
             sql = generator.Drop(store);
@@ -460,203 +460,198 @@ namespace OKHOSTING.Sql.Tests
             Assert.IsFalse(db.ExistsTable(store.Name));
         }
 
-<<<<<<< HEAD
+
         /// <summary>
         /// Create 3 tables a user whit 1 joins
         /// </summary>
         [TestMethod]
         public void PriceadjustmentTest()
-=======
-        /*
-        [TestMethod]
-        public void CreateTable()
->>>>>>> origin/master
         {
-            DataBase db = Connect();
-            var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
-<<<<<<< HEAD
-            //Declare table application            
-            Table application = new Table("application");
-            application.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = application });
-            application.Columns.Add(new Column() { Name = "Element", DbType = DbType.Int32, IsNullable = false, Table = application });
-            application.Columns.Add(new Column() { Name = "Priceadjustment", DbType = DbType.Int32, IsNullable = false, Table = application });
+            /*
+            [TestMethod]
+            public void CreateTable()
 
-            //Declare table priceadjustment
-            Table priceadjustment = new Table("priceadjustment");
-            priceadjustment.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = priceadjustment });
-            priceadjustment.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = priceadjustment });
-            priceadjustment.Columns.Add(new Column() { Name = "Customer", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = priceadjustment });
-            priceadjustment.Columns.Add(new Column() { Name = "Amount", DbType = DbType.AnsiString, Length = 20, IsNullable = false, Table = priceadjustment });
+            {
+                DataBase db = Connect();
+                var generator = new OKHOSTING.Sql.Net4.SqlServer.SqlGenerator();
 
-            //Declare table element
-            Table element = new Table("element");
-            element.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = element });
-            element.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = element });
+                //Declare table application            
+                Table application = new Table("application");
+                application.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = application });
+                application.Columns.Add(new Column() { Name = "Element", DbType = DbType.Int32, IsNullable = false, Table = application });
+                application.Columns.Add(new Column() { Name = "Priceadjustment", DbType = DbType.Int32, IsNullable = false, Table = application });
 
-            //Declare ForeignKey FK_application_priceadjustment
-            ForeignKey priceadjustmentFK = new ForeignKey();
-            priceadjustmentFK.Table = application;
-            priceadjustmentFK.RemoteTable = priceadjustment;
-            priceadjustmentFK.Name = "FK_application_priceadjustment";
-            priceadjustmentFK.Columns.Add(new Tuple<Column, Column>(application["priceadjustment"], priceadjustment["Id"]));
-            priceadjustmentFK.DeleteAction = priceadjustmentFK.UpdateAction = ConstraintAction.Restrict;
+                //Declare table priceadjustment
+                Table priceadjustment = new Table("priceadjustment");
+                priceadjustment.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = priceadjustment });
+                priceadjustment.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = priceadjustment });
+                priceadjustment.Columns.Add(new Column() { Name = "Customer", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = priceadjustment });
+                priceadjustment.Columns.Add(new Column() { Name = "Amount", DbType = DbType.AnsiString, Length = 20, IsNullable = false, Table = priceadjustment });
 
-            //Declare ForeignKey FK_application_element
-            ForeignKey elementFK = new ForeignKey();
-            elementFK.Table = application;
-            elementFK.RemoteTable = element;
-            elementFK.Name = "FK_application_element";
-            elementFK.Columns.Add(new Tuple<Column, Column>(application["element"], element["Id"]));
-            elementFK.DeleteAction = elementFK.UpdateAction = ConstraintAction.Restrict;
+                //Declare table element
+                Table element = new Table("element");
+                element.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = element });
+                element.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = element });
 
-            //Create table application
-            Command sql = generator.Create(application);
-            db.Execute(sql);
+                //Declare ForeignKey FK_application_priceadjustment
+                ForeignKey priceadjustmentFK = new ForeignKey();
+                priceadjustmentFK.Table = application;
+                priceadjustmentFK.RemoteTable = priceadjustment;
+                priceadjustmentFK.Name = "FK_application_priceadjustment";
+                priceadjustmentFK.Columns.Add(new Tuple<Column, Column>(application["priceadjustment"], priceadjustment["Id"]));
+                priceadjustmentFK.DeleteAction = priceadjustmentFK.UpdateAction = ConstraintAction.Restrict;
 
-            //Create table priceadjustment
-            sql = generator.Create(priceadjustment);
-            db.Execute(sql);
+                //Declare ForeignKey FK_application_element
+                ForeignKey elementFK = new ForeignKey();
+                elementFK.Table = application;
+                elementFK.RemoteTable = element;
+                elementFK.Name = "FK_application_element";
+                elementFK.Columns.Add(new Tuple<Column, Column>(application["element"], element["Id"]));
+                elementFK.DeleteAction = elementFK.UpdateAction = ConstraintAction.Restrict;
 
-            //Create table element
-            sql = generator.Create(element);
-            db.Execute(sql);
+                //Create table application
+                Command sql = generator.Create(application);
+                db.Execute(sql);
 
-            //Create Foreign Key priceadjustmentFK
-            sql = generator.Create(priceadjustmentFK);
-            db.Execute(sql);
+                //Create table priceadjustment
+                sql = generator.Create(priceadjustment);
+                db.Execute(sql);
 
-            //Create Foreign Key elementFK
-            sql = generator.Create(elementFK);
-            db.Execute(sql);
+                //Create table element
+                sql = generator.Create(element);
+                db.Execute(sql);
 
-            //inserts priceadjustment
-            Insert insert = new Insert();
-            insert.Table = priceadjustment;
-            insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Afiliados"));
-            insert.Values.Add(new ColumnValue(priceadjustment["Customer"], "Raul Gomez"));
-            insert.Values.Add(new ColumnValue(priceadjustment["Amount"], "$550"));
-=======
-            //Create table store
-            Table store = new Table("store");
-            store.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = store });
-            store.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
-            store.Columns.Add(new Column() { Name = "Inventory", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
-            store.Columns.Add(new Column() { Name = "Employee", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = store });
+                //Create Foreign Key priceadjustmentFK
+                sql = generator.Create(priceadjustmentFK);
+                db.Execute(sql);
 
-            Command sql = generator.Create(store);
-            db.Execute(sql);
+                //Create Foreign Key elementFK
+                sql = generator.Create(elementFK);
+                db.Execute(sql);
 
-            //First inserts store 
-            Insert insert = new Insert();
-            insert.Table = store;
-            insert.Values.Add(new ColumnValue(store["Id"], 1));
-            insert.Values.Add(new ColumnValue(store["Name"], "Abarrotes Torrez"));
-            insert.Values.Add(new ColumnValue(store["Inventory"], "Torreon"));
-            insert.Values.Add(new ColumnValue(store["Employee"], "Juan Rocha Gomez"));
->>>>>>> origin/master
+                //inserts priceadjustment
+                Insert insert = new Insert();
+                insert.Table = priceadjustment;
+                insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Afiliados"));
+                insert.Values.Add(new ColumnValue(priceadjustment["Customer"], "Raul Gomez"));
+                insert.Values.Add(new ColumnValue(priceadjustment["Amount"], "$550"));
 
-            sql = generator.Insert(insert);
-            int affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                //Create table store
+                Table store = new Table("store");
+                store.Columns.Add(new Column() { Name = "Id", DbType = DbType.Int32, IsPrimaryKey = true, IsAutoNumber = true, Table = store });
+                store.Columns.Add(new Column() { Name = "Name", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
+                store.Columns.Add(new Column() { Name = "Inventory", DbType = DbType.AnsiString, Length = 50, IsNullable = false, Table = store });
+                store.Columns.Add(new Column() { Name = "Employee", DbType = DbType.AnsiString, Length = 100, IsNullable = false, Table = store });
 
-<<<<<<< HEAD
-            insert = new Insert();
-            insert.Table = priceadjustment;
-            insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Clientes Frecuentes"));
-            insert.Values.Add(new ColumnValue(priceadjustment["Customer"], "Juan Ramírez"));
-            insert.Values.Add(new ColumnValue(priceadjustment["Amount"], "$780"));
+                Command sql = generator.Create(store);
+                db.Execute(sql);
 
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                //First inserts store 
+                Insert insert = new Insert();
+                insert.Table = store;
+                insert.Values.Add(new ColumnValue(store["Id"], 1));
+                insert.Values.Add(new ColumnValue(store["Name"], "Abarrotes Torrez"));
+                insert.Values.Add(new ColumnValue(store["Inventory"], "Torreon"));
+                insert.Values.Add(new ColumnValue(store["Employee"], "Juan Rocha Gomez"));
 
-            //inserts element
-            insert = new Insert();
-            insert.Table = element;
-            insert.Values.Add(new ColumnValue(element["Name"], "Llanta"));
+                sql = generator.Insert(insert);
+                int affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                insert = new Insert();
+                insert.Table = priceadjustment;
+                insert.Values.Add(new ColumnValue(priceadjustment["Name"], "Clientes Frecuentes"));
+                insert.Values.Add(new ColumnValue(priceadjustment["Customer"], "Juan Ramírez"));
+                insert.Values.Add(new ColumnValue(priceadjustment["Amount"], "$780"));
 
-            insert = new Insert();
-            insert.Table = element;
-            insert.Values.Add(new ColumnValue(element["Name"], "Rin"));
+                sql = generator.Insert(insert);
+                affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                //inserts element
+                insert = new Insert();
+                insert.Table = element;
+                insert.Values.Add(new ColumnValue(element["Name"], "Llanta"));
 
-            //inserts application
-            insert = new Insert();
-            insert.Table = application;
-            insert.Values.Add(new ColumnValue(application["Element"], 1));
-            insert.Values.Add(new ColumnValue(application["Priceadjustment"], 1));
+                sql = generator.Insert(insert);
+                affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                insert = new Insert();
+                insert.Table = element;
+                insert.Values.Add(new ColumnValue(element["Name"], "Rin"));
 
-            insert = new Insert();
-            insert.Table = application;
-            insert.Values.Add(new ColumnValue(application["Element"], 2));
-            insert.Values.Add(new ColumnValue(application["Priceadjustment"], 2));
+                sql = generator.Insert(insert);
+                affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            sql = generator.Insert(insert);
-            affectedRows = db.Execute(sql);
-            Assert.AreEqual(affectedRows, 1);
+                //inserts application
+                insert = new Insert();
+                insert.Table = application;
+                insert.Values.Add(new ColumnValue(application["Element"], 1));
+                insert.Values.Add(new ColumnValue(application["Priceadjustment"], 1));
 
-            //select whit inner join
-            Select select = new Select();
-            select.Table = priceadjustment;
-            select.Columns.Add(new SelectColumn(priceadjustment["Name"]));
-            select.Columns.Add(new SelectColumn(priceadjustment["Customer"]));
-            select.Columns.Add(new SelectColumn(priceadjustment["Amount"]));
+                sql = generator.Insert(insert);
+                affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            //Create inner join to priceadjustment
-            SelectJoin join2 = new SelectJoin();
-            join2.Table = application;
-            join2.On.Add(new ColumnCompareFilter() { Column = application["Priceadjustment"], ColumnToCompare = priceadjustment["id"], Operator = Data.CompareOperator.Equal });            
-            join2.JoinType = SelectJoinType.Inner;
+                insert = new Insert();
+                insert.Table = application;
+                insert.Values.Add(new ColumnValue(application["Element"], 2));
+                insert.Values.Add(new ColumnValue(application["Priceadjustment"], 2));
 
-            select.Joins.Add(join2);
+                sql = generator.Insert(insert);
+                affectedRows = db.Execute(sql);
+                Assert.AreEqual(affectedRows, 1);
 
-            select.Where.Add(new ValueCompareFilter() { Column = application["Element"], ValueToCompare = 1, Operator = Data.CompareOperator.Equal });
-            sql = generator.Select(select);
-            var result = db.GetDataTable(sql);
+                //select whit inner join
+                Select select = new Select();
+                select.Table = priceadjustment;
+                select.Columns.Add(new SelectColumn(priceadjustment["Name"]));
+                select.Columns.Add(new SelectColumn(priceadjustment["Customer"]));
+                select.Columns.Add(new SelectColumn(priceadjustment["Amount"]));
 
-            //drop table application
-            sql = generator.Drop(application);
-            db.Execute(sql);
-            Assert.IsFalse(db.ExistsTable(application.Name));
+                //Create inner join to priceadjustment
+                SelectJoin join2 = new SelectJoin();
+                join2.Table = application;
+                join2.On.Add(new ColumnCompareFilter() { Column = application["Priceadjustment"], ColumnToCompare = priceadjustment["id"], Operator = Data.CompareOperator.Equal });            
+                join2.JoinType = SelectJoinType.Inner;
 
-            //drop table element
-            sql = generator.Drop(element);
-            db.Execute(sql);
-            Assert.IsFalse(db.ExistsTable(element.Name));
+                select.Joins.Add(join2);
 
-            //drop table priceadjustment
-            sql = generator.Drop(priceadjustment);
-            db.Execute(sql);
-            Assert.IsFalse(db.ExistsTable(priceadjustment.Name));            
+                select.Where.Add(new ValueCompareFilter() { Column = application["Element"], ValueToCompare = 1, Operator = Data.CompareOperator.Equal });
+                sql = generator.Select(select);
+                var result = db.GetDataTable(sql);
+
+                //drop table application
+                sql = generator.Drop(application);
+                db.Execute(sql);
+                Assert.IsFalse(db.ExistsTable(application.Name));
+
+                //drop table element
+                sql = generator.Drop(element);
+                db.Execute(sql);
+                Assert.IsFalse(db.ExistsTable(element.Name));
+
+                //drop table priceadjustment
+                sql = generator.Drop(priceadjustment);
+                db.Execute(sql);
+                Assert.IsFalse(db.ExistsTable(priceadjustment.Name));            
+            }
+
+                //select
+                Select select = new Select();
+                select.Table = ;
+                select.Columns.Add(table["id"]);
+                select.Columns.Add(table["TextField"]);
+                select.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
+
+                Command sql = generator.Select(select);
+                var result = db.GetDataTable(sql);            
+
+                Assert.AreEqual(result.Count, 1);*/
+            //}
         }
-
-=======
-            //select
-            Select select = new Select();
-            select.Table = ;
-            select.Columns.Add(table["id"]);
-            select.Columns.Add(table["TextField"]);
-            select.Where.Add(new ValueCompareFilter() { Column = table["TextField"], ValueToCompare = "test11", Operator = Data.CompareOperator.Equal });
-
-            Command sql = generator.Select(select);
-            var result = db.GetDataTable(sql);            
-
-            Assert.AreEqual(result.Count, 1);
-        }*/
-        
->>>>>>> origin/master
     }
-
 }
