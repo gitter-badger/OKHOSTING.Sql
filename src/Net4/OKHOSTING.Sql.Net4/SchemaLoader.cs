@@ -41,6 +41,11 @@ namespace OKHOSTING.Sql.Net4
 
 			foreach (DatabaseTable dbt in schemaReader.Tables)
 			{
+                if (dbt.PrimaryKeyColumn == null)
+                {
+                    continue;
+                }
+
 				dbt.PrimaryKeyColumn.AddIdentity();
 
 				var table = new Table()
@@ -55,8 +60,13 @@ namespace OKHOSTING.Sql.Net4
 			}
 
 			foreach (DatabaseTable dbt in schemaReader.Tables)
-			{
-				var table = schema[dbt.Name];
+            {
+                if (dbt.PrimaryKeyColumn == null)
+                {
+                    continue;
+                }
+
+                var table = schema[dbt.Name];
 
 				foreach (DatabaseColumn dbc in dbt.Columns)
 				{
