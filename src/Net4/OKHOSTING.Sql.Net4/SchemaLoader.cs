@@ -119,11 +119,7 @@ namespace OKHOSTING.Sql.Net4
                         }
                         else if (dbc.DbDataType.StartsWith("text"))
                         {
-                            column.DbType = DbType.AnsiStringFixedLength;
-                        }
-                        else if (dbc.DbDataType.StartsWith("text"))
-                        {
-                            column.DbType = DbType.AnsiStringFixedLength;
+                            column.DbType = DbType.AnsiString;
                         }
 					}
 
