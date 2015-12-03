@@ -93,7 +93,38 @@ namespace OKHOSTING.Sql.Net4
 					}
 					else
 					{
-						column.DbType = DbType.Int32; //just guessing?
+						if(dbc.DbDataType.StartsWith("varchar"))
+                        {
+                            column.DbType = DbType.AnsiString;
+                        }
+                        else if (dbc.DbDataType.StartsWith("int"))
+                        {
+                            column.DbType = DbType.Int32;
+                        }
+                        else if (dbc.DbDataType.StartsWith("decimal"))
+                        {
+                            column.DbType = DbType.Decimal;
+                        }
+                        else if (dbc.DbDataType.StartsWith("datetime"))
+                        {
+                            column.DbType = DbType.DateTime;
+                        }
+                        else if (dbc.DbDataType.StartsWith("money"))
+                        {
+                            column.DbType = DbType.Currency;
+                        }
+                        else if (dbc.DbDataType.StartsWith("char"))
+                        {
+                            column.DbType = DbType.AnsiStringFixedLength;
+                        }
+                        else if (dbc.DbDataType.StartsWith("text"))
+                        {
+                            column.DbType = DbType.AnsiStringFixedLength;
+                        }
+                        else if (dbc.DbDataType.StartsWith("text"))
+                        {
+                            column.DbType = DbType.AnsiStringFixedLength;
+                        }
 					}
 
 					table.Columns.Add(column);

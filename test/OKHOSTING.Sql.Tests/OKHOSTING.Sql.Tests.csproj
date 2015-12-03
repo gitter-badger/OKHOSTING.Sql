@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{2B62C05E-CDDB-4052-AC36-003AA9F751FA}</ProjectGuid>
+    <ProjectGuid>{E86AE8F8-E836-4D07-AD59-F25BB380E5D3}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OKHOSTING.Sql.Tests</RootNamespace>
