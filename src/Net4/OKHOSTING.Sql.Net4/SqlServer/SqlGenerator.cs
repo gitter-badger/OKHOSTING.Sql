@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using OKHOSTING.Sql.Operations;
 using OKHOSTING.Sql.Schema;
+using OKHOSTING.Data;
+using OKHOSTING.Sql.Filters;
 
 namespace OKHOSTING.Sql.Net4.SqlServer
 {
@@ -235,5 +238,57 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			return string.Format("IDENT_CURRENT({0})", EncloseName(table.Name));
 		}
+
+        public override Command Select(Select select)
+        {
+            //Validating if the table argument is null
+            if (select == null) throw new ArgumentNullException("select");
+
+            if (select is SelectAggregate)
+            {
+                return Select((SelectAggregate)select);
+            }
+
+            //fix column filters tables names, if they come from a join, we should use the join alias if it exist
+            foreach (ColumnFilter filter in select.Where.Where(f => f is ColumnFilter))
+            {
+                //this filter is using a join table's column, so we need to the join's table alias
+                if (filter.Column.Table != select.Table)
+                {
+                    foreach (SelectJoin join in select.Joins)
+                    {
+                        //this filter is unsong this join's table, so we assign it the table alias from the join
+                        if (filter.Column.Table == join.Table && !string.IsNullOrWhiteSpace(join.Alias) && join.Table.Name != join.Alias)
+                        {
+                            filter.TableAlias = join.Alias;
+                        }
+                    }
+                }
+            }
+
+            //Creating Select sentence
+            Command command = SelectClause(select);
+
+            if (select.Limit != null && select.Limit.Count > 0)
+            {
+                command.Script = command.Script.Replace("SELECT", "SELECT " + LimitClause(select.Limit).Script);
+            }
+
+            command.Append(FromClause(select));
+            command.Append(WhereClause(select.Where, LogicalOperator.And));
+            command.Append(OrderByClause(select.OrderBy));
+            command.Script += ScriptSeparator;
+
+            //Returning the sql sentence
+            return command;
+        }
+
+        protected override Command LimitClause(SelectLimit limit)
+        {
+            //Validating arguments
+            if (limit == null) return null;
+
+            return "TOP " + limit.Count;
+        }
 	}
 }
