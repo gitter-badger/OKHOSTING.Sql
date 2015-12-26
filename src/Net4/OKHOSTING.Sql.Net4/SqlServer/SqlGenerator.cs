@@ -28,7 +28,7 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 		{
 			get
 			{				
-                return " ";
+				return " ";
 			}
 		}
 

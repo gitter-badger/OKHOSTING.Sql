@@ -18,10 +18,10 @@ namespace OKHOSTING.Sql
 		public virtual string Name { get; set; }
 
 		public virtual Schema.DataBaseSchema Schema 
-        { 
-            get; 
-            protected set; 
-        }
+		{ 
+			get; 
+			protected set; 
+		}
 
 		[RequiredValidator]
 		[StringLengthValidator(250)]

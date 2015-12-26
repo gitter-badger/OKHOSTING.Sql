@@ -8,7 +8,6 @@
 *.sln.docstates
 [Aa]pp.config
 [Ww]eb.config
-*.config
 
 # Build results
 [Dd]ebug/
