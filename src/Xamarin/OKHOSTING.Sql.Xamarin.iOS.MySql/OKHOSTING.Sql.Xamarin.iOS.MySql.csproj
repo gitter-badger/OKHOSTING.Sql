@@ -3,17 +3,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ProjectGuid>{E28CD018-1CA6-4237-A6B2-8C35F2F3ED7B}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectGuid>{66E6C15D-229D-40D7-9248-BA54AD8B14C7}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>OKHOSTING.Sql.Xamarin.Android.MySql</RootNamespace>
-    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-    <AndroidResgenClass>Resource</AndroidResgenClass>
-    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-    <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
-    <AssemblyName>OKHOSTING.Sql.Xamarin.Android.MySql</AssemblyName>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <RootNamespace>OKHOSTING.Sql.Xamarin.iOS.MySql</RootNamespace>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <AssemblyName>OKHOSTING.Sql.Xamarin.iOS.MySql</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,7 +19,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -33,40 +27,29 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
-    <Reference Include="Mono.Android" />
+    <Reference Include="Xamarin.iOS" />
     <Reference Include="MySql.Data.CF">
-      <HintPath>..\..\..\..\OKHOSTING.Files\src\Components\MySQL-Plugin-1.0\lib\android\MySql.Data.CF.dll</HintPath>
+      <HintPath>..\..\..\..\OKHOSTING.Files\src\Components\MySQL-Plugin-1.0\lib\ios-unified\MySql.Data.CF.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Resources\Resource.designer.cs" />
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataBase.cs" />
     <Compile Include="DataReader.cs" />
     <Compile Include="DataTable.cs" />
     <Compile Include="DataTableRow.cs" />
   </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <ItemGroup>
-    <None Include="Resources\AboutResources.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <AndroidResource Include="Resources\values\Strings.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
-      <Project>{3F4502FA-51EA-4CB9-8E50-46F828D240A1}</Project>
-      <Name>OKHOSTING.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
-      <Project>{5BA0CBAC-63E5-4E01-AECA-67AE3B63503B}</Project>
-      <Name>OKHOSTING.Data</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\PCL\OKHOSTING.Sql\OKHOSTING.Sql.csproj">
       <Project>{AFC2147B-EAD8-439B-8CA6-D1BF308064B3}</Project>
       <Name>OKHOSTING.Sql</Name>
@@ -75,8 +58,15 @@
       <Project>{35ED0AC8-2240-4095-B7CB-60622E515A9C}</Project>
       <Name>OKHOSTING.Sql.MySql</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Data\OKHOSTING.Data.csproj">
+      <Project>{5BA0CBAC-63E5-4E01-AECA-67AE3B63503B}</Project>
+      <Name>OKHOSTING.Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\OKHOSTING.Core\src\PCL\OKHOSTING.Core\OKHOSTING.Core.csproj">
+      <Project>{3F4502FA-51EA-4CB9-8E50-46F828D240A1}</Project>
+      <Name>OKHOSTING.Core</Name>
+    </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
   <ItemGroup>
     <XamarinComponentReference Include="MySQL-Plugin">
       <Version>1.0</Version>
