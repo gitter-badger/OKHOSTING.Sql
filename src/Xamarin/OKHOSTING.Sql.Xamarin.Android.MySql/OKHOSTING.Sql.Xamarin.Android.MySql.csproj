@@ -44,6 +44,8 @@
       <HintPath>..\..\..\..\OKHOSTING.Files\src\Components\MySQL-Plugin-1.0\lib\android\MySql.Data.CF.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
+    <Reference Include="I18N.West" />
+    <Reference Include="I18N" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Resources\Resource.designer.cs" />

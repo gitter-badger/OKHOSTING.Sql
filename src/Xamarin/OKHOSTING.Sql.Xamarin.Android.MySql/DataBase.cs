@@ -10,6 +10,9 @@ namespace OKHOSTING.Sql.Xamarin.Android.MySql
 		public DataBase ()
 		{
 			Connection = new MySqlPCL.MySqlConnection();
+
+			//needed by mysql component
+			new I18N.West.CP1252();
 		}
 
 		#region Fields and Properties
@@ -415,6 +418,7 @@ namespace OKHOSTING.Sql.Xamarin.Android.MySql
 		{
 			if (Connection.State != ConnectionState.Open)
 			{
+				Connection.ConnectionString = ConnectionString;
 				Connection.Open();
 			}
 		}
