@@ -53,7 +53,7 @@ namespace OKHOSTING.Sql.SQLite
 			set
 			{
 				//NativeTable.TableName = value;
-            }
+			}
 		}
 
 		public IEnumerable<DataColumn> Schema

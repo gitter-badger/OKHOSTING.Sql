@@ -206,8 +206,8 @@ namespace OKHOSTING.Sql.Net4.SqlServer
 			DbTypeMap.Add(DbType.StringFixedLength, SqlDbType.Text);
 			DbTypeMap.Add(DbType.Time, SqlDbType.Time);
 			DbTypeMap.Add(DbType.UInt16, SqlDbType.Int);
-            DbTypeMap.Add(DbType.UInt32, SqlDbType.BigInt);
-            DbTypeMap.Add(DbType.UInt64, SqlDbType.BigInt);
+			DbTypeMap.Add(DbType.UInt32, SqlDbType.BigInt);
+			DbTypeMap.Add(DbType.UInt64, SqlDbType.BigInt);
 			DbTypeMap.Add(DbType.VarNumeric, SqlDbType.Int);
 			DbTypeMap.Add(DbType.Xml, SqlDbType.Text);
 

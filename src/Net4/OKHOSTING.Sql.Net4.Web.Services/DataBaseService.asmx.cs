@@ -30,7 +30,7 @@ namespace OKHOSTING.Sql.Net4.Web.Services
 			IDataTable table = DataBase.GetDataTable(command);
 			SelectResult result = new SelectResult();
 			int columnCount = table.Schema.Count();
-            result.ColumnNames = new string[columnCount];
+			result.ColumnNames = new string[columnCount];
 			result.ColumnTypes = new string[columnCount];
 
 			for (int row = 0; row < table.Count; row++)
@@ -44,6 +44,6 @@ namespace OKHOSTING.Sql.Net4.Web.Services
 			}
 
 			return result;
-        }
+		}
 	}
 }

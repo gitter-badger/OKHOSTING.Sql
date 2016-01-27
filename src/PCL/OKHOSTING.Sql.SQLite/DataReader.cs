@@ -50,7 +50,7 @@ namespace OKHOSTING.Sql.SQLite
 		{
 			get
 			{
-                return CurrentResult.Count;
+				return CurrentResult.Count;
 			}
 		}
 
@@ -106,7 +106,7 @@ namespace OKHOSTING.Sql.SQLite
 		{
 			var column = CurrentResult.Columns().Where(c=> c.Name == name).Single();
 			return CurrentResult.Columns().ToList().IndexOf(column);
-        }
+		}
 
 		public bool IsNull(int ordinal)
 		{

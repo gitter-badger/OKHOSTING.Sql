@@ -11,7 +11,7 @@ namespace OKHOSTING.Sql.SQLite
 		public readonly DataTable Container;
 		public readonly IReadOnlyList<IResultSetValue> NativeRow;
 
-        public DataTableRow(DataTable container, IReadOnlyList<IResultSetValue> nativeRow)
+		public DataTableRow(DataTable container, IReadOnlyList<IResultSetValue> nativeRow)
 		{
 			if (container == null)
 			{

@@ -52,7 +52,7 @@ namespace OKHOSTING.Sql.Xamarin.Android.MySql
 			set
 			{
 				NativeTable.TableName = value;
-            }
+			}
 		}
 
 		public IEnumerable<DataColumn> Schema
