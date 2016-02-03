@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using OKHOSTING.Sql.Schema;
 
-namespace OKHOSTING.Sql.Xamarin.Android.MySql
+namespace OKHOSTING.Sql.Xamarin.iOS.MySql
 {
 	public class DataTable : IDataTable
 	{

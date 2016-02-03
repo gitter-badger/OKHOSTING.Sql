@@ -495,11 +495,7 @@ namespace OKHOSTING.Sql
 			//Building the final order definition
 			foreach (var ob in orderBy)
 			{
-				orderString +=
-					EncloseName(ob.Column.Name) +
-					" " +
-					Format(ob.Direction) +
-					", ";
+				orderString += EncloseName(ob.Column.Table.Name) + '.' + EncloseName(ob.Column.Name) + ' ' + Format(ob.Direction) + ", ";
 			}
 
 			//Returning the order by

@@ -12,7 +12,7 @@ namespace OKHOSTING.Sql
 		{
 		}
 
-        public DataColumn(string name, DbType columnType)
+		public DataColumn(string name, DbType columnType)
 		{
 			if (name == null)
 			{

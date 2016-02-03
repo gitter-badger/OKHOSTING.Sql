@@ -3,7 +3,7 @@ using System.Data;
 using System.Collections.Generic;
 using MySqlPCL = global::MySql.Data.MySqlClient;
 
-namespace OKHOSTING.Sql.Xamarin.Android.MySql
+namespace OKHOSTING.Sql.Xamarin.iOS.MySql
 {
 	public class DataBase: Sql.DataBase
 	{
