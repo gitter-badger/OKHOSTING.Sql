@@ -110,4 +110,5 @@ Assert.AreEqual(result.Count, 1);
 //this way you can just read the existing tables from DB and then perform Insert, Select, Update or Delete operations
 //on the tables without the need to manually creating schema like in the previous sample
 var schema = db.Schema;
+vat customerTable = schema["cuctomer"];
 ```
