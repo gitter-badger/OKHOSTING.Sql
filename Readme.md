@@ -2,6 +2,8 @@ Data acces library with a focus on portability, SQL generation and schema manage
 
 # Features for Windows, Linux, Android and iOS via PCL
 
+[![Join the chat at https://gitter.im/okhosting/OKHOSTING.Sql](https://badges.gitter.im/okhosting/OKHOSTING.Sql.svg)](https://gitter.im/okhosting/OKHOSTING.Sql?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 * Manage your database schema, create or drop tables, columns, indexes, and foreign keys
 * Generate and execute Insert, Select, Delete, Update, Create & Drop operations, without writing SQL code yourself
 * Select operation is capable of using joins, aggregation, group by, sort, limit, pretty much everything
